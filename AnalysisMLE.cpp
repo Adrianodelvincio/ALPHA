@@ -56,7 +56,7 @@ RooHistPdf PdfUwlosses("uwlossespdf", "uwlossespdf", x, Uw_h, 0);
 Uw_h.plotOn(frame2);
 PdfUwlosses.plotOn(frame2);
 
-// FIT THE DATA WITH A RAYLEIGH FUNCTION
+// FIT THE DATA WITH A RAYLEIGH
 
 RooRealVar sigRay("sigRay", "sigma", 0.,100);
 
@@ -90,8 +90,8 @@ PdfBk.plotOn(frame3);
 
 RooRealVar m("m", "m", 0,1000000);
 //RooRealVar q("q", "q",0.25, 0.25 - 200);
-RooGenericPdf line("line", "linear model", "(0.125)*x", RooArgSet(x));
-RooAddPdf line_pdf("model","model", RooArgList{line}, RooArgList{m} );
+RooGenericPdf linearFit("linearFit", "linear model", "(0.125)*x", RooArgSet(x));
+RooAddPdf line_pdf("modell","modell", RooArgList{linearFit}, RooArgList{m} );
 line_pdf.fitTo(cosm_h);
 line_pdf.paramOn(frame3);
 line_pdf.plotOn(frame3, LineColor(kRed));
@@ -166,7 +166,6 @@ std::cout << "chi^2 = " << frame4->chiSquare() << std::endl;
 frame4->Draw();
 
 // FIT WITH COSMIC FIXED
-
 RooRealVar Nmix_f("Nmix", "Nmix", 0., 200);
 RooRealVar Nuw_f("Nuw", "Nuw", -100, 100);
 RooRealVar Nbk_f("Nbk", "Nbk", 10,10);
@@ -204,4 +203,20 @@ auto canvas7 = new TCanvas("d7"," Only Mix", 800, 800);
 // Calculate the Chisquare
 std::cout << "chi^2 only mix = " << frame6->chiSquare() << std::endl;
 frame6->Draw();
+
+// FIT WITH THE ANALYTIC FORMULA
+
+RooRealVar Nmix_t("Nmix","Nmix",0,200.);
+RooRealVar Nuw_a("Nuw","Nuw", -100, 100);
+RooRealVar Nbk_a("Nbk", "Nbk",-100,100);
+RooPlot *analyticframe = x.frame(Title("Analitic Fit"));
+RooAddPdf model_analytic("model", "model", RooArgList{PdfMixing,Rayleigh,linearFit}, RooArgList{Nmix,Nuw_a,Nbk_a});
+model_analytic.fitTo(f4_h);
+f4_h.plotOn(analyticframe);
+model_analytic.plotOn(analyticframe, LineColor(28));
+model_analytic.paramOn(analyticframe);
+
+auto canvas8 = new TCanvas("d8","d8",800,800);
+analyticframe->Draw();
+
 }
