@@ -47,11 +47,23 @@ ROOT::RDataFrame uw_rdf("myTree",{"DataSetROOT/r68814_uwlosses_160.vertex.root",
 auto uw2_rdf = uw_rdf.Define("Radius", "TMath::Sqrt(X*X + Y*Y)").Filter("CutsType1 ==  \" 1\"");
 auto histUw = uw2_rdf.Histo1D({"UWlosses","Counts",30u,0.,4.}, "Radius");
 
+
 RooDataHist Uw_h("dh1", "dh1", x, Import(*histUw));
 RooPlot *frame2 = x.frame(Title("UW losses PDF"));
+
+// EXTRACT THE PDF FROM THE HISTOGRAM
 RooHistPdf PdfUwlosses("uwlossespdf", "uwlossespdf", x, Uw_h, 0);
 Uw_h.plotOn(frame2);
 PdfUwlosses.plotOn(frame2);
+
+// FIT THE DATA WITH A RAYLEIGH FUNCTION
+
+RooRealVar sigRay("sigRay", "sigma", 0.,100);
+
+RooGenericPdf Rayleigh("line", "linear model", " x/(sigRay*sigRay) * TMath::Exp(-(x*x)/(2*sigRay*sigRay))", RooArgSet(x,sigRay));
+Rayleigh.fitTo(Uw_h); // FIT
+Rayleigh.paramOn(frame2);
+Rayleigh.plotOn(frame2, LineColor(kRed));
 
 auto canvas1 = new TCanvas("d1", "d1",800,800);
 frame2->Draw();
@@ -68,12 +80,45 @@ auto histCosmic = cosmic2_rdf.Histo1D({"Cosmic","Counts",30u,0.,4.}, "Radius");
 
 RooDataHist cosm_h("dh2", "dh2", x, Import(*histCosmic));
 RooPlot *frame3 = x.frame(Title("Cosmic PDF"));
+
+//EXTRACT THE PDF FROM THE PLOT
 RooHistPdf PdfBk("Cosmic", "cosmic", x, cosm_h, 0);
 cosm_h.plotOn(frame3);
 PdfBk.plotOn(frame3);
 
+// FIT THE PDF WITH A LINE
+
+RooRealVar m("m", "m", 0,1000000);
+//RooRealVar q("q", "q",0.25, 0.25 - 200);
+RooGenericPdf line("line", "linear model", "(0.125)*x", RooArgSet(x));
+RooAddPdf line_pdf("model","model", RooArgList{line}, RooArgList{m} );
+line_pdf.fitTo(cosm_h);
+line_pdf.paramOn(frame3);
+line_pdf.plotOn(frame3, LineColor(kRed));
+
 auto canvas3 = new TCanvas("d2","d2",800,800);
 frame3->Draw();
+
+
+// PRINT ALL THE PDF TOGHETHER IN THE SAME CANVAS
+
+auto canvasPdf = new TCanvas("p0", "PDF normalized", 800, 800);
+RooPlot *allpdf = x.frame(Title("All Pdf"));
+
+PdfBk.plotOn(allpdf, LineColor(kBlue), Name("Cosmic"));
+PdfMixing.plotOn(allpdf, LineColor(kRed), Name("Mixing"));
+PdfUwlosses.plotOn(allpdf, LineColor(kGreen), Name("Uw"));
+
+// Aggiungo una legenda al plot
+TLegend *leg1 = new TLegend(0.65,0.73,0.86,0.87);
+leg1->SetFillColor(kWhite);
+leg1->SetLineColor(kWhite);
+leg1->AddEntry(allpdf->findObject("Cosmic"), "Cosmic Cemplate", "LP");
+leg1->AddEntry(allpdf->findObject("Mixing"), "Mixing Template", "LP");
+leg1->AddEntry(allpdf->findObject("Uw"), "Uw Template","LP");
+allpdf->Draw();
+leg1->Draw();
+
 
 // DATA TO FIT
 auto f4_rdf = ROOT::RDF::MakeCsvDataFrame("Spectroscopy/Dataset/r68465_uw_exp_freq4.vertex.csv");
@@ -102,11 +147,11 @@ frameG->Draw();
 
 // Fit with the sum of all distributions
 RooRealVar Nmix("Nmix", "Nmix", 0., 200);
-RooRealVar Nuw("Nuw", "Nuw", 0., 200);
-RooRealVar Nbk("Nbk", "Nbk", 0., 200);
+RooRealVar Nuw("Nuw", "Nuw", -100, 200);
+RooRealVar Nbk("Nbk", "Nbk", -100, 200);
 RooPlot *frame4 = x.frame(Title("Fit to f4 Dataset"));
 RooAddPdf model("model","model", RooArgList{PdfMixing,PdfUwlosses,PdfBk}, RooArgList{Nmix, Nuw, Nbk} );
-model.fitTo(f4_h, Extended());
+model.fitTo(f4_h, Extended(),PrintLevel(-1));
 f4_h.plotOn(frame4);
 model.plotOn(frame4, LineColor(kRed));
 
@@ -123,11 +168,11 @@ frame4->Draw();
 // FIT WITH COSMIC FIXED
 
 RooRealVar Nmix_f("Nmix", "Nmix", 0., 200);
-RooRealVar Nuw_f("Nuw", "Nuw", 0., 200);
-RooRealVar Nbk_f("Nbk", "Nbk", 10);
+RooRealVar Nuw_f("Nuw", "Nuw", -100, 100);
+RooRealVar Nbk_f("Nbk", "Nbk", 10,10);
 RooPlot *frame5 = x.frame(Title("Fit, Cosmic Fixed"));
 RooAddPdf model_bkfixed("model","model", RooArgList{PdfMixing,PdfUwlosses,PdfBk}, RooArgList{Nmix_f, Nuw_f, Nbk_f} );
-model_bkfixed.fitTo(f4_h,PrintLevel(-1));
+model_bkfixed.fitTo(f4_h); // FIT
 f4_h.plotOn(frame5);
 model_bkfixed.plotOn(frame5, LineColor(kBlue));
 
@@ -142,8 +187,6 @@ std::cout << "chi^2 bk fixed = " << frame5->chiSquare() << std::endl;
 frame5->Draw();
 
 // FIT WITH ONLY MIXING + COSMIC(FIXED)
-
-// FIT WITH COSMIC FIXED
 
 RooRealVar Nmix_f2("Nmix", "Nmix", 0., 200);
 RooPlot *frame6 = x.frame(Title("Fit, MIxing only"));
@@ -161,8 +204,4 @@ auto canvas7 = new TCanvas("d7"," Only Mix", 800, 800);
 // Calculate the Chisquare
 std::cout << "chi^2 only mix = " << frame6->chiSquare() << std::endl;
 frame6->Draw();
-
-
-
-
 }
