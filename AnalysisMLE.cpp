@@ -100,14 +100,15 @@ gauss.paramOn(frameG);
 auto canvas5 = new TCanvas("d5", "d5",800,800);
 frameG->Draw();
 
+// Fit with the sum of all distributions
 RooRealVar Nmix("Nmix", "Nmix", 0., 200);
 RooRealVar Nuw("Nuw", "Nuw", 0., 200);
 RooRealVar Nbk("Nbk", "Nbk", 0., 200);
 RooPlot *frame4 = x.frame(Title("Fit to f4 Dataset"));
 RooAddPdf model("model","model", RooArgList{PdfMixing,PdfUwlosses,PdfBk}, RooArgList{Nmix, Nuw, Nbk} );
-model.fitTo(f4_h,PrintLevel(-1));
+model.fitTo(f4_h, Extended());
 f4_h.plotOn(frame4);
-model.plotOn(frame4);
+model.plotOn(frame4, LineColor(kRed));
 
 // Print the chisquare on the plot
 Double_t chi2 = frame4->chiSquare();
@@ -117,6 +118,51 @@ model.paramOn(frame4, Label(chis2Line));
 auto canvas4 = new TCanvas("d4","d4", 800, 800);
 // Calculate the Chisquare
 std::cout << "chi^2 = " << frame4->chiSquare() << std::endl;
-
 frame4->Draw();
+
+// FIT WITH COSMIC FIXED
+
+RooRealVar Nmix_f("Nmix", "Nmix", 0., 200);
+RooRealVar Nuw_f("Nuw", "Nuw", 0., 200);
+RooRealVar Nbk_f("Nbk", "Nbk", 10);
+RooPlot *frame5 = x.frame(Title("Fit, Cosmic Fixed"));
+RooAddPdf model_bkfixed("model","model", RooArgList{PdfMixing,PdfUwlosses,PdfBk}, RooArgList{Nmix_f, Nuw_f, Nbk_f} );
+model_bkfixed.fitTo(f4_h,PrintLevel(-1));
+f4_h.plotOn(frame5);
+model_bkfixed.plotOn(frame5, LineColor(kBlue));
+
+// Print the chisquare on the plot
+Double_t chi2_bkfixed = frame5->chiSquare();
+TString chis2Line_fixed = TString::Format("Chisquare = %f ", chi2_bkfixed);
+model_bkfixed.paramOn(frame5, Label(chis2Line_fixed));
+
+auto canvas6 = new TCanvas("d6"," Cosmic Fixed", 800, 800);
+// Calculate the Chisquare
+std::cout << "chi^2 bk fixed = " << frame5->chiSquare() << std::endl;
+frame5->Draw();
+
+// FIT WITH ONLY MIXING + COSMIC(FIXED)
+
+// FIT WITH COSMIC FIXED
+
+RooRealVar Nmix_f2("Nmix", "Nmix", 0., 200);
+RooPlot *frame6 = x.frame(Title("Fit, MIxing only"));
+RooAddPdf model_onlyMix("model","model", RooArgList{PdfMixing,PdfBk}, RooArgList{Nmix_f2, Nbk_f} );
+model_onlyMix.fitTo(f4_h,PrintLevel(-1));
+f4_h.plotOn(frame6);
+model_onlyMix.plotOn(frame6, LineColor(kGreen));
+
+// Print the chisquare on the plot
+Double_t chi2_onlyMix = frame6->chiSquare();
+TString chis2Line_onlyMix = TString::Format("Chisquare = %f ", chi2_onlyMix);
+model_onlyMix.paramOn(frame6, Label(chis2Line_onlyMix));
+
+auto canvas7 = new TCanvas("d7"," Only Mix", 800, 800);
+// Calculate the Chisquare
+std::cout << "chi^2 only mix = " << frame6->chiSquare() << std::endl;
+frame6->Draw();
+
+
+
+
 }
