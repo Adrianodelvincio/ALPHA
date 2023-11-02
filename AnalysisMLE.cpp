@@ -108,6 +108,15 @@ RooAddPdf model("model","model", RooArgList{PdfMixing,PdfUwlosses,PdfBk}, RooArg
 model.fitTo(f4_h,PrintLevel(-1));
 f4_h.plotOn(frame4);
 model.plotOn(frame4);
+
+// Print the chisquare on the plot
+Double_t chi2 = frame4->chiSquare();
+TString chis2Line = TString::Format("Chisquare = %f ", chi2);
+model.paramOn(frame4, Label(chis2Line));
+
 auto canvas4 = new TCanvas("d4","d4", 800, 800);
+// Calculate the Chisquare
+std::cout << "chi^2 = " << frame4->chiSquare() << std::endl;
+
 frame4->Draw();
 }
