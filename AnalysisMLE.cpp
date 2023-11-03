@@ -20,6 +20,7 @@ ROOT::RDataFrame mix_rdf("myTree", {"DataSetROOT/r68814_mixing.vertex.root",
 
 auto mix2_rdf = mix_rdf.Define("Radius", "TMath::Sqrt(X*X + Y*Y)").Filter("CutsType1 ==  \" 1\"");
 auto histMix = mix2_rdf.Histo1D({"Mixing","Counts",30u,0.,4.}, "Radius");
+mix2_rdf.Snapshot("myTree", "Spectroscopy/RootCut1Data/MixCut1.root", {"X","Y","Radius"});
 
 RooRealVar x("x", "x", 0, 4);
 x.setBins(30);
@@ -46,7 +47,7 @@ ROOT::RDataFrame uw_rdf("myTree",{"DataSetROOT/r68814_uwlosses_160.vertex.root",
 
 auto uw2_rdf = uw_rdf.Define("Radius", "TMath::Sqrt(X*X + Y*Y)").Filter("CutsType1 ==  \" 1\"");
 auto histUw = uw2_rdf.Histo1D({"UWlosses","Counts",30u,0.,4.}, "Radius");
-
+uw2_rdf.Snapshot("myTree", "Spectroscopy/RootCut1Data/UWCut1.root", {"X","Y","Radius"});
 
 RooDataHist Uw_h("dh1", "dh1", x, Import(*histUw));
 RooPlot *frame2 = x.frame(Title("UW losses PDF"));
@@ -77,6 +78,7 @@ ROOT::RDataFrame cosmic_rdf("myTree",{"DataSetROOT/r68949_cosmics.vertex.root",
 
 auto cosmic2_rdf = cosmic_rdf.Define("Radius", "TMath::Sqrt(X*X + Y*Y)").Filter("CutsType1 ==  \" 1\"");
 auto histCosmic = cosmic2_rdf.Histo1D({"Cosmic","Counts",30u,0.,4.}, "Radius");
+cosmic2_rdf.Snapshot("myTree", "Spectroscopy/RootCut1Data/CosmicCut1.root", {"X","Y","Radius"});
 
 RooDataHist cosm_h("dh2", "dh2", x, Import(*histCosmic));
 RooPlot *frame3 = x.frame(Title("Cosmic PDF"));
@@ -206,8 +208,8 @@ frame6->Draw();
 
 // FIT WITH THE ANALYTIC FORMULA
 
-RooRealVar Nmix_t("Nmix","Nmix",0,200.);
-RooRealVar Nuw_a("Nuw","Nuw", -100, 100);
+RooRealVar Nmix_t("Nmix","Nmix",0.,200.);
+RooRealVar Nuw_a("Nuw","Nuw", -100,100);
 RooRealVar Nbk_a("Nbk", "Nbk",-100,100);
 RooPlot *analyticframe = x.frame(Title("Analitic Fit"));
 RooAddPdf model_analytic("model", "model", RooArgList{PdfMixing,Rayleigh,linearFit}, RooArgList{Nmix,Nuw_a,Nbk_a});
@@ -218,5 +220,4 @@ model_analytic.paramOn(analyticframe);
 
 auto canvas8 = new TCanvas("d8","d8",800,800);
 analyticframe->Draw();
-
 }
