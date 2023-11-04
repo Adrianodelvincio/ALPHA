@@ -59,16 +59,21 @@ PdfUwlosses.plotOn(frame2);
 
 // FIT THE DATA WITH A RAYLEIGH
 
-RooRealVar sigRay("sigRay", "sigma", 0.,100);
+RooRealVar sigRay("sigRay", "sigma", 1.722,1.722);
 
-RooGenericPdf Rayleigh("line", "linear model", " x/(sigRay*sigRay) * TMath::Exp(-(x*x)/(2*sigRay*sigRay))", RooArgSet(x,sigRay));
+RooGenericPdf Rayleigh("line", "linear model", " TMath::Abs(x/(sigRay*sigRay) * TMath::Exp(-(x*x)/(2*sigRay*sigRay)))", RooArgSet(x,sigRay));
+//RUN THE FIRST TIME FOR THE PARAMETERS OF THE RAYLEIGH
+/*
 Rayleigh.fitTo(Uw_h); // FIT
-Rayleigh.paramOn(frame2);
 Rayleigh.plotOn(frame2, LineColor(kRed));
+Double_t chi2ray = frame2->chiSquare();
+std::cout << "chi square rayleigh: " << frame2->chiSquare() << std::endl; 
+TString chis2ray = TString::Format("Chisquare = %f ", chi2ray);
+Rayleigh.paramOn(frame2,Label(chis2ray));
 
 auto canvas1 = new TCanvas("d1", "d1",800,800);
 frame2->Draw();
-
+*/
 //COSMIC
 
 ROOT::RDataFrame cosmic_rdf("myTree",{"DataSetROOT/r68949_cosmics.vertex.root",
@@ -92,9 +97,9 @@ PdfBk.plotOn(frame3);
 
 RooRealVar m("m", "m", 0,1000000);
 //RooRealVar q("q", "q",0.25, 0.25 - 200);
-RooGenericPdf linearFit("linearFit", "linear model", "(0.125)*x", RooArgSet(x));
+RooGenericPdf linearFit("linearFit", "linear model", "TMath::Abs((0.125)*x)", RooArgSet(x));
 RooAddPdf line_pdf("modell","modell", RooArgList{linearFit}, RooArgList{m} );
-line_pdf.fitTo(cosm_h);
+line_pdf.fitTo(cosm_h, PrintLevel(-1));
 line_pdf.paramOn(frame3);
 line_pdf.plotOn(frame3, LineColor(kRed));
 
@@ -173,7 +178,7 @@ RooRealVar Nuw_f("Nuw", "Nuw", -100, 100);
 RooRealVar Nbk_f("Nbk", "Nbk", 10,10);
 RooPlot *frame5 = x.frame(Title("Fit, Cosmic Fixed"));
 RooAddPdf model_bkfixed("model","model", RooArgList{PdfMixing,PdfUwlosses,PdfBk}, RooArgList{Nmix_f, Nuw_f, Nbk_f} );
-model_bkfixed.fitTo(f4_h); // FIT
+model_bkfixed.fitTo(f4_h,PrintLevel(-1)); // FIT
 f4_h.plotOn(frame5);
 model_bkfixed.plotOn(frame5, LineColor(kBlue));
 
@@ -192,7 +197,7 @@ frame5->Draw();
 RooRealVar Nmix_f2("Nmix", "Nmix", 0., 200);
 RooPlot *frame6 = x.frame(Title("Fit, MIxing only"));
 RooAddPdf model_onlyMix("model","model", RooArgList{PdfMixing,PdfBk}, RooArgList{Nmix_f2, Nbk_f} );
-model_onlyMix.fitTo(f4_h,PrintLevel(-1));
+model_onlyMix.fitTo(f4_h,PrintLevel(-1)); // FIT
 f4_h.plotOn(frame6);
 model_onlyMix.plotOn(frame6, LineColor(kGreen));
 
@@ -208,12 +213,17 @@ frame6->Draw();
 
 // FIT WITH THE ANALYTIC FORMULA
 
+//FOR MIXING USE A GAUSSIAN
+RooRealVar mu("mu", "mu", 2.38,2.38);
+RooRealVar sigMix("sigMix", "sigMix",0.85,0.85);
+RooGaussian gauss_Mix("gauss", "gauss", x, mu, sigMix);
+
 RooRealVar Nmix_t("Nmix","Nmix",0.,200.);
 RooRealVar Nuw_a("Nuw","Nuw", -100,100);
-RooRealVar Nbk_a("Nbk", "Nbk",-100,100);
+RooRealVar Nbk_a("Nbk", "Nbk",10.2,10.2);
 RooPlot *analyticframe = x.frame(Title("Analitic Fit"));
-RooAddPdf model_analytic("model", "model", RooArgList{PdfMixing,Rayleigh,linearFit}, RooArgList{Nmix,Nuw_a,Nbk_a});
-model_analytic.fitTo(f4_h);
+RooAddPdf model_analytic("model", "model", RooArgList{/*PdfMixing*/ gauss_Mix,Rayleigh,linearFit}, RooArgList{Nmix,Nuw_a,Nbk_a});
+model_analytic.fitTo(f4_h, PrintLevel(-1));
 f4_h.plotOn(analyticframe);
 model_analytic.plotOn(analyticframe, LineColor(28));
 model_analytic.paramOn(analyticframe);
