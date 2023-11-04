@@ -7,8 +7,8 @@ using namespace RooFit;
 
 void MonteCarloForFit(){
 
-double a = 75, b = 25; // percentage of the Pdfs
-int N = 500; // Number of event to generate
+double a = 50, b = 50; // percentage of the Pdfs
+int N = 165; // Number of event to generate
 int Nloop = 2000; //loop lenght
 //if the number of cosmic is fixed (costant time window), then use Nfix for Nbk_a
 double Nfix = 0;
