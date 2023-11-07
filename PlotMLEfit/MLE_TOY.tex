@@ -1,4 +1,4 @@
-\documentclass[10pt]{beamer}
+\documentclass[9pt]{beamer}
 \usetheme{Boadilla}
 \usepackage[utf8]{inputenc}
 \usepackage{amsmath}
@@ -39,7 +39,7 @@ The factor $\frac{1}{8}$ for the cosmic is due to normalization. The Mixing, UW 
 \begin{frame}{MIXING}
 
 \begin{figure}
-\includegraphics[width = 0.8\textwidth]{GaussianFitMixing.pdf}
+\includegraphics[width = 0.7\textwidth]{GaussianFitMixing.pdf}
 \end{figure}
 
 \end{frame}
@@ -130,7 +130,7 @@ Pdf = Gaussian (Mixing) + Rayleigh (Uwlosses) + linear model (cosmic)
 To study the accuracy of the algorithm to reconstruct the various parameter, a "toy" algorithm is done. The model to generate the data is:
 
 \begin{equation}
-Pdf_{total} = a \cdot Template_{mix} + b \cdot Rayleigh + c \cdot linearModel_{cosmic} 
+Pdf_{total} = a \cdot Gauss_{mix} + b \cdot Rayleigh + c \cdot linearModel_{cosmic} 
 \end{equation}
 
 $a,b,c$ represent the "weight", or degree or percentage of the various contributions to the Pdf used to generate the data. For simplicity the $c$ is setted to zero. 
@@ -138,11 +138,10 @@ $a,b,c$ represent the "weight", or degree or percentage of the various contribut
 We generate $N$ data. Once the data are generated, they are fitted with the model:
 
 \begin{equation}
-Pdf_{fit} = N_{mix} \cdot Template_{mix} + N_{uw} \cdot Rayleigh
+Pdf_{fit} = N_{mix} \cdot Gauss_{mix} + N_{uw} \cdot Rayleigh + N_{bk} \cdot linearModel_{cosmic}
 \end{equation}
 
-The parameters of the fit are $N_{mix}, N_{uw}$. The difference between the data from the fit and the "real values" is plotted. The "true value" are defined as:
-
+The parameters of the fit are $N_{mix}, N_{uw}$ and $N_{bk}$. The "true value" are defined as:
 
 \begin{itemize}
 \centering
@@ -150,27 +149,43 @@ The parameters of the fit are $N_{mix}, N_{uw}$. The difference between the data
 \item Nuw true  $= b \cdot N$
 \item Nbk true  $= c \cdot N$
 \end{itemize} 
-
 \end{frame}
 
-\begin{frame} {N = 165, a = 100, b = 0, c = 0}
+\begin{frame} {Toy: Nsample = 1000, a = $ \%33$, b = $\%33$, c = $\%33$}
 
+In this first following plot we have fixed the weight of each distribution to $33$. The number of sampled data is one thousand and the number of iteration of is one thousand. This first plot is made to ensure that the algorithm is able to reconstruct the parameters, and check the presence of a bias.
+
+The variable of the histograms are:
+\begin{equation}
+\dfrac{N_{fit} - N_{true}}{\sigma_{fit}}
+\end{equation}
+\end{frame}
+
+\begin{frame}{Toy: Nsample = 1000, a = $ \%33$, b = $\%33$, c = $\%33$}
 \begin{figure}
-\includegraphics[width = 1\textwidth]{Nequalto164/toy(100,0,0).png} 
+\includegraphics[width = 1\textwidth]{N1000/Toy(33,33,33).pdf} 
+\end{figure}
+\end{frame}
+
+\begin{frame}{Example of fit, Toy: Nsample = 1000, a = $ \%33$, b = $\%33$, c = $\%33$}
+\includegraphics[width = 0.9\textwidth]{N1000/FitToy(33,33,33).pdf} 
+\begin{figure}
+\end{figure}
+\end{frame}
+
+\begin{frame}{Coefficient variation}
+
+Now we study how or if the coefficients of the fit $N_{mix}, N_{uw}$ and $N_{bk}$ vary with the increase of the weight $a$, $b$ and $c$. 
+At fixed $c = 10\%$, $a$ is raised from $10\%$ to $80\%$ and $b$ is decreased accordingly. We end with:
+\begin{figure}
+\includegraphics[width = 0.9\textwidth]{N1000/Nmix_weight.pdf}
 \end{figure}
 
 \end{frame}
 
-\begin{frame}{N = 165, a = 75, b = 25, c = 0}
-
+\begin{frame}{$\sigma$ versus weight $a$}
 \begin{figure}
-\includegraphics[width = 1\textwidth]{Nequalto164/toy(75,25,0).png} 
-\end{figure}
-\end{frame}
-
-\begin{frame}{N = 165, a = 50, b = 50, c = 0}
-\begin{figure}
-\includegraphics[width = 1\textwidth]{Nequalto164/toy(50,50,0).png}
+\includegraphics[width = \textwidth]{N1000/sigma_weight.pdf}
 \end{figure}
 \end{frame}
 

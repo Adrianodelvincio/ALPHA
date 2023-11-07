@@ -1,4 +1,4 @@
-This is LuaHBTeX, Version 1.14.0 (TeX Live 2022/dev/Debian)  (format=lualatex 2023.5.31)  4 NOV 2023 22:03
+This is LuaHBTeX, Version 1.14.0 (TeX Live 2022/dev/Debian)  (format=lualatex 2023.5.31)  6 NOV 2023 22:26
  restricted system commands enabled.
 **MLE_TOY.tex
 (./MLE_TOY.tex
@@ -375,8 +375,8 @@ File: pgfcorepatterns.code.tex 2021/05/15 v3.1.9a (3.1.9a)
 )
 (/usr/share/texlive/texmf-dist/tex/generic/pgf/basiclayer/pgfcorerdf.code.tex
 File: pgfcorerdf.code.tex 2021/05/15 v3.1.9a (3.1.9a)
-))) (/usr/share/texlive/texmf-dist/tex/latex/base/size10.clo
-File: size10.clo 2021/10/04 v1.4n Standard LaTeX file (size option)
+))) (/usr/share/texlive/texmf-dist/tex/latex/extsizes/size9.clo
+File: size9.clo 1999/11/11 v1.4a NON-Standard LaTeX file (size option)
 )
 (/usr/share/texlive/texmf-dist/tex/latex/pgf/utilities/xxcolor.sty
 Package: xxcolor 2003/10/24 ver 0.1
@@ -765,23 +765,23 @@ LaTeX Font Info:    ... okay on input line 16.
 * layout: <same size as paper>
 * layoutoffset:(h,v)=(0.0pt,0.0pt)
 * modes: includehead includefoot 
-* h-part:(L,W,R)=(10.0pt, 344.19536pt, 10.0pt)
+* h-part:(L,W,R)=(9.0pt, 346.19536pt, 9.0pt)
 * v-part:(T,H,B)=(0.0pt, 273.14662pt, 0.0pt)
 * \paperwidth=364.19536pt
 * \paperheight=273.14662pt
-* \textwidth=344.19536pt
+* \textwidth=346.19536pt
 * \textheight=244.6939pt
-* \oddsidemargin=-62.26999pt
-* \evensidemargin=-62.26999pt
+* \oddsidemargin=-63.26999pt
+* \evensidemargin=-63.26999pt
 * \topmargin=-72.26999pt
 * \headheight=14.22636pt
 * \headsep=0.0pt
-* \topskip=10.0pt
+* \topskip=9.0pt
 * \footskip=14.22636pt
-* \marginparwidth=3.0pt
-* \marginparsep=11.0pt
+* \marginparwidth=4.0pt
+* \marginparsep=10.0pt
 * \columnsep=10.0pt
-* \skip\footins=9.0pt plus 4.0pt minus 2.0pt
+* \skip\footins=8.0pt plus 4.0pt minus 2.0pt
 * \hoffset=0.0pt
 * \voffset=0.0pt
 * \mag=1000
@@ -913,7 +913,7 @@ Dictionary: translator-theorem-dictionary, Language: English
 File: ../logo/logounibs.png Graphic file (type png)
 <use ../logo/logounibs.png>
 Package luatex.def Info: ../logo/logounibs.png  used on input line 20.
-(luatex.def)             Requested size: 43.02441pt x 43.214pt.
+(luatex.def)             Requested size: 43.27441pt x 43.46558pt.
  [1
 
 {/var/lib/texmf/fonts/map/pdftex/updmap/pdftex.map}<../logo/logounibs.png>]
@@ -929,206 +929,219 @@ LaTeX Font Info:    Trying to load font information for U+msb on input line 37.
 (/usr/share/texlive/texmf-dist/tex/latex/amsfonts/umsb.fd
 File: umsb.fd 2013/01/14 v3.01 AMS symbols B
 )
-LaTeX Font Info:    Font shape `TU/lmss/m/it' in size <10> not available
+LaTeX Font Info:    Font shape `TU/lmss/m/it' in size <9> not available
 (Font)              Font shape `TU/lmss/m/sl' tried instead on input line 37.
-LaTeX Font Info:    Font shape `TU/lmss/m/it' in size <7> not available
+LaTeX Font Info:    Font shape `TU/lmss/m/it' in size <6> not available
 (Font)              Font shape `TU/lmss/m/sl' tried instead on input line 37.
 LaTeX Font Info:    Font shape `TU/lmss/m/it' in size <5> not available
 (Font)              Font shape `TU/lmss/m/sl' tried instead on input line 37.
 File: ../logo/logounibs.png Graphic file (type png)
 <use ../logo/logounibs.png>
 Package luatex.def Info: ../logo/logounibs.png  used on input line 37.
-(luatex.def)             Requested size: 43.02441pt x 43.214pt.
+(luatex.def)             Requested size: 43.27441pt x 43.46558pt.
  [2
 
 ]
-<GaussianFitMixing.pdf, id=83, 462.528pt x 346.896pt>
+<GaussianFitMixing.pdf, id=83, 722.7pt x 722.7pt>
 File: GaussianFitMixing.pdf Graphic file (type pdf)
 <use GaussianFitMixing.pdf>
 Package luatex.def Info: GaussianFitMixing.pdf  used on input line 45.
-(luatex.def)             Requested size: 275.35733pt x 206.52477pt.
-File: ../logo/logounibs.png Graphic file (type png)
-<use ../logo/logounibs.png>
-Package luatex.def Info: ../logo/logounibs.png  used on input line 45.
-(luatex.def)             Requested size: 43.02441pt x 43.214pt.
- [3
+(luatex.def)             Requested size: 242.3357pt x 242.3293pt.
 
-<./GaussianFitMixing.pdf>]
-<FitToUW.pdf, id=162, 569.12625pt x 484.81125pt>
-File: FitToUW.pdf Graphic file (type pdf)
-<use FitToUW.pdf>
-Package luatex.def Info: FitToUW.pdf  used on input line 53.
-(luatex.def)             Requested size: 258.14651pt x 219.90887pt.
-File: ../logo/logounibs.png Graphic file (type png)
-<use ../logo/logounibs.png>
-Package luatex.def Info: ../logo/logounibs.png  used on input line 53.
-(luatex.def)             Requested size: 43.02441pt x 43.214pt.
- [4
-
-<./FitToUw.pdf>]
-<Cosmici_fit.pdf, id=235, 569.12625pt x 553.06625pt>
-File: Cosmici_fit.pdf Graphic file (type pdf)
-<use Cosmici_fit.pdf>
-Package luatex.def Info: Cosmici_fit.pdf  used on input line 61.
-(luatex.def)             Requested size: 240.9357pt x 234.14284pt.
-
-Overfull \vbox (3.85997pt too high) detected at line 61
+Overfull \vbox (6.36002pt too high) detected at line 45
  []
 
 File: ../logo/logounibs.png Graphic file (type png)
 <use ../logo/logounibs.png>
+Package luatex.def Info: ../logo/logounibs.png  used on input line 45.
+(luatex.def)             Requested size: 43.27441pt x 43.46558pt.
+[3
+
+<./GaussianFitMixing.pdf>]
+<FitToUW.pdf, id=174, 569.12625pt x 484.81125pt>
+File: FitToUW.pdf Graphic file (type pdf)
+<use FitToUW.pdf>
+Package luatex.def Info: FitToUW.pdf  used on input line 53.
+(luatex.def)             Requested size: 259.64651pt x 221.18866pt.
+File: ../logo/logounibs.png Graphic file (type png)
+<use ../logo/logounibs.png>
+Package luatex.def Info: ../logo/logounibs.png  used on input line 53.
+(luatex.def)             Requested size: 43.27441pt x 43.46558pt.
+ [4
+
+<./FitToUw.pdf>]
+<Cosmici_fit.pdf, id=247, 569.12625pt x 553.06625pt>
+File: Cosmici_fit.pdf Graphic file (type pdf)
+<use Cosmici_fit.pdf>
+Package luatex.def Info: Cosmici_fit.pdf  used on input line 61.
+(luatex.def)             Requested size: 242.3357pt x 235.50153pt.
+File: ../logo/logounibs.png Graphic file (type png)
+<use ../logo/logounibs.png>
 Package luatex.def Info: ../logo/logounibs.png  used on input line 61.
-(luatex.def)             Requested size: 43.02441pt x 43.214pt.
-[5
+(luatex.def)             Requested size: 43.27441pt x 43.46558pt.
+ [5
 
 <./Cosmici_fit.pdf>]
-<PdfTogether.pdf, id=307, 569.12625pt x 417.56pt>
+<PdfTogether.pdf, id=319, 569.12625pt x 417.56pt>
 File: PdfTogether.pdf Graphic file (type pdf)
 <use PdfTogether.pdf>
 Package luatex.def Info: PdfTogether.pdf  used on input line 67.
-(luatex.def)             Requested size: 275.35733pt x 202.03212pt.
+(luatex.def)             Requested size: 276.95734pt x 203.20445pt.
 File: ../logo/logounibs.png Graphic file (type png)
 <use ../logo/logounibs.png>
 Package luatex.def Info: ../logo/logounibs.png  used on input line 67.
-(luatex.def)             Requested size: 43.02441pt x 43.214pt.
+(luatex.def)             Requested size: 43.27441pt x 43.46558pt.
  [6
 
 <./PdfTogether.pdf>]
-<Normalizedf4.pdf, id=380, 462.528pt x 346.896pt>
+<Normalizedf4.pdf, id=392, 462.528pt x 346.896pt>
 File: Normalizedf4.pdf Graphic file (type pdf)
 <use Normalizedf4.pdf>
 Package luatex.def Info: Normalizedf4.pdf  used on input line 78.
-(luatex.def)             Requested size: 275.35733pt x 206.52477pt.
+(luatex.def)             Requested size: 276.95734pt x 207.72632pt.
 
-Overfull \vbox (30.1559pt too high) detected at line 78
+Overfull \vbox (22.10103pt too high) detected at line 78
  []
 
 File: ../logo/logounibs.png Graphic file (type png)
 <use ../logo/logounibs.png>
 Package luatex.def Info: ../logo/logounibs.png  used on input line 78.
-(luatex.def)             Requested size: 43.02441pt x 43.214pt.
+(luatex.def)             Requested size: 43.27441pt x 43.46558pt.
 [7
 
 <./Normalizedf4.pdf>]
-<NormalizedMixing.pdf, id=453, 462.528pt x 346.896pt>
+<NormalizedMixing.pdf, id=464, 462.528pt x 346.896pt>
 File: NormalizedMixing.pdf Graphic file (type pdf)
 <use NormalizedMixing.pdf>
 Package luatex.def Info: NormalizedMixing.pdf  used on input line 87.
-(luatex.def)             Requested size: 275.35733pt x 206.52477pt.
-
-Overfull \vbox (4.0959pt too high) detected at line 87
- []
-
+(luatex.def)             Requested size: 276.95734pt x 207.72632pt.
 File: ../logo/logounibs.png Graphic file (type png)
 <use ../logo/logounibs.png>
 Package luatex.def Info: ../logo/logounibs.png  used on input line 87.
-(luatex.def)             Requested size: 43.02441pt x 43.214pt.
-[8
+(luatex.def)             Requested size: 43.27441pt x 43.46558pt.
+ [8
 
 <./NormalizedMixing.pdf>]
-<NormalizedUW.pdf, id=523, 462.528pt x 346.896pt>
+<NormalizedUW.pdf, id=534, 462.528pt x 346.896pt>
 File: NormalizedUW.pdf Graphic file (type pdf)
 <use NormalizedUW.pdf>
 Package luatex.def Info: NormalizedUW.pdf  used on input line 96.
-(luatex.def)             Requested size: 275.35733pt x 206.52477pt.
-
-Overfull \vbox (4.0959pt too high) detected at line 96
- []
-
+(luatex.def)             Requested size: 276.95734pt x 207.72632pt.
 File: ../logo/logounibs.png Graphic file (type png)
 <use ../logo/logounibs.png>
 Package luatex.def Info: ../logo/logounibs.png  used on input line 96.
-(luatex.def)             Requested size: 43.02441pt x 43.214pt.
-[9
+(luatex.def)             Requested size: 43.27441pt x 43.46558pt.
+ [9
 
 <./NormalizedUW.pdf>]
-<NormalizedBK.pdf, id=594, 462.528pt x 346.896pt>
+<NormalizedBK.pdf, id=605, 462.528pt x 346.896pt>
 File: NormalizedBK.pdf Graphic file (type pdf)
 <use NormalizedBK.pdf>
 Package luatex.def Info: NormalizedBK.pdf  used on input line 105.
-(luatex.def)             Requested size: 275.35733pt x 206.52477pt.
-
-Overfull \vbox (4.0959pt too high) detected at line 105
- []
-
+(luatex.def)             Requested size: 276.95734pt x 207.72632pt.
 File: ../logo/logounibs.png Graphic file (type png)
 <use ../logo/logounibs.png>
 Package luatex.def Info: ../logo/logounibs.png  used on input line 105.
-(luatex.def)             Requested size: 43.02441pt x 43.214pt.
+(luatex.def)             Requested size: 43.27441pt x 43.46558pt.
+
 [10
 
 <./NormalizedBK.pdf>]
-<FitTemplate.pdf, id=662, 569.12625pt x 553.06625pt>
+<FitTemplate.pdf, id=673, 569.12625pt x 553.06625pt>
 File: FitTemplate.pdf Graphic file (type pdf)
 <use FitTemplate.pdf>
 Package luatex.def Info: FitTemplate.pdf  used on input line 115.
-(luatex.def)             Requested size: 223.72487pt x 217.41653pt.
-
-Overfull \vbox (1.19366pt too high) detected at line 115
- []
-
+(luatex.def)             Requested size: 225.02486pt x 218.67397pt.
 File: ../logo/logounibs.png Graphic file (type png)
 <use ../logo/logounibs.png>
 Package luatex.def Info: ../logo/logounibs.png  used on input line 115.
-(luatex.def)             Requested size: 43.02441pt x 43.214pt.
-[11
+(luatex.def)             Requested size: 43.27441pt x 43.46558pt.
+ [11
 
 <./FitTemplate.pdf>]
-<TuttoAnalitico.pdf, id=736, 569.12625pt x 484.81125pt>
+<TuttoAnalitico.pdf, id=747, 569.12625pt x 484.81125pt>
 File: TuttoAnalitico.pdf Graphic file (type pdf)
 <use TuttoAnalitico.pdf>
 Package luatex.def Info: TuttoAnalitico.pdf  used on input line 125.
-(luatex.def)             Requested size: 240.9357pt x 205.24681pt.
+(luatex.def)             Requested size: 242.3357pt x 206.43782pt.
 File: ../logo/logounibs.png Graphic file (type png)
 <use ../logo/logounibs.png>
 Package luatex.def Info: ../logo/logounibs.png  used on input line 125.
-(luatex.def)             Requested size: 43.02441pt x 43.214pt.
+(luatex.def)             Requested size: 43.27441pt x 43.46558pt.
  [12
 
 <./TuttoAnalitico.pdf>]
 File: ../logo/logounibs.png Graphic file (type png)
 <use ../logo/logounibs.png>
-Package luatex.def Info: ../logo/logounibs.png  used on input line 154.
-(luatex.def)             Requested size: 43.02441pt x 43.214pt.
- [13
+Package luatex.def Info: ../logo/logounibs.png  used on input line 152.
+(luatex.def)             Requested size: 43.27441pt x 43.46558pt.
+
+[13
 
 ]
-<Nequalto164/toy(100,0,0).png, id=836, 1925.1925pt x 1022.82124pt>
-File: Nequalto164/toy(100,0,0).png Graphic file (type png)
-<use Nequalto164/toy(100,0,0).png>
-Package luatex.def Info: Nequalto164/toy(100,0,0).png  used on input line 162.
-(luatex.def)             Requested size: 344.19536pt x 182.85132pt.
+LaTeX Font Info:    Font shape `TU/lmss/m/it' in size <10.95> not available
+(Font)              Font shape `TU/lmss/m/sl' tried instead on input line 162.
+LaTeX Font Info:    Font shape `TU/lmss/m/it' in size <8> not available
+(Font)              Font shape `TU/lmss/m/sl' tried instead on input line 162.
 File: ../logo/logounibs.png Graphic file (type png)
 <use ../logo/logounibs.png>
 Package luatex.def Info: ../logo/logounibs.png  used on input line 162.
-(luatex.def)             Requested size: 43.02441pt x 43.214pt.
+(luatex.def)             Requested size: 43.27441pt x 43.46558pt.
  [14
 
-<./Nequalto164/toy(100,0,0).png>]
-<Nequalto164/toy(75,25,0).png, id=865, 1623.06375pt x 908.39375pt>
-File: Nequalto164/toy(75,25,0).png Graphic file (type png)
-<use Nequalto164/toy(75,25,0).png>
-Package luatex.def Info: Nequalto164/toy(75,25,0).png  used on input line 169.
-(luatex.def)             Requested size: 344.19536pt x 192.63954pt.
+]
+<N1000/Toy(33,33,33).pdf, id=876, 569.12625pt x 317.185pt>
+File: N1000/Toy(33,33,33).pdf Graphic file (type pdf)
+<use N1000/Toy(33,33,33).pdf>
+Package luatex.def Info: N1000/Toy(33,33,33).pdf  used on input line 168.
+(luatex.def)             Requested size: 346.19536pt x 192.95016pt.
 File: ../logo/logounibs.png Graphic file (type png)
 <use ../logo/logounibs.png>
-Package luatex.def Info: ../logo/logounibs.png  used on input line 169.
-(luatex.def)             Requested size: 43.02441pt x 43.214pt.
+Package luatex.def Info: ../logo/logounibs.png  used on input line 168.
+(luatex.def)             Requested size: 43.27441pt x 43.46558pt.
  [15
 
-<./Nequalto164/toy(75,25,0).png>]
-<Nequalto164/toy(50,50,0).png, id=892, 1925.1925pt x 1022.82124pt>
-File: Nequalto164/toy(50,50,0).png Graphic file (type png)
-<use Nequalto164/toy(50,50,0).png>
-Package luatex.def Info: Nequalto164/toy(50,50,0).png  used on input line 175.
-(luatex.def)             Requested size: 344.19536pt x 182.85132pt.
+<./N1000/Toy(33,33,33).pdf>]
+<N1000/FitToy(33,33,33).pdf, id=948, 569.12625pt x 461.725pt>
+File: N1000/FitToy(33,33,33).pdf Graphic file (type pdf)
+<use N1000/FitToy(33,33,33).pdf>
+Package luatex.def Info: N1000/FitToy(33,33,33).pdf  used on input line 174.
+(luatex.def)             Requested size: 311.5737pt x 252.78705pt.
+
+Overfull \vbox (27.76776pt too high) detected at line 174
+ []
+
 File: ../logo/logounibs.png Graphic file (type png)
 <use ../logo/logounibs.png>
-Package luatex.def Info: ../logo/logounibs.png  used on input line 175.
-(luatex.def)             Requested size: 43.02441pt x 43.214pt.
- [16
+Package luatex.def Info: ../logo/logounibs.png  used on input line 174.
+(luatex.def)             Requested size: 43.27441pt x 43.46558pt.
+[16
 
-<./Nequalto164/toy(50,50,0).png>]
+<./N1000/FitToy(33,33,33).pdf>]
+<N1000/Nmix_weight.pdf, id=1021, 569.12625pt x 363.3575pt>
+File: N1000/Nmix_weight.pdf Graphic file (type pdf)
+<use N1000/Nmix_weight.pdf>
+Package luatex.def Info: N1000/Nmix_weight.pdf  used on input line 184.
+(luatex.def)             Requested size: 311.5737pt x 198.9324pt.
+File: ../logo/logounibs.png Graphic file (type png)
+<use ../logo/logounibs.png>
+Package luatex.def Info: ../logo/logounibs.png  used on input line 184.
+(luatex.def)             Requested size: 43.27441pt x 43.46558pt.
+ [17
+
+<./N1000/Nmix_weight.pdf>]
+<N1000/sigma_weight.pdf, id=1092, 569.12625pt x 387.4475pt>
+File: N1000/sigma_weight.pdf Graphic file (type pdf)
+<use N1000/sigma_weight.pdf>
+Package luatex.def Info: N1000/sigma_weight.pdf  used on input line 190.
+(luatex.def)             Requested size: 346.19536pt x 235.6923pt.
+File: ../logo/logounibs.png Graphic file (type png)
+<use ../logo/logounibs.png>
+Package luatex.def Info: ../logo/logounibs.png  used on input line 190.
+(luatex.def)             Requested size: 43.27441pt x 43.46558pt.
+ [18
+
+<./N1000/sigma_weight.pdf>]
 \tf@nav=\write6
 
 \openout6 = MLE_TOY.nav
@@ -1144,31 +1157,32 @@ Package rerunfilecheck Info: File `MLE_TOY.out' has not changed.
 )
 
 Here is how much of LuaTeX's memory you used:
- 23105 strings out of 477805
+ 23149 strings out of 477805
  100000,794899 words of node,token memory allocated
- 1641 words of node memory still in use:
-   26 hlist, 9 vlist, 5 rule, 3 local_par, 54 glue, 5 kern, 16 penalty, 20 glyph
-, 58 attribute, 61 glue_spec, 58 attribute_list, 4 write, 12 pdf_colorstack, 1 p
-df_setmatrix, 1 pdf_save, 1 pdf_restore nodes
-   avail lists: 2:700,3:332,4:289,5:291,6:65,7:3045,8:76,9:477,10:19,11:177
- 42445 multiletter control sequences out of 65536+600000
- 43 fonts using 3157503 bytes
+ 1627 words of node memory still in use:
+   26 hlist, 9 vlist, 5 rule, 1 disc, 3 local_par, 4 math, 46 glue, 8 kern, 16 p
+enalty, 16 glyph, 62 attribute, 61 glue_spec, 62 attribute_list, 4 write, 12 pdf
+_colorstack, 1 pdf_setmatrix, 1 pdf_save, 1 pdf_restore nodes
+   avail lists: 2:700,3:332,4:289,5:288,6:65,7:2876,8:76,9:477,10:22,11:161
+ 42467 multiletter control sequences out of 65536+600000
+ 59 fonts using 4428943 bytes
  128i,15n,115p,405b,603s stack positions out of 5000i,500n,10000p,200000b,80000s
-</usr/share/texmf/fonts/opentype/public/lm/lmsans9-regular.otf></usr/share/texmf
-/fonts/opentype/public/lm/lmsans10-oblique.otf></usr/share/texmf/fonts/opentype/
+</usr/share/texmf/fonts/opentype/public/lm/lmsans10-oblique.otf></usr/share/texm
+f/fonts/opentype/public/lm/lmsans9-oblique.otf></usr/share/texmf/fonts/opentype/
 public/lm/lmsans8-oblique.otf></usr/share/texmf/fonts/opentype/public/lm/lmsans8
--regular.otf></usr/share/texmf/fonts/opentype/public/lm/lmsans10-regular.otf></u
-sr/share/texmf/fonts/opentype/public/lm/lmsans12-regular.otf></usr/share/texlive
-/texmf-dist/fonts/type1/public/amsfonts/cm/cmmi10.pfb></usr/share/texlive/texmf-
-dist/fonts/type1/public/amsfonts/cm/cmmi5.pfb></usr/share/texlive/texmf-dist/fon
-ts/type1/public/amsfonts/cm/cmmi7.pfb></usr/share/texlive/texmf-dist/fonts/type1
-/public/amsfonts/cm/cmss10.pfb></usr/share/texlive/texmf-dist/fonts/type1/public
-/amsfonts/cm/cmsy10.pfb></usr/share/texlive/texmf-dist/fonts/type1/public/amsfon
-ts/cm/cmsy7.pfb>
-Output written on MLE_TOY.pdf (16 pages, 318251 bytes).
+-regular.otf></usr/share/texmf/fonts/opentype/public/lm/lmsans9-regular.otf></us
+r/share/texmf/fonts/opentype/public/lm/lmsans10-regular.otf></usr/share/texlive/
+texmf-dist/fonts/type1/public/amsfonts/cm/cmmi10.pfb></usr/share/texlive/texmf-d
+ist/fonts/type1/public/amsfonts/cm/cmmi5.pfb></usr/share/texlive/texmf-dist/font
+s/type1/public/amsfonts/cm/cmmi6.pfb></usr/share/texlive/texmf-dist/fonts/type1/
+public/amsfonts/cm/cmmi9.pfb></usr/share/texlive/texmf-dist/fonts/type1/public/a
+msfonts/cm/cmss10.pfb></usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts
+/cm/cmss9.pfb></usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmsy
+6.pfb></usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmsy9.pfb>
+Output written on MLE_TOY.pdf (18 pages, 315849 bytes).
 
-PDF statistics: 981 PDF objects out of 1000 (max. 8388607)
- 616 compressed objects within 7 object streams
- 33 named destinations out of 1000 (max. 131072)
+PDF statistics: 1233 PDF objects out of 1440 (max. 8388607)
+ 750 compressed objects within 8 object streams
+ 37 named destinations out of 1000 (max. 131072)
  26 words of extra memory for PDF output out of 10000 (max. 100000000)
 
