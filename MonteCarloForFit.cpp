@@ -13,20 +13,24 @@ Double_t media(std::vector<Double_t>&v);
 
 void MonteCarloForFit(){
 double a = 0.33, b = 0.33, c = 0.33; // percentage of the Pdfs
+int CosmicFixed = 0;
 // N: statistic of the data, Nloop number of iterations
 int N = 1000, Nloop = 1000; // f4 contains 165 event, use this number for real simulation
 //if the number of cosmic is fixed (costant time window), then use Nfix for Nbk_a
 //For the cosmic realistic scenario
-double Nfix = 0;
-//Nfix = 10.2;
-//c = Nfix/N
-//a = a - c/2;
-//b = b - c/2;
+double Nfix = 10.2;
+if(CosmicFixed == 1){
+c = Nfix/N;	// c fixed
+double tt = a;
+a = a/(a+b); b = b/(tt+b);
+a = (N - Nfix)*a/N; // Correct a
+b = (N - Nfix)*b/N; // Correct b
+}
 
 //CREATE AN ISTOGRAM TO SAVE THE QUANTITIES OF THE MONTECARLO
-TH1* hmix = new TH1I("h1", "MIX : (N - Nfit)/sigma",30, -6,6);
-TH1* huw =  new TH1I("h2", "UW : (N - Nfit)/sigma",30,-6,6);
-TH1* hbk =  new TH1I("h3", "BK : (N - Nfit)/sigma",30,-6,6);
+TH1* hmix = new TH1I("h1", "MIX : (N_{fit} - N_{gen})/sigma",30, -6,6);
+TH1* huw =  new TH1I("h2", "UW : (N_{fit} - N_{gen})/sigma",30,-6,6);
+TH1* hbk =  new TH1I("h3", "BK : (N_{fit} - N_{gen})/sigma",30,-6,6);
 TH1* hchisq = new TH1I("hchisq", "chiquadro", 30, 0, 50);
 
 //LOAD THE DATA
@@ -61,37 +65,12 @@ RooRealVar Nuw_a ("Nuw", "Nuw", b*N, -3000, +3000);
 RooRealVar Nbk_a ("Nbk", "Nbk", c*N, -3000, +3000);
 RooPlot *frame1 = x.frame(Title("Sum Of Three Pdfs"));
 //Model to generate the data
-RooAddPdf model_gen("model", "model", RooArgList{/*PdfMixing*/ gauss_Mix,Rayleigh,linearFit}, RooArgList{Nmix_t,Nuw_a,Nbk_a});
+RooAddPdf model_gen("model", "model", RooArgList{gauss_Mix,Rayleigh,linearFit}, RooArgList{Nmix_t,Nuw_a,Nbk_a});
 model_gen.plotOn(frame1, LineColor(28));
 model_gen.paramOn(frame1);
 
-/* SINGLE DISTRIBUTIONS
-RooPlot *frame2 = x.frame(Title("Sum of PdfMixing + rayleigh"));
-RooAddPdf mix_cosmic("model1", "model1", RooArgList{PdfMixing, linearFit}, RooArgList{Nmix_t,Nuw_a});
-
-RooPlot *frame3 = x.frame(Title("Sum of Rayleigh + cosmic"));
-RooAddPdf rayleigh_cosmic("model2", "model2", RooArgList{Rayleigh,linearFit}, RooArgList{Nuw_a,Nbk_a});
-
-RooPlot *frame4 = x.frame(Title("Mixing from the hist"));
-RooAddPdf mix_basta("model3", "model3", RooArgList{PdfMixing}, RooArgList{Nmix_t});
-
-mix_cosmic.plotOn(frame2, LineColor(27));
-mix_basta.plotOn(frame4,LineColor(26));
-rayleigh_cosmic.plotOn(frame3, LineColor(26));
-
-// SINGLE DISTRIBUTIONS
-auto canvass1 = new TCanvas("d2", "d2",800,800);
-frame2->Draw();
-
-auto canvass2 = new TCanvas("d3", "d3", 800,800);
-frame3->Draw();
-
-auto canvass3 = new TCanvas("d4","d4",800,800);
-frame4->Draw();
-*/
-
 //Generate a dataset of N events in x from model_analytic pdf
-std::unique_ptr<RooDataSet> data{model_gen.generate(x,N)}; //generate the data
+std::unique_ptr<RooDataSet> data{model_gen.generate(x,Extended())}; //generate the data
 RooDataHist *histXgen = data->binnedClone(); //create a binned histogram
 RooPlot *frame2 = x.frame(Title("Toy Model"));
 //data->plotOn(frame2);
@@ -103,6 +82,7 @@ histXgen->plotOn(frame2);
 //variable of the fit
 RooRealVar Nmix_f("Nmixf","Nmix",a*N,-3000, +3000);
 RooRealVar Nuw_f("Nuwf","Nuw",b*N,-3000, +3000);
+//RooRealVar Nuw_f("Nuwf","Nuw", 0.);
 RooRealVar Nbk_f("Nbkf", "Nbk",c*N,-3000,3000);
 //create the fit model
 RooAddPdf model_forfit("model2", "model", RooArgList{/*PdfMixing*/ gauss_Mix,Rayleigh,linearFit},RooArgList{Nmix_f,Nuw_f,Nbk_f});
@@ -121,6 +101,7 @@ fit2 = Nbk_f.getVal();
 //Print expected number of event from the fit
 //fitResult->Print();
 std::cout << "\n \n" << std::endl;
+std::cout << "Sample N = " << data->numEntries() << std::endl;
 std::cout << "Nmix, Nuw, Nbk expected from the tow" << std::endl;
 std::cout << "Nmix: " << N*a << " Nuw: " << N*b << " Nbk: " << c*N << std::endl;
 std::cout << "values from the fit " << std::endl;
@@ -130,10 +111,11 @@ double fit3 = 0,fit4 = 0,fit5 = 0;
 //Disable some unuseful print
 RooMsgService::instance().setGlobalKillBelow(RooFit::INFO);
 RooMsgService::instance().setGlobalKillBelow(RooFit::PROGRESS);
+TRandom *sampleN = new TRandom();
 //LOOP ON THE FIT NOW
 for(int i = 0; i < Nloop; i++){
 	//generate the data
-	std::unique_ptr<RooDataSet> dataLoop{model_gen.generate(x,N)};
+	std::unique_ptr<RooDataSet> dataLoop{model_gen.generate(x,Extended())};
 	model_forfit.fitTo(*dataLoop, Save(), PrintLevel(-1));
 	//save and store the fit values
 	fit3 = (Nmix_f.getVal() - N*a)/Nmix_f.errorVar()->getVal();
@@ -149,9 +131,9 @@ for(int i = 0; i < Nloop; i++){
 	hbk->Fill(fit5);
 	hchisq->Fill((frameLoop->chiSquare())*(30));
 	if(i%10 == 0){
-		std::cout << "Event LOOP N°" << i << std::endl;
+		std::cout << "Event LOOP N°" << i << " Gen Event: " << dataLoop->numEntries() <<std::endl;
 		std::cout << "fit:      " << "Nmix: " << Nmix_f.getVal() << " Nuw: " << Nuw_f.getVal() << " Nbk " << Nbk_f.getVal() << std::endl;
-		std::cout << "Expected: " << "Nmix: " << N*a << " Nuw: " << N*b << " Nbk: " << Nfix*N << std::endl;
+		std::cout << "Expected: " << "Nmix: " << N*a << " Nuw: " << N*b << " Nbk: " << c*N << std::endl;
 	}
 }
 
@@ -190,9 +172,9 @@ frame2->Draw();
 auto canvas3 = new TCanvas("d3", "Fit to toy model", 800, 800);
 frame3->Draw();
 
-auto canvas4 = new TCanvas("d4", "Toy Result", 1000,1000);
+auto canvas4 = new TCanvas("d4", "Toy Result", 1000,550);
 auto pad = new TPad("pad", "pad",0,0,1,1);
-gStyle->SetOptStat(1);
+gStyle->SetOptStat(0);
 gStyle->SetOptFit(1);
 pad->Divide(3,1,0.,0.);
 pad->Draw();
@@ -210,23 +192,63 @@ pad->cd(3);
 hbk->SetLineColor(1);
 hbk->SetLineWidth(2);
 hbk->Draw();
+TString percorso = TString::Format("PlotMLEfit/N%d/",N);
 
+if(CosmicFixed == 1){
+TString nameFile0 = TString::Format("ToyNmix_with_bkFixed(%d,%d,%d).pdf",static_cast<int>(a*100),static_cast<int>(b*100),static_cast<int>(c*100));
+canvas4->SaveAs(percorso + nameFile0);
+}
+else{
+TString nameFile0 = TString::Format("ToyNmix(%d,%d,%d).pdf",static_cast<int>(a*100),static_cast<int>(b*100),static_cast<int>(c*100));
+canvas4->SaveAs(percorso + nameFile0);
+}
 auto canvas5 = new TCanvas("d5","d5",800,800);
 hchisq->Draw();
+
+auto canvas6 = new TCanvas("d6", "Toy Result", 1000,700);
+auto pad1 = new TPad("pad", "pad",0,0,1,1);
+gStyle->SetOptStat(1);
+gStyle->SetOptFit(1);
+pad1->Divide(2,1,0.,0.);
+pad1->Draw();
+pad1->cd(1);
+hmix->SetLineColor(1);
+hmix->SetLineWidth(2);
+hmix->Draw();
+legend->Draw();
+pad1->cd(2);
+hbk->SetLineColor(1);
+hbk->SetLineWidth(2);
+hbk->Draw();
+
+//legend->Draw();
+if(CosmicFixed == 1){
+TString nameFile1 = TString::Format("ToyNmixNbk_with_bkFixed(%d,%d,%d).pdf",static_cast<int>(a*100),static_cast<int>(b*100),static_cast<int>(c*100));
+canvas6->SaveAs(percorso + nameFile1);
+}
+else{
+TString nameFile1 = TString::Format("ToyNmixNbk(%d,%d,%d).pdf",static_cast<int>(a*100),static_cast<int>(b*100),static_cast<int>(c*100));
+canvas6->SaveAs(percorso + nameFile1);
+	}
 }
 
 
-
 void SecondMontecarlo(){
-double a = 0.90, b = 0.10, c = 0.10; // percentage of the Pdfs
+double a = 0.80, b = 0.10, c = 0.10; // percentage of the Pdfs
+int CosmicFixed = 1;
 // N: statistic of the data, Npoint number of iterations
-int N = 500, Npoint = 30; // f4 contains 165 event, use this number for real simulation
+int N = 165, Npoint = 30; // f4 contains 165 event, use this number for real simulation
 int Nnested = 100;
-double Nfix = 0;
-//Nfix = 10.2;
-//c = Nfix/N
-//a = a - c/2;
-//b = b - c/2;
+
+// With fixed contribution of cosmic
+double Nfix = 10.2;
+if(CosmicFixed == 1){
+c = Nfix/N;	// c fixed
+double tt = a;
+a = a/(a+b); b = b/(tt+b);
+a = (N - Nfix)*a/N; // Correct a
+b = (N - Nfix)*b/N; // Correct b
+}
 
 RooRealVar x("x","x",0.,4.);
 x.setBins(30);
@@ -254,6 +276,7 @@ RooAddPdf model_gen("model", "model", RooArgList{/*PdfMixing*/ gauss_Mix,Rayleig
 //create the fit model
 RooRealVar Nmix_f("Nmixf","Nmix",a*N,-(2*N), +(2*N));
 RooRealVar Nuw_f ("Nuwf", "Nuw", b*N,-(2*N), +(2*N));
+//RooRealVar Nuw_f ("Nuwf", "Nuw", 0);
 RooRealVar Nbk_f ("Nbkf", "Nbk", c*N,-(2*N), +(2*N));
 RooAddPdf model_forfit("model2", "model", RooArgList{/*PdfMixing*/ gauss_Mix,Rayleigh,linearFit},RooArgList{Nmix_f,Nuw_f,Nbk_f});
 
@@ -285,7 +308,9 @@ for(int i = 0; i < Npoint; i++){
 	
 	for(int j = 0; j < Nnested; j++){
 		//generate the data
-		std::unique_ptr<RooDataSet> dataLoop{model_gen.generate(x,N)};
+		std::unique_ptr<RooDataSet> dataLoop{model_gen.generate(x,Extended())};
+		if(j%10 == 0 ){
+		std::cout << "Event gen " << dataLoop->numEntries() << std::endl;}
 		model_forfit.fitTo(*dataLoop, Save(), PrintLevel(-1));
 		//save the data
 		//set parameter of the fit
@@ -305,7 +330,7 @@ for(int i = 0; i < Npoint; i++){
 	bk_l.clear();
 	mixErrors_l.clear();
 	if(i%1 == 0){
-	std::cout << "Event LOOP N°" << i << std::endl;
+	std::cout << "Event LOOP N°" << i  <<std::endl;
 	std::cout << "weight Mix: " << wmix << std::endl;
 	std::cout << "fit:      " << "Nmix: " << mix[i] << " Nuw: " << uw[i] << " Nbk " << bk[i] << std::endl;
 	std::cout << "Expected: " << "Nmix: " << Nmix_t.getVal() << " Nuw: " << Nuw_a.getVal() << " Nbk: " << Nbk_a.getVal() << std::endl;
@@ -315,32 +340,59 @@ for(int i = 0; i < Npoint; i++){
 //Visualize the Montecarlo
 vector<double> errorx(30,0);
 auto g = new TGraphErrors(weight.size(), weight.data(), mix.data(),errorx.data(),Errors.data());
-
-g->SetTitle("#mu_{N - Nfit}");
-g->GetYaxis()->SetTitle("#mu_{N - Nfit}");
-g->GetXaxis()->SetTitle("weight");
+std::ostringstream s; s << "MIX: N_{gen} - N_{fit} averaged over " << Nnested << " trials";
+g->SetTitle(s.str().c_str());
+g->GetYaxis()->SetTitle("<N_{gen} - N_{fit}>");
+g->GetXaxis()->SetTitle("w_{mix}");
+if(N > 500){
+g->SetMinimum(-50);
+g->SetMaximum(50);}
+else{
 g->SetMinimum(-30);
-g->SetMaximum(+30);
-g->GetYaxis()->SetLimits(-20,20);
+g->SetMaximum(+30);}
+g->GetYaxis()->SetLimits(-30,30);
 g->SetMarkerStyle(21);
 
 auto canvas0 = new TCanvas("canvas0", "Nmix vs weight",1000,1000);
 g->Draw("ap");
 
+TString percorso = TString::Format("PlotMLEfit/N%d/",N);
+TString nameFile0 = TString::Format("Nmix_minus_Nfit(%d,%d,%d).pdf",static_cast<int>(a*100),static_cast<int>(b*100),static_cast<int>(c*100));
+canvas0->SaveAs(percorso + nameFile0);
+
 auto g1 = new TGraph(weight.size(),weight.data(),mixErrors.data());
 g1->SetMarkerStyle(21);
-g1->GetYaxis()->SetTitle("#sigma_{Nmix} vs. weight");
-g1->SetMinimum(0.);
-g1->SetMaximum(100.);
-g1->GetYaxis()->SetLimits(-50,50);
+g1->GetYaxis()->SetTitle("sigma_{Nmix} vs. w_{mix}");
+g1->GetXaxis()->SetTitle("w_{mix}");
+if(N > 500){
+g1->SetMinimum(50);
+g1->SetMaximum(80);}
+else{
+g1->SetMinimum(0);
+g1->SetMaximum(30);
+}
+//g1->GetYaxis()->SetLimits(-50,50);
 //g1->SetMarkerStyle(21);
 
-auto canvas1 = new TCanvas("canvas1", "#sigma_{mix} vs weight",1000,1000);
+auto canvas1 = new TCanvas("canvas1", "Bias and sigma",1000,1000);
+auto pad = new TPad("padd", "pad",0,0,1,1);
+pad->Divide(2,1,0.1,0.1);
+pad->Draw();
+pad->cd(1);
+g->Draw("ap");
+pad->cd(2);
 g1->Draw("ap");
+
+if(CosmicFixed == 1){
+TString nameFile1 = TString::Format("Nmix_and_Sigma_bkFixed(%d,%d,%d).pdf", static_cast<int>(a*100),static_cast<int>(b*100),static_cast<int>(c*100));
+canvas1->SaveAs(percorso + nameFile1);
+}
+else{
+TString nameFile1 = TString::Format("Nmix_and_Sigma(%d,%d,%d).pdf", static_cast<int>(a*100),static_cast<int>(b*100),static_cast<int>(c*100));
+canvas1->SaveAs(percorso + nameFile1);
 }
 
-
-
+}
 
 void SetVectors(int i,std::vector<double> &mix,std::vector<double> &uw, std::vector<double> &bk, RooRealVar a,RooRealVar b,RooRealVar c,RooRealVar aa,RooRealVar bb,RooRealVar cc){
 		mix.push_back(a.getVal() - aa.getVal());
