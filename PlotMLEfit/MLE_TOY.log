@@ -1,4 +1,4 @@
-This is LuaHBTeX, Version 1.14.0 (TeX Live 2022/dev/Debian)  (format=lualatex 2023.5.31)  8 NOV 2023 17:16
+This is LuaHBTeX, Version 1.14.0 (TeX Live 2022/dev/Debian)  (format=lualatex 2023.5.31)  8 NOV 2023 23:36
  restricted system commands enabled.
 **MLE_TOY.tex
 (./MLE_TOY.tex
@@ -1228,15 +1228,15 @@ Overfull \hbox (78.83847pt too wide) has occurred while \output is active
 [9
 
 <./N1000/FitToy(33,33,33).pdf>]
-<N1000/ToyNmix(33,33,33).pdf, id=613, 569.12625pt x 385.44pt>
+<N1000/ToyNmix(33,33,33).pdf, id=613, 569.12625pt x 306.14375pt>
 File: N1000/ToyNmix(33,33,33).pdf Graphic file (type pdf)
 <use N1000/ToyNmix(33,33,33).pdf>
-Package luatex.def Info: N1000/ToyNmix(33,33,33).pdf  used on input line 138.
-(luatex.def)             Requested size: 173.09767pt x 117.2326pt.
-File: ../logo/ALPHA_Logo.jpg Graphic file (type jpg)
-<use ../logo/ALPHA_Logo.jpg>
-Package luatex.def Info: ../logo/ALPHA_Logo.jpg  used on input line 138.
-(luatex.def)             Requested size: 43.27441pt x 28.19287pt.
+Package luatex.def Info: N1000/ToyNmix(33,33,33).pdf  used on input line 136.
+(luatex.def)             Requested size: 346.19536pt x 186.23355pt.
+
+Overfull \vbox (11.1124pt too high) detected at line 136
+ []
+
 
 Overfull \hbox (78.83847pt too wide) has occurred while \output is active
  [][]  \TU/lmss/m/n/5 ([])  
@@ -1245,14 +1245,15 @@ Overfull \hbox (78.83847pt too wide) has occurred while \output is active
 [10
 
 <./N1000/ToyNmix(33,33,33).pdf>]
-<N1000/sigmaNmix(89,9,1).pdf, id=685, 569.12625pt x 304.13625pt>
-File: N1000/sigmaNmix(89,9,1).pdf Graphic file (type pdf)
-<use N1000/sigmaNmix(89,9,1).pdf>
-Package luatex.def Info: N1000/sigmaNmix(89,9,1).pdf  used on input line 150.
-(luatex.def)             Requested size: 311.5737pt x 166.50972pt.
+<N1000/Nmix_and_Sigma(80,10,10).pdf, id=685, 569.12625pt x 257.96375pt>
+File: N1000/Nmix_and_Sigma(80,10,10).pdf Graphic file (type pdf)
+<use N1000/Nmix_and_Sigma(80,10,10).pdf>
+Package luatex.def Info: N1000/Nmix_and_Sigma(80,10,10).pdf  used on input line
+ 148.
+(luatex.def)             Requested size: 346.19536pt x 156.92467pt.
 File: ../logo/ALPHA_Logo.jpg Graphic file (type jpg)
 <use ../logo/ALPHA_Logo.jpg>
-Package luatex.def Info: ../logo/ALPHA_Logo.jpg  used on input line 150.
+Package luatex.def Info: ../logo/ALPHA_Logo.jpg  used on input line 148.
 (luatex.def)             Requested size: 43.27441pt x 28.19287pt.
 
 Overfull \hbox (78.83847pt too wide) has occurred while \output is active
@@ -1261,12 +1262,13 @@ Overfull \hbox (78.83847pt too wide) has occurred while \output is active
 
 [11
 
-<./N1000/sigmaNmix(89,9,1).pdf>]
-<N165/sigmaNmix(84,9,6).pdf, id=759, 569.12625pt x 314.17375pt>
-File: N165/sigmaNmix(84,9,6).pdf Graphic file (type pdf)
-<use N165/sigmaNmix(84,9,6).pdf>
-Package luatex.def Info: N165/sigmaNmix(84,9,6).pdf  used on input line 161.
-(luatex.def)             Requested size: 311.5737pt x 172.0051pt.
+<./N1000/Nmix_and_Sigma(80,10,10).pdf>]
+<N165/Nmix_and_Sigma_bkFixed(83,10,6).pdf, id=759, 569.12625pt x 260.975pt>
+File: N165/Nmix_and_Sigma_bkFixed(83,10,6).pdf Graphic file (type pdf)
+<use N165/Nmix_and_Sigma_bkFixed(83,10,6).pdf>
+Package luatex.def Info: N165/Nmix_and_Sigma_bkFixed(83,10,6).pdf  used on inpu
+t line 157.
+(luatex.def)             Requested size: 346.19536pt x 158.75648pt.
 
 Overfull \hbox (78.83847pt too wide) has occurred while \output is active
  [][]  \TU/lmss/m/n/5 ([])  
@@ -1274,16 +1276,16 @@ Overfull \hbox (78.83847pt too wide) has occurred while \output is active
 
 [12
 
-<./N165/sigmaNmix(84,9,6).pdf>]
+<./N165/Nmix_and_Sigma_bkFixed(83,10,6).pdf>]
 <./SingleModel/TuttoAnalitico.pdf, id=832, 569.12625pt x 484.81125pt>
 File: ./SingleModel/TuttoAnalitico.pdf Graphic file (type pdf)
 <use ./SingleModel/TuttoAnalitico.pdf>
 Package luatex.def Info: ./SingleModel/TuttoAnalitico.pdf  used on input line 1
-73.
+69.
 (luatex.def)             Requested size: 242.3357pt x 206.43782pt.
 File: ../logo/ALPHA_Logo.jpg Graphic file (type jpg)
 <use ../logo/ALPHA_Logo.jpg>
-Package luatex.def Info: ../logo/ALPHA_Logo.jpg  used on input line 173.
+Package luatex.def Info: ../logo/ALPHA_Logo.jpg  used on input line 169.
 (luatex.def)             Requested size: 43.27441pt x 28.19287pt.
 
 Overfull \hbox (78.83847pt too wide) has occurred while \output is active
@@ -1295,7 +1297,7 @@ Overfull \hbox (78.83847pt too wide) has occurred while \output is active
 <./SingleModel/TuttoAnalitico.pdf>]
 File: ../logo/ALPHA_Logo.jpg Graphic file (type jpg)
 <use ../logo/ALPHA_Logo.jpg>
-Package luatex.def Info: ../logo/ALPHA_Logo.jpg  used on input line 179.
+Package luatex.def Info: ../logo/ALPHA_Logo.jpg  used on input line 175.
 (luatex.def)             Requested size: 43.27441pt x 28.19287pt.
 
 Overfull \hbox (78.83847pt too wide) has occurred while \output is active
@@ -1308,7 +1310,7 @@ Overfull \hbox (78.83847pt too wide) has occurred while \output is active
 <N165/ToyNmix(46,46,6).pdf, id=933, 569.12625pt x 385.44pt>
 File: N165/ToyNmix(46,46,6).pdf Graphic file (type pdf)
 <use N165/ToyNmix(46,46,6).pdf>
-Package luatex.def Info: N165/ToyNmix(46,46,6).pdf  used on input line 186.
+Package luatex.def Info: N165/ToyNmix(46,46,6).pdf  used on input line 182.
 (luatex.def)             Requested size: 346.19536pt x 234.4711pt.
 
 Overfull \hbox (78.83847pt too wide) has occurred while \output is active
@@ -1322,11 +1324,11 @@ Overfull \hbox (78.83847pt too wide) has occurred while \output is active
 File: N165/ToyNmixNbk,NuwFixed(46,46,6).pdf Graphic file (type pdf)
 <use N165/ToyNmixNbk,NuwFixed(46,46,6).pdf>
 Package luatex.def Info: N165/ToyNmixNbk,NuwFixed(46,46,6).pdf  used on input l
-ine 195.
+ine 191.
 (luatex.def)             Requested size: 276.95734pt x 187.57335pt.
 File: ../logo/ALPHA_Logo.jpg Graphic file (type jpg)
 <use ../logo/ALPHA_Logo.jpg>
-Package luatex.def Info: ../logo/ALPHA_Logo.jpg  used on input line 195.
+Package luatex.def Info: ../logo/ALPHA_Logo.jpg  used on input line 191.
 (luatex.def)             Requested size: 43.27441pt x 28.19287pt.
 
 Overfull \hbox (78.83847pt too wide) has occurred while \output is active
@@ -1339,14 +1341,14 @@ Overfull \hbox (78.83847pt too wide) has occurred while \output is active
 <N165/Nmix,NuwFixed(84,9,6).pdf, id=1078, 569.12625pt x 556.0775pt>
 File: N165/Nmix,NuwFixed(84,9,6).pdf Graphic file (type pdf)
 <use N165/Nmix,NuwFixed(84,9,6).pdf>
-Package luatex.def Info: N165/Nmix,NuwFixed(84,9,6).pdf  used on input line 207
+Package luatex.def Info: N165/Nmix,NuwFixed(84,9,6).pdf  used on input line 203
 .
 (luatex.def)             Requested size: 169.63762pt x 165.74693pt.
 <N165/sigmaNmix,NuwFixed(84,9,6).pdf, id=1079, 569.12625pt x 556.0775pt>
 File: N165/sigmaNmix,NuwFixed(84,9,6).pdf Graphic file (type pdf)
 <use N165/sigmaNmix,NuwFixed(84,9,6).pdf>
 Package luatex.def Info: N165/sigmaNmix,NuwFixed(84,9,6).pdf  used on input lin
-e 207.
+e 203.
 (luatex.def)             Requested size: 169.63762pt x 165.74693pt.
 
 Overfull \hbox (78.83847pt too wide) has occurred while \output is active
@@ -1372,7 +1374,7 @@ Package rerunfilecheck Info: File `MLE_TOY.out' has not changed.
 )
 
 Here is how much of LuaTeX's memory you used:
- 26300 strings out of 477805
+ 26294 strings out of 477805
  100000,794899 words of node,token memory allocated
  4488 words of node memory still in use:
    43 hlist, 13 vlist, 6 rule, 21 disc, 4 local_par, 10 math, 103 glue, 27 kern,
@@ -1396,7 +1398,7 @@ hare/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmss9.pfb></usr/share/tex
 live/texmf-dist/fonts/type1/public/amsfonts/cm/cmsy10.pfb></usr/share/texlive/te
 xmf-dist/fonts/type1/public/amsfonts/cm/cmsy6.pfb></usr/share/texlive/texmf-dist
 /fonts/type1/public/amsfonts/cm/cmsy9.pfb>
-Output written on MLE_TOY.pdf (17 pages, 1450234 bytes).
+Output written on MLE_TOY.pdf (17 pages, 1450609 bytes).
 
 PDF statistics: 1274 PDF objects out of 1440 (max. 8388607)
  775 compressed objects within 8 object streams
