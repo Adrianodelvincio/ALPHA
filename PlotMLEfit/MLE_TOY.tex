@@ -117,13 +117,13 @@ The histogram in $r$ variable doesn't account for the different area of the bin 
 To study the accuracy of the algorithm to reconstruct the various parameter, we have developed a "toy" simulation tool. The model to generate the data is:
 
 \begin{equation}
-PDF_{total} = a \cdot Gauss_{mix} + b \cdot Rayleigh + c \cdot linearModel_{cosmic} 
+F_{gen}(r) = N_{sample} \cdot (a \cdot PDF_{mix} + b \cdot PDF_{gas} + c \cdot PDF_{cosmic}) 
 \end{equation}
 
 where $a,b,c$ represent the "weights" of the various contributions to the PDF used to generate the data. The number of annihilation is indicated as $N_{sample}$. Once the data are generated, they are fitted with the model:
 
 \begin{equation}
-PDF_{fit} = Nfit_{mix} \cdot Gauss_{mix} + Nfit_{uw} \cdot Rayleigh + Nfit_{bk} \cdot linearModel_{cosmic}
+Nfit_{mix} \cdot PDF_{mix} + Nfit_{uw} \cdot PDF_{gas} + Nfit_{bk} \cdot PDF_{cosmic}
 \end{equation}
 
 The parameters of the fit are $Nfit_{mix}, Nfit_{uw}$ and $Nfit_{bk}$. The "true value" are defined as:
@@ -131,10 +131,13 @@ The parameters of the fit are $Nfit_{mix}, Nfit_{uw}$ and $Nfit_{bk}$. The "true
 \begin{itemize}
 \centering
 \item $Ngen_{mix} = a \cdot N_{sample}$
-\item $Ngen_{uw}  = b \cdot N_{sample}$
-\item $Ngen_{bk}  = c \cdot N_{sample}$
+\item $Ngen_{gas}  = b \cdot N_{sample}$
+\item $Ngen_{cosmic}  = c \cdot N_{sample}$
 \end{itemize} 
+
+In generation $Ngen_{mix}$,$Ngen_{gas}$,$Ngen_{cosmic}$ are varied accordin to a Poissonian distribution. 
 \end{frame}
+
 
 \begin{frame}{Example of fit, Toy: $N_{sample} = 1000$, a = $33\%$, b = $33\%$, c = $33\%$}
 \includegraphics[width = 0.75\textwidth , left]{N1000/FitToy(33,33,33).pdf} 

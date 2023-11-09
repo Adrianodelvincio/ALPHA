@@ -28,9 +28,9 @@ b = (N - Nfix)*b/N; // Correct b
 }
 
 //CREATE AN ISTOGRAM TO SAVE THE QUANTITIES OF THE MONTECARLO
-TH1* hmix = new TH1I("h1", "MIX : (N_{fit} - N_{gen})/sigma",30, -6,6);
-TH1* huw =  new TH1I("h2", "UW : (N_{fit} - N_{gen})/sigma",30,-6,6);
-TH1* hbk =  new TH1I("h3", "BK : (N_{fit} - N_{gen})/sigma",30,-6,6);
+TH1* hmix = new TH1I("h1", "MIX : (N_{fit} - N_{gen})/#sigma",30, -6,6);
+TH1* huw =  new TH1I("h2", "Residual gas : (N_{fit} - N_{gen})/#sigma",30,-6,6);
+TH1* hbk =  new TH1I("h3", "Cosmic : (N_{fit} - N_{gen})/#sigma",30,-6,6);
 TH1* hchisq = new TH1I("hchisq", "chiquadro", 30, 0, 50);
 
 //LOAD THE DATA
@@ -47,13 +47,13 @@ RooDataHist mix_h("dh0", "dh0", x, Import(*histMix));
 RooHistPdf PdfMixing("mixingpdf", "mixingpdf", x, mix_h, 0);
 
 //MIXING analytic model
-RooRealVar mu("mu", "mu", 2.38,2.38);
-RooRealVar sigMix("sigMix", "sigMix",0.85,0.85);
+RooRealVar mu("mu", "mu", 2.38);
+RooRealVar sigMix("sigMix", "sigMix",0.85);
 RooGaussian gauss_Mix("gauss", "gauss", x, mu, sigMix);
 
 //PDF UWlosses
 //FIXING sigRay to the value from the fit to the model (see analysisMLE.cpp)
-RooRealVar sigRay("sigRay", "sigma", 1.722,1.722);
+RooRealVar sigRay("sigRay", "sigma", 1.722);
 RooGenericPdf Rayleigh("line", "linear model", " TMath::Abs(x)/(sigRay*sigRay) * TMath::Exp(-(x*x)/(2*sigRay*sigRay))", RooArgSet(x,sigRay));
 
 //PDF Cosmic
@@ -365,19 +365,20 @@ canvas0->SaveAs(percorso + nameFile0);
 
 auto g1 = new TGraph(weight.size(),weight.data(),mixErrors.data());
 g1->SetMarkerStyle(21);
-g1->GetYaxis()->SetTitle("sigma_{Nmix} vs. w_{mix}");
+g1->SetTitle("MIX: #sigma vs weight");
+g1->GetYaxis()->SetTitle("#sigma_{Nmix} vs. w_{mix}");
 g1->GetXaxis()->SetTitle("w_{mix}");
 if(N > 500){
 g1->SetMinimum(50);
 g1->SetMaximum(80);}
 else{
-g1->SetMinimum(0);
-g1->SetMaximum(30);
+g1->SetMinimum(20);
+g1->SetMaximum(40);
 }
 //g1->GetYaxis()->SetLimits(-50,50);
 //g1->SetMarkerStyle(21);
 
-auto canvas1 = new TCanvas("canvas1", "Bias and sigma",1000, 700);
+auto canvas1 = new TCanvas("canvas1", "Bias and sigma",1000, 500);
 auto pad = new TPad("padd", "pad",0,0,1,1);
 pad->Divide(2,1,0.01,0.01);
 pad->Draw();

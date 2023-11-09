@@ -9,7 +9,7 @@ void AnalysisMLE(){
 
 // DATA TO FIT
 TString cartella = TString::Format("Spectroscopy/Dataset/");
-TString filename = TString::Format("r68465_uw_exp_freq5.vertex.csv");
+TString filename = TString::Format("r68465_uw_exp_freq4.vertex.csv");
 
 //MIXING
 ROOT::RDataFrame mix_rdf("myTree", {"DataSetROOT/r68814_mixing.vertex.root",
@@ -63,7 +63,7 @@ PdfUwlosses.plotOn(frame2);
 
 // FIT THE DATA WITH A RAYLEIGH
 
-RooRealVar sigRay("sigRay", "sigma", 1.722,1.722);
+RooRealVar sigRay("sigRay", "sigma", 1.722);
 RooRealVar sigRay2("sigRay", "sigma", 1.722,0,100);
 RooGenericPdf Rayleigh("line", "linear model", " TMath::Abs(x/(sigRay*sigRay) * TMath::Exp(-(x*x)/(2*sigRay*sigRay)))", RooArgSet(x,sigRay));
 //RUN THE FIRST TIME FOR THE PARAMETERS OF THE RAYLEIGH
@@ -217,8 +217,8 @@ frame6->Draw();
 // FIT WITH THE ANALYTIC FORMULA
 
 //FOR MIXING USE A GAUSSIAN
-RooRealVar mu("mu", "mu", 2.38,2.38);
-RooRealVar sigMix("sigMix", "sigMix",0.85,0.85);
+RooRealVar mu("mu", "mu", 2.38);
+RooRealVar sigMix("sigMix", "sigMix",0.85);
 RooGaussian gauss_Mix("gauss", "gauss", x, mu, sigMix);
 
 RooRealVar Nmix_t("Nmix","Nmix",0.,200.);
