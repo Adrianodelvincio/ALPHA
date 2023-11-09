@@ -7,6 +7,10 @@ using namespace RooFit;
 
 void AnalysisMLE(){
 
+// DATA TO FIT
+TString cartella = TString::Format("Spectroscopy/Dataset/");
+TString filename = TString::Format("r68465_uw_exp_freq5.vertex.csv");
+
 //MIXING
 ROOT::RDataFrame mix_rdf("myTree", {"DataSetROOT/r68814_mixing.vertex.root",
 		"DataSetROOT/r68839_mixing.vertex.root",
@@ -22,7 +26,7 @@ auto mix2_rdf = mix_rdf.Define("Radius", "TMath::Sqrt(X*X + Y*Y)").Filter("CutsT
 auto histMix = mix2_rdf.Histo1D({"Mixing","Counts",30u,0.,4.}, "Radius");
 mix2_rdf.Snapshot("myTree", "Spectroscopy/RootCut1Data/MixCut1.root", {"X","Y","Radius"});
 
-RooRealVar x("x", "x", 0, 4);
+RooRealVar x("x", "r [cm]", 0, 4);
 x.setBins(30);
 
 RooDataHist mix_h("dh0", "dh0", x, Import(*histMix));
@@ -51,7 +55,7 @@ uw2_rdf.Snapshot("myTree", "Spectroscopy/RootCut1Data/UWCut1.root", {"X","Y","Ra
 
 RooDataHist Uw_h("dh1", "dh1", x, Import(*histUw));
 RooPlot *frame2 = x.frame(Title("UW losses PDF"));
-
+frame2->GetYaxis()->SetTitle("Counts");
 // EXTRACT THE PDF FROM THE HISTOGRAM
 RooHistPdf PdfUwlosses("uwlossespdf", "uwlossespdf", x, Uw_h, 0);
 Uw_h.plotOn(frame2);
@@ -60,20 +64,21 @@ PdfUwlosses.plotOn(frame2);
 // FIT THE DATA WITH A RAYLEIGH
 
 RooRealVar sigRay("sigRay", "sigma", 1.722,1.722);
-
+RooRealVar sigRay2("sigRay", "sigma", 1.722,0,100);
 RooGenericPdf Rayleigh("line", "linear model", " TMath::Abs(x/(sigRay*sigRay) * TMath::Exp(-(x*x)/(2*sigRay*sigRay)))", RooArgSet(x,sigRay));
 //RUN THE FIRST TIME FOR THE PARAMETERS OF THE RAYLEIGH
-/*
-Rayleigh.fitTo(Uw_h); // FIT
-Rayleigh.plotOn(frame2, LineColor(kRed));
+
+RooGenericPdf Rayleigh2("line", "linear model", " TMath::Abs(x/(sigRay*sigRay) * TMath::Exp(-(x*x)/(2*sigRay*sigRay)))", RooArgSet(x,sigRay2));
+Rayleigh2.fitTo(Uw_h); // FIT
+Rayleigh2.plotOn(frame2, LineColor(kRed));
 Double_t chi2ray = frame2->chiSquare();
 std::cout << "chi square rayleigh: " << frame2->chiSquare() << std::endl; 
-TString chis2ray = TString::Format("Chisquare = %f ", chi2ray);
-Rayleigh.paramOn(frame2,Label(chis2ray));
+TString chis2ray = TString::Format("Chisquare = %.1f ndof %d", chi2ray*27,27);
+Rayleigh2.paramOn(frame2,Label(chis2ray));
 
 auto canvas1 = new TCanvas("d1", "d1",800,800);
 frame2->Draw();
-*/
+
 //COSMIC
 
 ROOT::RDataFrame cosmic_rdf("myTree",{"DataSetROOT/r68949_cosmics.vertex.root",
@@ -126,9 +131,7 @@ leg1->AddEntry(allpdf->findObject("Uw"), "Uw Template","LP");
 allpdf->Draw();
 leg1->Draw();
 
-
-// DATA TO FIT
-auto f4_rdf = ROOT::RDF::MakeCsvDataFrame("Spectroscopy/Dataset/r68465_uw_exp_freq4.vertex.csv");
+auto f4_rdf = ROOT::RDF::MakeCsvDataFrame(cartella + filename);
 auto displ = f4_rdf.Display({"CutsType0","CutsType1","CutsType2", "X", "Y", "Z"}, 5);
     displ->Print();
 
@@ -221,12 +224,15 @@ RooGaussian gauss_Mix("gauss", "gauss", x, mu, sigMix);
 RooRealVar Nmix_t("Nmix","Nmix",0.,200.);
 RooRealVar Nuw_a("Nuw","Nuw", -100,100);
 RooRealVar Nbk_a("Nbk", "Nbk",10.2,10.2);
-RooPlot *analyticframe = x.frame(Title("Analitic Fit"));
+
+RooPlot *analyticframe = x.frame(Title(filename));
+analyticframe->GetYaxis()->SetTitle("Counts");
 RooAddPdf model_analytic("model", "model", RooArgList{/*PdfMixing*/ gauss_Mix,Rayleigh,linearFit}, RooArgList{Nmix,Nuw_a,Nbk_a});
 model_analytic.fitTo(f4_h, PrintLevel(-1));
 f4_h.plotOn(analyticframe);
 model_analytic.plotOn(analyticframe, LineColor(28));
-model_analytic.paramOn(analyticframe);
+TString chiquadrato = TString::Format("chisq = %.1f, ndof = %d",analyticframe->chiSquare()*(30), (30-3));
+model_analytic.paramOn(analyticframe, Label(chiquadrato));
 
 auto canvas8 = new TCanvas("d8","d8",800,800);
 analyticframe->Draw();

@@ -38,7 +38,7 @@ ROOT::RDataFrame mix("myTree", "Spectroscopy/RootCut1Data/MixCut1.root");
 ROOT::RDataFrame uwlosses("myTree", "Spectroscopy/RootCut1Data/UWCut1.root");
 ROOT::RDataFrame cosmic("myTree", "Spectroscopy/RootCut1Data/CosmicCut1.root");
 
-RooRealVar x("x","x",0.,4.);
+RooRealVar x("x","r [cm]",0.,4.);
 x.setBins(30);
 
 //RETRIEVE PDF MIXING
@@ -86,13 +86,15 @@ RooRealVar Nuw_f("Nuwf","Nuw",b*N,-3000, +3000);
 RooRealVar Nbk_f("Nbkf", "Nbk",c*N,-3000,3000);
 //create the fit model
 RooAddPdf model_forfit("model2", "model", RooArgList{/*PdfMixing*/ gauss_Mix,Rayleigh,linearFit},RooArgList{Nmix_f,Nuw_f,Nbk_f});
-RooPlot *frame3 = x.frame(Title("Fit Toy Model"));
-std::unique_ptr<RooFitResult> fitResult(model_forfit.fitTo(*data, Save()));
+RooPlot *frame3 = x.frame(Title("Toy Model Fit"));
+frame3->GetYaxis()->SetTitle("Counts");
+model_forfit.fitTo(*data, Save());
 histXgen->plotOn(frame3);
 model_forfit.plotOn(frame3,LineColor(27));
-
+TString chiquadrato = TString::Format("chisq = %.1f, ndof = %d",frame3->chiSquare()*(30), (30-3));
 //TString cosmici = TString::Format("Cosmici Nbk = %.2f ", Nfix*N);
-model_forfit.paramOn(frame3/*,Label(cosmici)*/);
+model_forfit.paramOn(frame3,Label(chiquadrato)/*,Label(cosmici)*/);
+//frame3->getAttText()->SetTextSize(9); 
 double fit0, fit1, fit2;
 fit0 = Nmix_f.getVal();
 fit1 = Nuw_f.getVal();
@@ -163,13 +165,14 @@ legend2->AddEntry(hbk,coeffUw);
 legend2->AddEntry(hbk,coeffbk);
 
 
-auto canvas1 = new TCanvas("d1","d1",800,800);
-frame1->Draw();
+//auto canvas1 = new TCanvas("d1","d1",800,800);
+//frame1->Draw();
 
 auto canvas2 = new TCanvas("d2", "Toy Model data",800,800);
 frame2->Draw();
 
 auto canvas3 = new TCanvas("d3", "Fit to toy model", 800, 800);
+TString filenamefit = TString::Format("PlotMLEfit/N%d/FitToy(%d,%d,%d).pdf",N,static_cast<int>(a*100),static_cast<int>(b*100),static_cast<int>(c*100));
 frame3->Draw();
 
 auto canvas4 = new TCanvas("d4", "Toy Result", 1000,550);
@@ -250,7 +253,7 @@ a = (N - Nfix)*a/N; // Correct a
 b = (N - Nfix)*b/N; // Correct b
 }
 
-RooRealVar x("x","x",0.,4.);
+RooRealVar x("x","r [cm]",0.,4.);
 x.setBins(30);
 
 //MIXING analytic model

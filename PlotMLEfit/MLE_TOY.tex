@@ -7,13 +7,17 @@
 \usepackage{graphicx}
 \usepackage{subfig}
 \usepackage[export]{adjustbox}
-\author{Adriano Del Vincio, Germano Bonomi,\\ Simone Stracka}
+\usepackage{xcolor}
+
+\setbeamercolor{block title}{fg=white, bg = cyan }
+
+\author[Adriano, Germano, Simone]{Adriano Del Vincio, Germano Bonomi,\\ Simone Stracka}
 \title[Alpha 2]{Studying Annihilation Distributions \hrule}
 %\setbeamercovered{transparent} 
 %\setbeamertemplate{navigation symbols}{} 
 \logo{\includegraphics[width = 0.125\textwidth]{../logo/ALPHA_Logo.jpg}}
 \newcommand{\nologo}{\setbeamertemplate{logo}{}}
-\institute{University of Brescia, INFN Pisa} 
+\institute[]{University of Brescia, INFN Pisa} 
 \titlegraphic{
 \begin{figure}
 \hspace{1.cm}
@@ -37,15 +41,27 @@
 
 \begin{frame}{}
 
-I tried to fit the distributions the radial distribution of the anti-hydrogen annihilation with analytic models. This should improve the results, avoiding statistical fluctuations:
-The models are listed below:
+\begin{block}{Objective}
+A procedure to disantangle the contribution of annihilations of antihydrogen on the trap walls and on the residual gas has been developed and tested.
+It is based on a Maximum Likelihood fit of the radial distribution of the annihilations that has been tuned using an “ad-hoc” Monte Carlo simulation toy.
+\end{block}
+
 \begin{itemize}
-\item Pdf Mixing: the Normal distribution.
-\item Pdf Uwlosses: Rayleigh distribution $\frac{r}{\sigma^{2}} e^{-\frac{r^{2}}{2 \sigma^{2}}}$.
-\item Pdf Cosmic: $k \cdot x$.
+\item The model/template for annihilations on the trap walls has been extracted from the 2-second mixing window.
+\item The model/template for annihilations of the residual gas has been obtained using the losses when antihydrogen is hold in the trap (microwaves - UW - losses).
+\item A model/template for the cosmic background is also used.
 \end{itemize}
 
-The factor $k$ is the normalization constant. The Mixing, UW losses and cosmic data are fitted and the result are shown in the following slides.
+%The fitting procedure proved to be \textbf{stable and reliable} with the simulation toy. %and it has been tested also on a couple of runs.
+
+The PDFs used for the fit procedure and the data generation the data are listed below:
+\begin{itemize}
+\item PDF Mixing: the Normal distribution
+\item PDF Residual gas: Rayleigh distribution $\frac{r}{\sigma^{2}} e^{-\frac{r^{2}}{2 \sigma^{2}}}$
+\item PDF Cosmic: $k \cdot x$
+\end{itemize}
+
+The factor $k$ is the normalization constant. The Mixing, residual gas and cosmic data \\ are fitted and the result are shown in the following slides.
 \end{frame}
 
 \begin{frame}{MIXING}
@@ -59,19 +75,19 @@ Mixing dataset represents almost pure data of anti-hydrogen annihilation on the 
 
 \end{frame}
 
-\begin{frame}{UWlosses}
+\begin{frame}{Residual Gas}
 
 The microwave losses represent an almost pure anti-hydrogen sample of annihilation events due to residual gas inside the trap.
 
 \begin{figure}
-\includegraphics[width = 0.75\textwidth]{./SingleModel/FitToUW.pdf}
+\includegraphics[width = 0.65\textwidth]{./SingleModel/FitToUW.pdf}
 \end{figure}
 
 \end{frame}
 
 \begin{frame}{Cosmic}
 
-The cosmic distribution is obtained from dataset without anti-hydogren. 
+The cosmic distribution is obtained from dataset without anti-hydrogen. 
 
 \begin{figure}
 \includegraphics[width = 0.7\textwidth]{./SingleModel/Cosmici_fit.pdf}
@@ -79,9 +95,9 @@ The cosmic distribution is obtained from dataset without anti-hydogren.
 
 \end{frame}
 
-\begin{frame}{Pdfs normalized plotted together}
+\begin{frame}{PDFs normalized plotted together}
 \begin{figure}
-\includegraphics[width = 0.80\textwidth ,left]{PdfTogether.pdf}
+\includegraphics[width = 0.75\textwidth]{PdfTogether.pdf}
 \end{figure}
 \end{frame}
 
@@ -91,23 +107,23 @@ The histogram in $r$ variable doesn't account for the different area of the bin 
 
 \begin{figure}[hbtp]
 \centering
-\includegraphics[width = 0.7\textwidth , left]{RadialDensity.pdf}
-\caption{Radial density Pdf for f4 dataset}
+\includegraphics[width = 0.7\textwidth]{RadialDensity.pdf}
+\caption{Radial density for \texttt{r68465\_uw\_exp\_freq4.vertex.csv} dataset}
 \end{figure}
 \end{frame}
 
-\begin{frame}[t]{Toy simulation.}
+\begin{frame}[t]{Monte Carlo Simulation Toy}
 
 To study the accuracy of the algorithm to reconstruct the various parameter, we have developed a "toy" simulation tool. The model to generate the data is:
 
 \begin{equation}
-Pdf_{total} = a \cdot Gauss_{mix} + b \cdot Rayleigh + c \cdot linearModel_{cosmic} 
+PDF_{total} = a \cdot Gauss_{mix} + b \cdot Rayleigh + c \cdot linearModel_{cosmic} 
 \end{equation}
 
-where $a,b,c$ represent the "weights" of the various contributions to the Pdf used to generate the data. The number of annihilation is indicated as $N_{sample}$. Once the data are generated, they are fitted with the model:
+where $a,b,c$ represent the "weights" of the various contributions to the PDF used to generate the data. The number of annihilation is indicated as $N_{sample}$. Once the data are generated, they are fitted with the model:
 
 \begin{equation}
-Pdf_{fit} = Nfit_{mix} \cdot Gauss_{mix} + Nfit_{uw} \cdot Rayleigh + Nfit_{bk} \cdot linearModel_{cosmic}
+PDF_{fit} = Nfit_{mix} \cdot Gauss_{mix} + Nfit_{uw} \cdot Rayleigh + Nfit_{bk} \cdot linearModel_{cosmic}
 \end{equation}
 
 The parameters of the fit are $Nfit_{mix}, Nfit_{uw}$ and $Nfit_{bk}$. The "true value" are defined as:
@@ -121,14 +137,14 @@ The parameters of the fit are $Nfit_{mix}, Nfit_{uw}$ and $Nfit_{bk}$. The "true
 \end{frame}
 
 \begin{frame}{Example of fit, Toy: $N_{sample} = 1000$, a = $33\%$, b = $33\%$, c = $33\%$}
-\includegraphics[width = 0.65\textwidth , left]{N1000/FitToy(33,33,33).pdf} 
+\includegraphics[width = 0.75\textwidth , left]{N1000/FitToy(33,33,33).pdf} 
 \end{frame}
 
 {\nologo
 \begin{frame}[t]{Toy: $N_{sample} = 1000$, a = $ 33\%$, b = $33\%$, c = $33\%$}
 
-In this plot we have fixed the weight of each distribution to $33\%$, with $N_{sample} = 1000$ and $N_{trials} = 1000$. This first plot is made to ensure that the algorithm is able to reconstruct the parameters, and check the presence of a bias.
-The variable of the histograms are: $\dfrac{Nfit - Ngen}{\sigma_{fit}}$. The distributions are normal, the fit is behaving as expected.
+In this plot we have fixed the weight of each distribution to $33\%$, with $N_{sample} = 1000$ and $N_{trials} = 1000$, to ensure that the algorithm is able to reconstruct the parameters, and check the presence of a bias.
+The variable of the histograms are: $\dfrac{Nfit - Ngen}{\sigma_{fit}}$. The distributions are normal and the fit procedure is behaving as expected.
 
 \begin{figure}[!t]
 \includegraphics[width = 1\textwidth]{N1000/ToyNmix(33,33,33).pdf} 
@@ -137,7 +153,7 @@ The variable of the histograms are: $\dfrac{Nfit - Ngen}{\sigma_{fit}}$. The dis
 }
 \begin{frame}{weight variation $a$ for mix.}
 
-Now we study how or if the coefficients of the fit $Nfit_{mix}, Nfit_{uw}$ and $Nfit_{bk}$ vary with the increment of the weight $a$. 
+Now we study how the coefficients of the fit $Nfit_{mix}, Nfit_{uw}$ and $Nfit_{bk}$ vary with the increment of the weight $a$. 
 At fixed $c = 10\%$, $a$ is raised from $10\%$ to $80\%$ and $b$ is decreased accordingly. 
 
 \begin{figure}
@@ -148,7 +164,7 @@ The number events is always $ N_{sample} = 1000$. For each value of the weight $
 \end{frame}
 
 {\nologo
-\begin{frame}{$N = 165$.}
+\begin{frame}{$N_{sample} = 165$.}
 Now we have done the same plot with $N = 165$, the same amount of data in \texttt{r68465\_uw\_exp\_freq4.vertex.csv} after applying \textit{cut1}. The value of $c$ is fixed to reproduce the number of expected events from background ($c = 6\%$).
 \begin{figure}
 \subfloat{\includegraphics[width = 1\textwidth]{N165/Nmix_and_Sigma_bkFixed(83,10,6).pdf}}
@@ -156,17 +172,29 @@ Now we have done the same plot with $N = 165$, the same amount of data in \textt
 \end{figure}
 \end{frame}
 }
-\begin{frame}{Fit to data.}
+\begin{frame}{Fit to Data}
 
-Pdf = Gaussian (Mixing) + Rayleigh (Uwlosses) + linear model (cosmic fixed).
+PDF = Gaussian (Mixing) + Rayleigh (Residual gas) + linear model (cosmic fixed).
 
 Data taken from: \texttt{r68465\_uw\_exp\_freq4.vertex.csv}
 
 \begin{figure}[hbtp]
 \centering
-\includegraphics[width = 0.70 \textwidth]{./SingleModel/TuttoAnalitico.pdf}
+\includegraphics[width = 0.65 \textwidth]{./SingleModel/TuttoAnalitico.pdf}
 \end{figure}
 \end{frame}
+
+\begin{frame}{Fit to Data}
+
+PDF = Gaussian (Mixing) + Rayleigh (Residual gas) + linear model (cosmic fixed).
+
+Data taken from: \texttt{r68465\_uw\_exp\_freq5.vertex.csv}
+\begin{figure}
+\centering
+\includegraphics[width = 0.65 \textwidth]{./SingleModel/AnalyFit_2.pdf}
+\end{figure}
+\end{frame}
+
 
 \begin{frame}[noframenumbering]
 \begin{center}
@@ -194,7 +222,7 @@ The Toy simulation is tested fixing the $N_{uw}$ parameter of the fit model to $
 {\nologo
 \begin{frame}{$N_{uw}$ parameter of the fit model fixed}
 
-We study the bias $N_{mix} - N_{reconstructed}$ with the parameter $N_{uw}$ of the fit model fixed to $0$. For small value of $w_{mix}$, corresponding to small contribution of \textit{Mixing}  (and, conversely, a significant contribution of \textit{Uwlosses} pdf) we observe a large bias.
+We study the bias $N_{mix} - N_{reconstructed}$ with the parameter $N_{uw}$ of the fit model fixed to $0$. For small value of $w_{mix}$, corresponding to small contribution of \textit{Mixing}  (and, conversely, a significant contribution of \textit{Residual gas} PDF) we observe a large bias.
 
 \begin{figure}
 \subfloat{\includegraphics[width = 0.49\textwidth]{N165/Nmix,NuwFixed(84,9,6).pdf}}
