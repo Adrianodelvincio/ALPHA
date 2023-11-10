@@ -238,10 +238,10 @@ canvas6->SaveAs(percorso + nameFile1);
 
 
 void SecondMontecarlo(){
-double a = 0.80, b = 0.10, c = 0.10; // percentage of the Pdfs
-int CosmicFixed = 1;
+double a = 0.9, b = 0., c = 0.10; // percentage of the Pdfs
+int CosmicFixed = 0;
 // N: statistic of the data, Npoint number of iterations
-int N = 165, Npoint = 30; // f4 contains 165 event, use this number for real simulation
+int N = 1000, Npoint = 30; // f4 contains 165 event, use this number for real simulation
 int Nnested = 100;
 
 // With fixed contribution of cosmic
@@ -302,7 +302,7 @@ RooMsgService::instance().setGlobalKillBelow(RooFit::INFO);
 RooMsgService::instance().setGlobalKillBelow(RooFit::PROGRESS);
 for(int i = 0; i < Npoint; i++){
 	//Fix the weight of the pdf
-	double wmix = b + static_cast<double>(i)*(1 - 2*b - c)/Npoint;
+	double wmix = b + static_cast<double>(i)*(1 - 2*b - c)/(Npoint-1);
 	weight.push_back(wmix);
 	//Fix Pdf weights
 	Nmix_t.setVal(N*wmix);
@@ -387,8 +387,10 @@ pad->Divide(2,1,0.01,0.01);
 pad->Draw();
 pad->cd(1);
 g->Draw("ap");
+g->GetXaxis()->SetRangeUser(-0.05, 0.95);
 pad->cd(2);
 g1->Draw("ap");
+g1->GetXaxis()->SetRangeUser(-0.05, 0.95);
 
 if(CosmicFixed == 1){
 TString nameFile1 = TString::Format("Nmix_and_Sigma_bkFixed(%d,%d,%d).pdf", static_cast<int>(a*100),static_cast<int>(b*100),static_cast<int>(c*100));
