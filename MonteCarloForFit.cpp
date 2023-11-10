@@ -80,10 +80,10 @@ histXgen->plotOn(frame2);
 
 // FIT the toy model
 //variable of the fit
-RooRealVar Nmix_f("Nmixf","Nmix",a*N,-3000, +3000);
-RooRealVar Nuw_f("Nuwf","Nuw",b*N,-3000, +3000);
+RooRealVar Nmix_f("Nfit_{mix}","Nmix",a*N,-3000, +3000);
+RooRealVar Nuw_f("Nfit_{uw}","Nuw",b*N,-3000, +3000);
 //RooRealVar Nuw_f("Nuwf","Nuw", 0.);
-RooRealVar Nbk_f("Nbkf", "Nbk",c*N,-3000,3000);
+RooRealVar Nbk_f("Nfit_{cosmic}", "Nbk",c*N,-3000,3000);
 //create the fit model
 RooAddPdf model_forfit("model2", "model", RooArgList{/*PdfMixing*/ gauss_Mix,Rayleigh,linearFit},RooArgList{Nmix_f,Nuw_f,Nbk_f});
 RooPlot *frame3 = x.frame(Title("Toy Model Fit"));
@@ -174,6 +174,7 @@ frame2->Draw();
 auto canvas3 = new TCanvas("d3", "Fit to toy model", 800, 800);
 TString filenamefit = TString::Format("PlotMLEfit/N%d/FitToy(%d,%d,%d).pdf",N,static_cast<int>(a*100),static_cast<int>(b*100),static_cast<int>(c*100));
 frame3->Draw();
+canvas3->SaveAs(filenamefit);
 
 auto canvas4 = new TCanvas("d4", "Toy Result", 1000,550);
 auto pad = new TPad("pad", "pad",0,0,1,1);
@@ -199,11 +200,11 @@ TString percorso = TString::Format("PlotMLEfit/N%d/",N);
 
 if(CosmicFixed == 1){
 TString nameFile0 = TString::Format("ToyNmix_with_bkFixed(%d,%d,%d).pdf",static_cast<int>(a*100),static_cast<int>(b*100),static_cast<int>(c*100));
-canvas4->SaveAs(percorso + nameFile0);
+//canvas4->SaveAs(percorso + nameFile0);
 }
 else{
 TString nameFile0 = TString::Format("ToyNmix(%d,%d,%d).pdf",static_cast<int>(a*100),static_cast<int>(b*100),static_cast<int>(c*100));
-canvas4->SaveAs(percorso + nameFile0);
+//canvas4->SaveAs(percorso + nameFile0);
 }
 auto canvas5 = new TCanvas("d5","d5",800,800);
 hchisq->Draw();
@@ -238,9 +239,9 @@ canvas6->SaveAs(percorso + nameFile1);
 
 void SecondMontecarlo(){
 double a = 0.80, b = 0.10, c = 0.10; // percentage of the Pdfs
-int CosmicFixed = 0;
+int CosmicFixed = 1;
 // N: statistic of the data, Npoint number of iterations
-int N = 1000, Npoint = 30; // f4 contains 165 event, use this number for real simulation
+int N = 165, Npoint = 30; // f4 contains 165 event, use this number for real simulation
 int Nnested = 100;
 
 // With fixed contribution of cosmic
@@ -346,7 +347,7 @@ auto g = new TGraphErrors(weight.size(), weight.data(), mix.data(),errorx.data()
 std::ostringstream s; s << "MIX: N_{gen} - N_{fit} averaged over " << Nnested << " trials";
 g->SetTitle(s.str().c_str());
 g->GetYaxis()->SetTitle("<N_{gen} - N_{fit}>");
-g->GetXaxis()->SetTitle("w_{mix}");
+g->GetXaxis()->SetTitle("a");
 if(N > 500){
 g->SetMinimum(-50);
 g->SetMaximum(50);}
@@ -366,8 +367,8 @@ canvas0->SaveAs(percorso + nameFile0);
 auto g1 = new TGraph(weight.size(),weight.data(),mixErrors.data());
 g1->SetMarkerStyle(21);
 g1->SetTitle("MIX: #sigma vs weight");
-g1->GetYaxis()->SetTitle("#sigma_{Nmix} vs. w_{mix}");
-g1->GetXaxis()->SetTitle("w_{mix}");
+g1->GetYaxis()->SetTitle("#sigma_{Nmix} vs. a");
+g1->GetXaxis()->SetTitle("a");
 if(N > 500){
 g1->SetMinimum(50);
 g1->SetMaximum(80);}
@@ -380,6 +381,8 @@ g1->SetMaximum(40);
 
 auto canvas1 = new TCanvas("canvas1", "Bias and sigma",1000, 500);
 auto pad = new TPad("padd", "pad",0,0,1,1);
+gStyle->SetPadTickX(1);
+gStyle->SetPadTickY(1);
 pad->Divide(2,1,0.01,0.01);
 pad->Draw();
 pad->cd(1);

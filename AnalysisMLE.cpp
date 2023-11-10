@@ -9,7 +9,7 @@ void AnalysisMLE(){
 
 // DATA TO FIT
 TString cartella = TString::Format("Spectroscopy/Dataset/");
-TString filename = TString::Format("r68465_uw_exp_freq4.vertex.csv");
+TString filename = TString::Format("r68465_uw_exp_freq4.vertex");
 
 //MIXING
 ROOT::RDataFrame mix_rdf("myTree", {"DataSetROOT/r68814_mixing.vertex.root",
@@ -131,7 +131,9 @@ leg1->AddEntry(allpdf->findObject("Uw"), "Uw Template","LP");
 allpdf->Draw();
 leg1->Draw();
 
-auto f4_rdf = ROOT::RDF::MakeCsvDataFrame(cartella + filename);
+// DATA FOR THE FIT f
+TString formato = TString::Format(".csv");
+auto f4_rdf = ROOT::RDF::MakeCsvDataFrame(cartella + filename + formato);
 auto displ = f4_rdf.Display({"CutsType0","CutsType1","CutsType2", "X", "Y", "Z"}, 5);
     displ->Print();
 
@@ -221,13 +223,13 @@ RooRealVar mu("mu", "mu", 2.38);
 RooRealVar sigMix("sigMix", "sigMix",0.85);
 RooGaussian gauss_Mix("gauss", "gauss", x, mu, sigMix);
 
-RooRealVar Nmix_t("Nmix","Nmix",0.,200.);
-RooRealVar Nuw_a("Nuw","Nuw", -100,100);
-RooRealVar Nbk_a("Nbk", "Nbk",10.2,10.2);
+RooRealVar Nmix_t("Nfit_{mix}","Nfit_{mix}",0.,200.);
+RooRealVar Nuw_a("Nfit_{uw}","Nfit_{uw}", -100,100);
+RooRealVar Nbk_a("Nfit_{cosmic}", "Nfit_{cosmic}",10.2,10.2);
 
 RooPlot *analyticframe = x.frame(Title(filename));
 analyticframe->GetYaxis()->SetTitle("Counts");
-RooAddPdf model_analytic("model", "model", RooArgList{/*PdfMixing*/ gauss_Mix,Rayleigh,linearFit}, RooArgList{Nmix,Nuw_a,Nbk_a});
+RooAddPdf model_analytic("model", "model", RooArgList{/*PdfMixing*/ gauss_Mix,Rayleigh,linearFit}, RooArgList{Nmix_t,Nuw_a,Nbk_a});
 model_analytic.fitTo(f4_h, PrintLevel(-1));
 f4_h.plotOn(analyticframe);
 model_analytic.plotOn(analyticframe, LineColor(28));
