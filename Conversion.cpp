@@ -61,4 +61,67 @@ void Conversion(){
 	udf7.Snapshot("myTree", "DataSetROOT/r69126_uwlosses_160.vertex.root");
 	udf8.Snapshot("myTree", "DataSetROOT/r69142_uwlosses_160.vertex.root");
 	
+	
+	// REAL DATA
+	auto realf = ROOT::RDF::MakeCsvDataFrame("Spectroscopy/Dataset/r68465_uw_exp_freq1.vertex.csv");
+	auto realf1 = ROOT::RDF::MakeCsvDataFrame("Spectroscopy/Dataset/r68465_uw_exp_freq1.vertex.csv");
+	auto realf2 = ROOT::RDF::MakeCsvDataFrame("Spectroscopy/Dataset/r68465_uw_exp_freq2.vertex.csv");
+	auto realf3 = ROOT::RDF::MakeCsvDataFrame("Spectroscopy/Dataset/r68465_uw_exp_freq3.vertex.csv");
+	auto realf4 = ROOT::RDF::MakeCsvDataFrame("Spectroscopy/Dataset/r68465_uw_exp_freq4.vertex.csv");
+	auto realf5 = ROOT::RDF::MakeCsvDataFrame("Spectroscopy/Dataset/r68465_uw_exp_freq5.vertex.csv");
+	realf1.Snapshot("myTree", "DataSetROOT/r68465_f1.root");
+	realf2.Snapshot("myTree", "DataSetROOT/r68465_f2.root");
+	realf3.Snapshot("myTree", "DataSetROOT/r68465_f3.root");
+	realf4.Snapshot("myTree", "DataSetROOT/r68465_f4.root");
+	realf5.Snapshot("myTree", "DataSetROOT/r68465_f5.root");
+	
+	ROOT::RDataFrame total_rdf("myTree", {"DataSetROOT/r68465_f1.root", "DataSetROOT/r68465_f2.root", "DataSetROOT/r68465_f3.root", "DataSetROOT/r68465_f4.root", "DataSetROOT/r68465_f5.root"});
+	total_rdf.Snapshot("myTree", "Spectroscopy/RootCut1Data/r68465_cut1.root");
+
+	auto realff1 = ROOT::RDF::MakeCsvDataFrame("Spectroscopy/Dataset/r68481_uw_exp_freq1.vertex.csv");
+	auto realff2 = ROOT::RDF::MakeCsvDataFrame("Spectroscopy/Dataset/r68481_uw_exp_freq2.vertex.csv");
+	auto realff3 = ROOT::RDF::MakeCsvDataFrame("Spectroscopy/Dataset/r68481_uw_exp_freq3.vertex.csv");
+	auto realff4 = ROOT::RDF::MakeCsvDataFrame("Spectroscopy/Dataset/r68481_uw_exp_freq4.vertex.csv");
+	auto realff5 = ROOT::RDF::MakeCsvDataFrame("Spectroscopy/Dataset/r68481_uw_exp_freq5.vertex.csv");
+	auto realff6 = ROOT::RDF::MakeCsvDataFrame("Spectroscopy/Dataset/r68481_uw_exp_freq6.vertex.csv");
+	auto realff7 = ROOT::RDF::MakeCsvDataFrame("Spectroscopy/Dataset/r68481_uw_exp_freq7.vertex.csv");
+	auto realff8 = ROOT::RDF::MakeCsvDataFrame("Spectroscopy/Dataset/r68481_uw_exp_freq8.vertex.csv");
+	realff1.Snapshot("myTree", "DataSetROOT/r68481_f1.root");
+	realff2.Snapshot("myTree", "DataSetROOT/r68481_f2.root");
+	realff3.Snapshot("myTree", "DataSetROOT/r68481_f3.root");
+	realff4.Snapshot("myTree", "DataSetROOT/r68481_f4.root");
+	realff5.Snapshot("myTree", "DataSetROOT/r68481_f5.root");
+	realff6.Snapshot("myTree", "DataSetROOT/r68481_f6.root");
+	realff7.Snapshot("myTree", "DataSetROOT/r68481_f7.root");
+	realff8.Snapshot("myTree", "DataSetROOT/r68481_f8.root");
+	
+	ROOT::RDataFrame ttotal_rdf("myTree", {"DataSetROOT/r68481_f1.root","DataSetROOT/r68481_f2.root","DataSetROOT/r68481_f3.root","DataSetROOT/r68481_f4.root","DataSetROOT/r68481_f5.root","DataSetROOT/r68481_f6.root","DataSetROOT/r68481_f7.root","DataSetROOT/r68481_f8.root"});
+	ttotal_rdf.Snapshot("myTree", "Spectroscopy/RootCut1Data/r68481_cut1.root");
+	
+	
+	auto realfff1 = ROOT::RDF::MakeCsvDataFrame("Spectroscopy/Dataset/r68489_uw_exp_freq1.vertex.csv");
+	auto realfff2 = ROOT::RDF::MakeCsvDataFrame("Spectroscopy/Dataset/r68489_uw_exp_freq2.vertex.csv");
+	auto realfff3 = ROOT::RDF::MakeCsvDataFrame("Spectroscopy/Dataset/r68489_uw_exp_freq3.vertex.csv");
+	auto realfff4 = ROOT::RDF::MakeCsvDataFrame("Spectroscopy/Dataset/r68489_uw_exp_freq4.vertex.csv");
+	auto realfff5 = ROOT::RDF::MakeCsvDataFrame("Spectroscopy/Dataset/r68489_uw_exp_freq5.vertex.csv");
+	auto realfff6 = ROOT::RDF::MakeCsvDataFrame("Spectroscopy/Dataset/r68489_uw_exp_freq6.vertex.csv");
+	auto realfff7 = ROOT::RDF::MakeCsvDataFrame("Spectroscopy/Dataset/r68489_uw_exp_freq7.vertex.csv");
+	auto realfff8 = ROOT::RDF::MakeCsvDataFrame("Spectroscopy/Dataset/r68489_uw_exp_freq8.vertex.csv");
+	auto realfff9 = ROOT::RDF::MakeCsvDataFrame("Spectroscopy/Dataset/r68489_uw_exp_freq9.vertex.csv");
+	realff1.Snapshot("myTree", "DataSetROOT/r68489_f1.root");
+	realff2.Snapshot("myTree", "DataSetROOT/r68489_f2.root");
+	realff3.Snapshot("myTree", "DataSetROOT/r68489_f3.root");
+	realff4.Snapshot("myTree", "DataSetROOT/r68489_f4.root");
+	realff5.Snapshot("myTree", "DataSetROOT/r68489_f5.root");
+	realff6.Snapshot("myTree", "DataSetROOT/r68489_f6.root");
+	realff7.Snapshot("myTree", "DataSetROOT/r68489_f7.root");
+	realff8.Snapshot("myTree", "DataSetROOT/r68489_f8.root");
+	realff8.Snapshot("myTree", "DataSetROOT/r68489_f9.root");
+	
+	ROOT::RDataFrame tttotal_rdf("myTree", {"DataSetROOT/r68489_f1.root","DataSetROOT/r68489_f2.root","DataSetROOT/r68489_f3.root","DataSetROOT/r68489_f4.root","DataSetROOT/r68489_f5.root","DataSetROOT/r68489_f6.root","DataSetROOT/r68489_f7.root","DataSetROOT/r68489_f8.root","DataSetROOT/r68489_f9.root"});
+	ttotal_rdf.Snapshot("myTree", "Spectroscopy/RootCut1Data/r68489_cut1.root");
+	
+	
+	
+		
 }

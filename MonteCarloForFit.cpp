@@ -61,8 +61,8 @@ RooGenericPdf Rayleigh("line", "linear model", " TMath::Abs(x)/(sigRay*sigRay) *
 RooGenericPdf linearFit("linearFit", "linear model", "TMath::Abs((0.125)*x)", RooArgSet(x));
 
 RooRealVar Nmix_t("Nmix","Nmix",a*N, -3000, +3000);
-RooRealVar Nuw_a ("Nuw", "Nuw", b*N, -3000, +3000);
-RooRealVar Nbk_a ("Nbk", "Nbk", c*N, -3000, +3000);
+RooRealVar Nuw_a ("Ngas", "Ngas", b*N, -3000, +3000);
+RooRealVar Nbk_a ("Ncosmic", "Ncosmic", c*N, -3000, +3000);
 RooPlot *frame1 = x.frame(Title("Sum Of Three Pdfs"));
 //Model to generate the data
 RooAddPdf model_gen("model", "model", RooArgList{gauss_Mix,Rayleigh,linearFit}, RooArgList{Nmix_t,Nuw_a,Nbk_a});
@@ -81,7 +81,7 @@ histXgen->plotOn(frame2);
 // FIT the toy model
 //variable of the fit
 RooRealVar Nmix_f("Nfit_{mix}","Nmix",a*N,-3000, +3000);
-RooRealVar Nuw_f("Nfit_{uw}","Nuw",b*N,-3000, +3000);
+RooRealVar Nuw_f("Nfit_{gas}","Ngas",b*N,-3000, +3000);
 //RooRealVar Nuw_f("Nuwf","Nuw", 0.);
 RooRealVar Nbk_f("Nfit_{cosmic}", "Nbk",c*N,-3000,3000);
 //create the fit model
@@ -91,7 +91,7 @@ frame3->GetYaxis()->SetTitle("Counts");
 model_forfit.fitTo(*data, Save());
 histXgen->plotOn(frame3);
 model_forfit.plotOn(frame3,LineColor(27));
-TString chiquadrato = TString::Format("chisq = %.1f, ndof = %d",frame3->chiSquare()*(30), (30-3));
+TString chiquadrato = TString::Format("#chi^{2} = %.1f, ndof = %d",frame3->chiSquare()*(30), (30-3));
 //TString cosmici = TString::Format("Cosmici Nbk = %.2f ", Nfix*N);
 model_forfit.paramOn(frame3,Label(chiquadrato)/*,Label(cosmici)*/);
 //frame3->getAttText()->SetTextSize(9); 
@@ -148,8 +148,8 @@ hbk->Fit("gaus");
 auto legend = new TLegend(0.1,0.7,0.48,0.9);
 legend->SetHeader("PDF Composition","C"); // option "C" allows to center the header
 TString coeffMix = TString::Format("degree mixing = %.2f %% ", a*100);
-TString coeffUw = TString::Format("degree uw = %.2f %%", b*100);
-TString coeffbk = TString::Format("degree bk = %.2f %%", c*100);
+TString coeffUw = TString::Format("degree gas = %.2f %%", b*100);
+TString coeffbk = TString::Format("degree cosmic = %.2f %%", c*100);
 legend->AddEntry(hmix,coeffMix);
 legend->AddEntry(hmix,coeffUw);
 legend->AddEntry(hmix,coeffbk);
@@ -186,7 +186,7 @@ pad->cd(1);
 hmix->SetLineColor(1);
 hmix->SetLineWidth(2);
 hmix->Draw();
-legend->Draw();
+//legend->Draw();
 pad->cd(2);
 huw->SetLineColor(1);
 huw->SetLineWidth(2);
@@ -273,15 +273,15 @@ RooGenericPdf linearFit("linearFit", "linear model", "TMath::Abs((0.125)*x)", Ro
 
 //Model to generate the data
 RooRealVar Nmix_t("Nmix","Nmix",a*N, -(2*N), +(2*N));
-RooRealVar Nuw_a ("Nuw", "Nuw", b*N, -(2*N), +(2*N));
-RooRealVar Nbk_a ("Nbk", "Nbk", c*N, -(2*N), +(2*N));
+RooRealVar Nuw_a ("Ngas", "Ngas", b*N, -(2*N), +(2*N));
+RooRealVar Nbk_a ("Ncosmic", "Ncosmic", c*N, -(2*N), +(2*N));
 RooAddPdf model_gen("model", "model", RooArgList{/*PdfMixing*/ gauss_Mix,Rayleigh,linearFit}, RooArgList{Nmix_t,Nuw_a,Nbk_a});
 
 //create the fit model
-RooRealVar Nmix_f("Nmixf","Nmix",a*N,-(2*N), +(2*N));
-RooRealVar Nuw_f ("Nuwf", "Nuw", b*N,-(2*N), +(2*N));
+RooRealVar Nmix_f("Nmix fit","Nmix",a*N,-(2*N), +(2*N));
+RooRealVar Nuw_f ("Ngas fit", "Ngas", b*N,-(2*N), +(2*N));
 //RooRealVar Nuw_f ("Nuwf", "Nuw", 0);
-RooRealVar Nbk_f ("Nbkf", "Nbk", c*N,-(2*N), +(2*N));
+RooRealVar Nbk_f ("Ncosmic fit", "Ncosmic", c*N,-(2*N), +(2*N));
 RooAddPdf model_forfit("model2", "model", RooArgList{/*PdfMixing*/ gauss_Mix,Rayleigh,linearFit},RooArgList{Nmix_f,Nuw_f,Nbk_f});
 
 //Arrays to store the data

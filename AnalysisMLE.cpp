@@ -9,7 +9,7 @@ void AnalysisMLE(){
 
 // DATA TO FIT
 TString cartella = TString::Format("Spectroscopy/Dataset/");
-TString filename = TString::Format("r68465_uw_exp_freq4.vertex");
+TString filename = TString::Format("r68465_uw_exp_freq5.vertex");
 
 //MIXING
 ROOT::RDataFrame mix_rdf("myTree", {"DataSetROOT/r68814_mixing.vertex.root",
@@ -54,7 +54,7 @@ auto histUw = uw2_rdf.Histo1D({"UWlosses","Counts",30u,0.,4.}, "Radius");
 uw2_rdf.Snapshot("myTree", "Spectroscopy/RootCut1Data/UWCut1.root", {"X","Y","Radius"});
 
 RooDataHist Uw_h("dh1", "dh1", x, Import(*histUw));
-RooPlot *frame2 = x.frame(Title("UW losses PDF"));
+RooPlot *frame2 = x.frame(Title("GAS losses PDF"));
 frame2->GetYaxis()->SetTitle("Counts");
 // EXTRACT THE PDF FROM THE HISTOGRAM
 RooHistPdf PdfUwlosses("uwlossespdf", "uwlossespdf", x, Uw_h, 0);
@@ -73,7 +73,7 @@ Rayleigh2.fitTo(Uw_h); // FIT
 Rayleigh2.plotOn(frame2, LineColor(kRed));
 Double_t chi2ray = frame2->chiSquare();
 std::cout << "chi square rayleigh: " << frame2->chiSquare() << std::endl; 
-TString chis2ray = TString::Format("Chisquare = %.1f ndof %d", chi2ray*27,27);
+TString chis2ray = TString::Format("#chi^{2} = %.1f ndof %d", chi2ray*27,27);
 Rayleigh2.paramOn(frame2,Label(chis2ray));
 
 auto canvas1 = new TCanvas("d1", "d1",800,800);
@@ -119,15 +119,15 @@ RooPlot *allpdf = x.frame(Title("All Pdf"));
 
 PdfBk.plotOn(allpdf, LineColor(kBlue), Name("Cosmic"));
 PdfMixing.plotOn(allpdf, LineColor(kRed), Name("Mixing"));
-PdfUwlosses.plotOn(allpdf, LineColor(kGreen), Name("Uw"));
+PdfUwlosses.plotOn(allpdf, LineColor(kGreen), Name("Gas"));
 
 // Aggiungo una legenda al plot
 TLegend *leg1 = new TLegend(0.65,0.73,0.86,0.87);
 leg1->SetFillColor(kWhite);
 leg1->SetLineColor(kWhite);
-leg1->AddEntry(allpdf->findObject("Cosmic"), "Cosmic Cemplate", "LP");
+leg1->AddEntry(allpdf->findObject("Cosmic"), "Cosmic Template", "LP");
 leg1->AddEntry(allpdf->findObject("Mixing"), "Mixing Template", "LP");
-leg1->AddEntry(allpdf->findObject("Uw"), "Uw Template","LP");
+leg1->AddEntry(allpdf->findObject("Gas"), "Gas Template","LP");
 allpdf->Draw();
 leg1->Draw();
 
@@ -159,8 +159,8 @@ frameG->Draw();
 
 // Fit with the sum of all distributions
 RooRealVar Nmix("Nmix", "Nmix", 0., 200);
-RooRealVar Nuw("Nuw", "Nuw", -100, 200);
-RooRealVar Nbk("Nbk", "Nbk", -100, 200);
+RooRealVar Nuw("Ngas", "Ngas", -100, 200);
+RooRealVar Nbk("Ncosmic", "Ncosmic", -100, 200);
 RooPlot *frame4 = x.frame(Title("Fit to f4 Dataset"));
 RooAddPdf model("model","model", RooArgList{PdfMixing,PdfUwlosses,PdfBk}, RooArgList{Nmix, Nuw, Nbk} );
 model.fitTo(f4_h, Extended(),PrintLevel(-1));
@@ -169,7 +169,7 @@ model.plotOn(frame4, LineColor(kRed));
 
 // Print the chisquare on the plot
 Double_t chi2 = frame4->chiSquare();
-TString chis2Line = TString::Format("Chisquare = %f ", chi2);
+TString chis2Line = TString::Format("#chi^{2} = %f ", chi2);
 model.paramOn(frame4, Label(chis2Line));
 
 auto canvas4 = new TCanvas("d4","d4", 800, 800);
@@ -179,8 +179,8 @@ frame4->Draw();
 
 // FIT WITH COSMIC FIXED
 RooRealVar Nmix_f("Nmix", "Nmix", 0., 200);
-RooRealVar Nuw_f("Nuw", "Nuw", -100, 100);
-RooRealVar Nbk_f("Nbk", "Nbk", 10,10);
+RooRealVar Nuw_f("Ngas", "Ngas", -100, 100);
+RooRealVar Nbk_f("Ncosmic", "Ncosmic", 10,10);
 RooPlot *frame5 = x.frame(Title("Fit, Cosmic Fixed"));
 RooAddPdf model_bkfixed("model","model", RooArgList{PdfMixing,PdfUwlosses,PdfBk}, RooArgList{Nmix_f, Nuw_f, Nbk_f} );
 model_bkfixed.fitTo(f4_h,PrintLevel(-1)); // FIT
@@ -189,7 +189,7 @@ model_bkfixed.plotOn(frame5, LineColor(kBlue));
 
 // Print the chisquare on the plot
 Double_t chi2_bkfixed = frame5->chiSquare();
-TString chis2Line_fixed = TString::Format("Chisquare = %f ", chi2_bkfixed);
+TString chis2Line_fixed = TString::Format("#chi^{2} = %f ", chi2_bkfixed);
 model_bkfixed.paramOn(frame5, Label(chis2Line_fixed));
 
 auto canvas6 = new TCanvas("d6"," Cosmic Fixed", 800, 800);
@@ -208,7 +208,7 @@ model_onlyMix.plotOn(frame6, LineColor(kGreen));
 
 // Print the chisquare on the plot
 Double_t chi2_onlyMix = frame6->chiSquare();
-TString chis2Line_onlyMix = TString::Format("Chisquare = %f ", chi2_onlyMix);
+TString chis2Line_onlyMix = TString::Format("#chi^{2} = %f ", chi2_onlyMix);
 model_onlyMix.paramOn(frame6, Label(chis2Line_onlyMix));
 
 auto canvas7 = new TCanvas("d7"," Only Mix", 800, 800);
@@ -224,7 +224,7 @@ RooRealVar sigMix("sigMix", "sigMix",0.85);
 RooGaussian gauss_Mix("gauss", "gauss", x, mu, sigMix);
 
 RooRealVar Nmix_t("Nfit_{mix}","Nfit_{mix}",0.,200.);
-RooRealVar Nuw_a("Nfit_{uw}","Nfit_{uw}", -100,100);
+RooRealVar Nuw_a("Nfit_{gas}","Nfit_{gas}", -100,100);
 RooRealVar Nbk_a("Nfit_{cosmic}", "Nfit_{cosmic}",10.2,10.2);
 
 RooPlot *analyticframe = x.frame(Title(filename));
@@ -233,7 +233,7 @@ RooAddPdf model_analytic("model", "model", RooArgList{/*PdfMixing*/ gauss_Mix,Ra
 model_analytic.fitTo(f4_h, PrintLevel(-1));
 f4_h.plotOn(analyticframe);
 model_analytic.plotOn(analyticframe, LineColor(28));
-TString chiquadrato = TString::Format("chisq = %.1f, ndof = %d",analyticframe->chiSquare()*(30), (30-3));
+TString chiquadrato = TString::Format("#chi^{2} = %.1f, ndof = %d",analyticframe->chiSquare()*(30), (30-3));
 model_analytic.paramOn(analyticframe, Label(chiquadrato));
 
 auto canvas8 = new TCanvas("d8","d8",800,800);
