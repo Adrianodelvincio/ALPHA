@@ -1,6 +1,6 @@
-Spectroscopy/Control
-Spectroscopy/Dataset
-Spectroscopy/RootCut1Data
+ALPHA-2/Control
+ALPHA-2/DataSetROOT
+ALPHA-2/DataSet
 PlotMLEfit/MLE_TOY.aux
 PlotMLEfit/MLE_TOY.log
 PlotMLEfit/MLE_TOY.out
@@ -13,13 +13,9 @@ PlotMLEfit/elog_version.snm
 PlotMLEfit/elog_version.log
 PlotMLEfit/elog_version.aux
 PlotMLEfit/elog_version.out
-2021_nature_laser_cooling.pdf
-2010_nature_trapped_Hbar.pdf
-2012_nature_first_spectroscopy.pdf
-2018_alpha_CERN_Courier.pdf
-2020_nature_hyperfine.pdf
-REPORT-ALPHA-status report.pdf
+
+
 s41586-018-0435-1.pdf
 s41586-020-2006-5.pdf
 s41586-023-06527-1.pdf
-DataSetROOT
+

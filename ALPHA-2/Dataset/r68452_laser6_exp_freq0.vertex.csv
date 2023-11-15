@@ -1,0 +1,2 @@
+Run Number,Event Number,Plot Time (Time axis of TAPlot),Detector Time (detectors internal clock),OfficialTime (run time),CutsType0,CutsType1,CutsType2,Vertex Status,X,Y,Z,Number of Helices,Number of Tracks
+68452,435842,0.010482,28925.444822,28925.639153,0, 0, 0, 0,-99.000000,-99.000000,-99.000000,-1,1
