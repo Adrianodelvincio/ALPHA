@@ -143,20 +143,6 @@ auto Histf4_h = f4_2_rdf.Histo1D({"Counts Frequency 4","Counts",30u,0.,4.}, "Rad
 
 RooDataHist f4_h("dh3", "dh3", x, Import(*Histf4_h));
 
-
-// Fit a Gaussian pdf to the data
-RooRealVar mean("mean", "mean", 0, -10, 10);
-RooRealVar sigma("sigma", "sigma", 3, 0.1, 10);
-RooGaussian gauss("gauss", "gauss", x, mean, sigma);
-gauss.fitTo(f4_h, PrintLevel(-1));
-RooPlot *frameG = x.frame(Title("fit with gaussian"));
-f4_h.plotOn(frameG);
-gauss.plotOn(frameG);
-gauss.paramOn(frameG);
-
-auto canvas5 = new TCanvas("d5", "d5",800,800);
-frameG->Draw();
-
 // Fit with the sum of all distributions
 RooRealVar Nmix("Nmix", "Nmix", 0., 200);
 RooRealVar Nuw("Ngas", "Ngas", -100, 200);
@@ -215,27 +201,4 @@ auto canvas7 = new TCanvas("d7"," Only Mix", 800, 800);
 // Calculate the Chisquare
 std::cout << "chi^2 only mix = " << frame6->chiSquare() << std::endl;
 frame6->Draw();
-
-// FIT WITH THE ANALYTIC FORMULA
-
-//FOR MIXING USE A GAUSSIAN
-RooRealVar mu("mu", "mu", 2.38);
-RooRealVar sigMix("sigMix", "sigMix",0.85);
-RooGaussian gauss_Mix("gauss", "gauss", x, mu, sigMix);
-
-RooRealVar Nmix_t("Nfit_{mix}","Nfit_{mix}",0.,200.);
-RooRealVar Nuw_a("Nfit_{gas}","Nfit_{gas}", -100,100);
-RooRealVar Nbk_a("Nfit_{cosmic}", "Nfit_{cosmic}",10.2,10.2);
-
-RooPlot *analyticframe = x.frame(Title(filename));
-analyticframe->GetYaxis()->SetTitle("Counts");
-RooAddPdf model_analytic("model", "model", RooArgList{/*PdfMixing*/ gauss_Mix,Rayleigh,linearFit}, RooArgList{Nmix_t,Nuw_a,Nbk_a});
-model_analytic.fitTo(f4_h, PrintLevel(-1));
-f4_h.plotOn(analyticframe);
-model_analytic.plotOn(analyticframe, LineColor(28));
-TString chiquadrato = TString::Format("#chi^{2} = %.1f, ndof = %d",analyticframe->chiSquare()*(30), (30-3));
-model_analytic.paramOn(analyticframe, Label(chiquadrato));
-
-auto canvas8 = new TCanvas("d8","d8",800,800);
-analyticframe->Draw();
 }

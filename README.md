@@ -17,7 +17,8 @@ Structure of the repository
 
 The software is dived in different scripts, that are
 
-1. *AnalysisMLE.cpp*
+1. *TemplateMLE.cpp*
+2. *AnalyticMLE.cpp*
 2. *MonteCarloForFit.cpp*
 3. *Conversion.cpp*
 4. *fitAllFrequency.cpp*
