@@ -13,7 +13,7 @@ void Conversion(){
 	
 	int numFile = 0;
 	while(numFile <= 8){
-		
+		// Mixing
 		std::cout << "Processing file : " << folderCsv+Mixing_Files[numFile]+endnameMix << std::endl;
 		if(!gSystem->AccessPathName(folderCsv+Mixing_Files[numFile]+endnameMix)){
 			std::cout << "File found, creating .root file" << std::endl;
@@ -24,7 +24,7 @@ void Conversion(){
 			std::cout << "!!!File .root already existing!!!" << std::endl;
 			}
 		}
-		
+		// Residual Gas
 		std::cout << "Processing file : " << folderCsv+Mixing_Files[numFile]+endnameUw << std::endl;
 		if(!gSystem->AccessPathName(folderCsv+Mixing_Files[numFile]+endnameUw)){
 			std::cout << "File found, creating .root file" << std::endl;
@@ -39,27 +39,47 @@ void Conversion(){
 	numFile += 1;
 	}
 	
+	// COSMICI
 	auto cdf = ROOT::RDF::MakeCsvDataFrame("Control/cosmic/r68949_cosmics.vertex.csv");
 	auto cdf1 = ROOT::RDF::MakeCsvDataFrame("Control/cosmic/r69177_cosmics.vertex.csv");
 	auto cdf2 = ROOT::RDF::MakeCsvDataFrame("Control/cosmic/r69207_cosmics.vertex.csv");
 	auto cdf3 = ROOT::RDF::MakeCsvDataFrame("Control/cosmic/r69219_cosmics.vertex.csv");
+	if(gSystem->AccessPathName("DataSetROOT/r68949_cosmics.vertex.root")){
+		cdf.Snapshot("myTree", "DataSetROOT/r68949_cosmics.vertex.root");
+		cdf1.Snapshot("myTree", "DataSetROOT/r69177_cosmics.vertex.root");
+		cdf2.Snapshot("myTree", "DataSetROOT/r69207_cosmics.vertex.root");
+		cdf3.Snapshot("myTree", "DataSetROOT/r69219_cosmics.vertexroot");
+	}
 	
-	cdf.Snapshot("myTree", "DataSetROOT/r68949_cosmics.vertex.root");
-	cdf1.Snapshot("myTree", "DataSetROOT/r69177_cosmics.vertex.root");
-	cdf2.Snapshot("myTree", "DataSetROOT/r69207_cosmics.vertex.root");
-	cdf3.Snapshot("myTree", "DataSetROOT/r69219_cosmics.vertexroot");
 	// REAL DATA
 	std::cout << "Real Data: " << std::endl;
 	TString front_file = "Dataset/";
-	TString RealData[3] = {"r68465", "r68481", "r68489"};
+	TString RealData[4] = {"r68465", "r68481", "r68489", "r68498"};
+	
 	numFile = 1;
-	for (int i = 0; i < 3 ; i ++){
+	for (int i = 0; i < 4 ; i ++){
 		numFile = 1;
 		while(numFile < 100){
+		
 		TString file_end = TString::Format("_uw_exp_freq%d.vertex.csv", numFile);
 		std::cout << "Processing file: " << front_file + RealData[i] + file_end << std::endl;
-			if(!gSystem->AccessPathName(front_file + RealData[i] + file_end)){
+			//Check if the file exist
+			if(!gSystem->AccessPathName(front_file + RealData[i] + file_end)){	
 			std::cout << "File found, proceding to the conversion" << std::endl;
+			//Check Empty file
+			std::string namecsv((front_file + RealData[i] + file_end).Data());
+			ifstream stream(namecsv); 
+			string firstLine,str; 
+			getline(stream, firstLine);
+			if(!std::getline(stream,str)){
+			numFile += 1;
+			std::cout << "File EMPTY" << std::endl;
+			continue;
+			} // empty files, ignore it
+			// Open the Data Frame
+			TString NamefileRoot = TString::Format("_f%d.root", numFile);
+			auto rdf = ROOT::RDF::MakeCsvDataFrame(front_file + RealData[i] + file_end);
+			rdf.Snapshot("myTree",folder + RealData[i] + NamefileRoot);
 			}
 			else{
 			std::cout << "File NOT found, loop ends" << std::endl;
@@ -67,22 +87,5 @@ void Conversion(){
 			}
 		numFile += 1;
 		};
-	};
-	/*
-	ROOT::RDataFrame total_rdf("myTree", {"DataSetROOT/r68465_f1.root", "DataSetROOT/r68465_f2.root", "DataSetROOT/r68465_f3.root", "DataSetROOT/r68465_f4.root", "DataSetROOT/r68465_f5.root"});
-	total_rdf.Snapshot("myTree", "DataSetROOT/r68465_cut1.root");
-
-	
-	ROOT::RDataFrame ttotal_rdf("myTree", {"DataSetROOT/r68481_f1.root","DataSetROOT/r68481_f2.root","DataSetROOT/r68481_f3.root","DataSetROOT/r68481_f4.root","DataSetROOT/r68481_f5.root","DataSetROOT/r68481_f6.root","DataSetROOT/r68481_f7.root","DataSetROOT/r68481_f8.root"});
-	ttotal_rdf.Snapshot("myTree", "DataSetROOT/r68481_cut1.root");
-	
-	
-	ROOT::RDataFrame tttotal_rdf("myTree", {"DataSetROOT/r68489_f1.root","DataSetROOT/r68489_f2.root","DataSetROOT/r68489_f3.root","DataSetROOT/r68489_f4.root","DataSetROOT/r68489_f5.root","DataSetROOT/r68489_f6.root","DataSetROOT/r68489_f7.root","DataSetROOT/r68489_f8.root","DataSetROOT/r68489_f9.root"});
-	tttotal_rdf.Snapshot("myTree", "DataSetROOT/r68489_cut1.root");
-	
-	
-	ROOT::RDataFrame ttttotal_rdf("myTree", {"DataSetROOT/r68498_f1.root","DataSetROOT/r68498_f2.root","DataSetROOT/r68498_f3.root","DataSetROOT/r68498_f4.root","DataSetROOT/r68498_f5.root","DataSetROOT/r68498_f6.root","DataSetROOT/r68498_f7.root"});
-	ttttotal_rdf.Snapshot("myTree", "DataSetROOT/r68498_cut1.root");
-	*/
-		
+	};		
 }

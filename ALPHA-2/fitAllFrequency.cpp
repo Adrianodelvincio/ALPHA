@@ -4,7 +4,36 @@
 #include "RooHistPdf.h"
 #include <TMath.h>
 #include "TGraphErrors.h"
+#include <string>
 using namespace RooFit;
+
+std::vector<std::string> getFiles(TString);
+std::vector<std::string> getFiles(TString RunNumber){
+	std::vector<string> elenco;
+	TString Directory = "DataSetROOT/";
+	int numFile = 1;
+	std::cout << "Creating list of files" << std::endl;
+	while(numFile < 100){
+		TString endfile = TString::Format("_f%d.root", numFile);
+		TString namefile = Directory + RunNumber + endfile;
+		std::cout << namefile << std::endl;
+		if(!gSystem->AccessPathName(namefile)){
+			std::string lastfile(namefile.Data());
+			elenco.push_back(lastfile);
+		}
+		else{
+			break;
+		}
+		numFile += 1;
+	}
+	return elenco;
+}
+
+void example(){
+	TString runNumber = "r68481";
+	std::vector<std::string> lista = getFiles(runNumber);
+	std::cout << lista[3] << std::endl;
+}
 
 
 void fitAllFrequency(){
@@ -93,16 +122,22 @@ gres->Draw("p");
 
 void AllDataFit(){
 
-//ROOT::RDataFrame total_rdf("myTree", "DataSetROOT/r68465_cut1.root");
-//ROOT::RDataFrame total_rdf("myTree", "DataSetROOT/r68481_cut1.root");
-//ROOT::RDataFrame total_rdf("myTree", "DataSetROOT/r68489_cut1.root");
-ROOT::RDataFrame total_rdf("myTree", "DataSetROOT/r68498_cut1.root");
-RooRealVar Ncosmic("Nfit_{cosmic}", "Nfit_{cosmic}", 70, 70);
+//"DataSetROOT/r68465_cut1.root" "DataSetROOT/r68481_cut1.root" "DataSetROOT/r68489_cut1.root" "DataSetROOT/r68498_cut1.root"
+TString runNumber = "r68498";
+std::vector<std::string> FileList = getFiles(runNumber);
 
+if (FileList.size() == 0) {
+gROOT->ProcessLine(".x Conversion.cpp");
+}
+
+std::cout << FileList.size() << std::endl;
+double ExpectedRateMuons = (10.2)*FileList.size();
+RooRealVar Ncosmic("Nfit_{cosmic}", "Nfit_{cosmic}" , ExpectedRateMuons, ExpectedRateMuons);
+ROOT::RDataFrame rdf("myTree", FileList);
 //Display some data
-auto displ = total_rdf.Display({"CutsType0","CutsType1","CutsType2", "X", "Y", "Z"}, 5);
+auto displ = rdf.Display({"CutsType0","CutsType1","CutsType2", "X", "Y", "Z"}, 5);
 displ->Print();
-auto rdf2 = total_rdf.Define("Radius", "TMath::Sqrt(X*X + Y*Y)").Filter("CutsType1 ==  \" 1\"");
+auto rdf2 = rdf.Define("Radius", "TMath::Sqrt(X*X + Y*Y)").Filter("CutsType1 ==  \" 1\"");
 auto Hist = rdf2.Histo1D({"Counts Frequency 4","Counts",30u,0.,4.}, "Radius");
 
 
@@ -136,4 +171,3 @@ model_analytic.paramOn(analyticframe, Label(chiquadrato));
 auto canvas = new TCanvas("Fit all the data together","d",800,800);
 analyticframe->Draw();
 }
-
