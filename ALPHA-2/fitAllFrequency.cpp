@@ -29,13 +29,6 @@ std::vector<std::string> getFiles(TString RunNumber){
 	return elenco;
 }
 
-void example(){
-	TString runNumber = "r68481";
-	std::vector<std::string> lista = getFiles(runNumber);
-	std::cout << lista[3] << std::endl;
-}
-
-
 void fitAllFrequency(){
 // DATA TO FIT
 TString cartella = TString::Format("Dataset/");
@@ -124,14 +117,16 @@ void AllDataFit(){
 
 //"DataSetROOT/r68465_cut1.root" "DataSetROOT/r68481_cut1.root" "DataSetROOT/r68489_cut1.root" "DataSetROOT/r68498_cut1.root"
 TString runNumber = "r68498";
-std::vector<std::string> FileList = getFiles(runNumber);
+std::vector<std::string> FileList;
+FileList = getFiles(runNumber);
 
 if (FileList.size() == 0) {
 gROOT->ProcessLine(".x Conversion.cpp");
+FileList = getFiles(runNumber);
 }
 
-std::cout << FileList.size() << std::endl;
 double ExpectedRateMuons = (10.2)*FileList.size();
+
 RooRealVar Ncosmic("Nfit_{cosmic}", "Nfit_{cosmic}" , ExpectedRateMuons, ExpectedRateMuons);
 ROOT::RDataFrame rdf("myTree", FileList);
 //Display some data

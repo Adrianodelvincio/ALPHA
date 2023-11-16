@@ -4,28 +4,25 @@
 #include "RooHistPdf.h"
 #include <TMath.h>
 #include "TGraphErrors.h"
+#include "Headers/MontecarloForFit.h"
+
 using namespace RooFit;
 
-
-void SetVectors(int i,std::vector<double> &,std::vector<double> &,std::vector<double> &, RooRealVar,RooRealVar,RooRealVar,RooRealVar,RooRealVar, RooRealVar);
-Double_t media(std::vector<Double_t>&v);
-
-
 void MonteCarloForFit(){
-double a = 0.33, b = 0.33, c = 0.33; // percentage of the Pdfs
+// percentage of the Pdfs
+double a = 0.33;
+double b = 0.33;
+double c = 0.33; 
 int CosmicFixed = 0;
-// N: statistic of the data, Nloop number of iterations
-int N = 1000, Nloop = 1000; // f4 contains 165 event, use this number for real simulation
-//if the number of cosmic is fixed (costant time window), then use Nfix for Nbk_a
-//For the cosmic realistic scenario
+int N = 1000;
+int Nloop = 1000; 
 double Nfix = 10.2;
 if(CosmicFixed == 1){
-c = Nfix/N;	// c fixed
-double tt = a;
-a = a/(a+b); b = b/(tt+b);
-a = (N - Nfix)*a/N; // Correct a
-b = (N - Nfix)*b/N; // Correct b
+SetProb(&a, &b, &c, N, Nfix);
 }
+
+//Generate dictionary
+gInterpreter->GenerateDictionary("Functions", "Headers/MontecarloForFit.h");
 
 //CREATE AN ISTOGRAM TO SAVE THE QUANTITIES OF THE MONTECARLO
 TH1* hmix = new TH1I("h1", "MIX : (N_{fit} - N_{gen})/#sigma",30, -6,6);
@@ -33,18 +30,8 @@ TH1* huw =  new TH1I("h2", "Residual gas : (N_{fit} - N_{gen})/#sigma",30,-6,6);
 TH1* hbk =  new TH1I("h3", "Cosmic : (N_{fit} - N_{gen})/#sigma",30,-6,6);
 TH1* hchisq = new TH1I("hchisq", "chiquadro", 30, 0, 50);
 
-//LOAD THE DATA
-ROOT::RDataFrame mix("myTree", "DataSetROOT/MixCut1.root");
-ROOT::RDataFrame uwlosses("myTree", "DataSetROOT/UWCut1.root");
-ROOT::RDataFrame cosmic("myTree", "DataSetROOT/CosmicCut1.root");
-
 RooRealVar x("x","r [cm]",0.,4.);
 x.setBins(30);
-
-//RETRIEVE PDF MIXING
-auto histMix = mix.Histo1D({"Mixing","Counts",30u,0.,4.}, "Radius");
-RooDataHist mix_h("dh0", "dh0", x, Import(*histMix));
-RooHistPdf PdfMixing("mixingpdf", "mixingpdf", x, mix_h, 0);
 
 //MIXING analytic model
 RooRealVar mu("mu", "mu", 2.38);
@@ -85,7 +72,7 @@ RooRealVar Nuw_f("Nfit_{gas}","Ngas",b*N,-3000, +3000);
 //RooRealVar Nuw_f("Nuwf","Nuw", 0.);
 RooRealVar Nbk_f("Nfit_{cosmic}", "Nbk",c*N,-3000,3000);
 //create the fit model
-RooAddPdf model_forfit("model2", "model", RooArgList{/*PdfMixing*/ gauss_Mix,Rayleigh,linearFit},RooArgList{Nmix_f,Nuw_f,Nbk_f});
+RooAddPdf model_forfit("model2", "model", RooArgList{gauss_Mix,Rayleigh,linearFit},RooArgList{Nmix_f,Nuw_f,Nbk_f});
 RooPlot *frame3 = x.frame(Title("Toy Model Fit"));
 frame3->GetYaxis()->SetTitle("Counts");
 model_forfit.fitTo(*data, Save());
@@ -93,7 +80,7 @@ histXgen->plotOn(frame3);
 model_forfit.plotOn(frame3,LineColor(27));
 TString chiquadrato = TString::Format("#chi^{2} = %.1f, ndof = %d",frame3->chiSquare()*(30), (30-3));
 //TString cosmici = TString::Format("Cosmici Nbk = %.2f ", Nfix*N);
-model_forfit.paramOn(frame3,Label(chiquadrato)/*,Label(cosmici)*/);
+model_forfit.paramOn(frame3,Label(chiquadrato));
 //frame3->getAttText()->SetTextSize(9); 
 double fit0, fit1, fit2;
 fit0 = Nmix_f.getVal();
@@ -236,53 +223,50 @@ canvas6->SaveAs(percorso + nameFile1);
 	}
 }
 
-
 void SecondMontecarlo(){
-double a = 0.9, b = 0., c = 0.10; // percentage of the Pdfs
-int CosmicFixed = 0;
+// percentage of the Pdfs
+double a = 0.9;
+double b = 0. ;
+double c = 0.10; 
 // N: statistic of the data, Npoint number of iterations
-int N = 1000, Npoint = 30; // f4 contains 165 event, use this number for real simulation
+int CosmicFixed = 0;
+int N = 1000; 
+int Npoint = 30; // f4 contains 165 event, use this number for real simulation
 int Nnested = 100;
 
-// With fixed contribution of cosmic
+//Generate dictionary
+gInterpreter->GenerateDictionary("MontecarloForFit", "Headers/MontecarloForFit.h");
+
+// Fix the cosmic Background
 double Nfix = 10.2;
 if(CosmicFixed == 1){
-c = Nfix/N;	// c fixed
-double tt = a;
-a = a/(a+b); b = b/(tt+b);
-a = (N - Nfix)*a/N; // Correct a
-b = (N - Nfix)*b/N; // Correct b
+SetProb(&a,&b,&c,N,Nfix);
 }
 
+// Set the variable to store the data
 RooRealVar x("x","r [cm]",0.,4.);
 x.setBins(30);
 
-//MIXING analytic model
 RooRealVar mu("mu", "mu", 2.38,2.38);
 RooRealVar sigMix("sigMix", "sigMix",0.85,0.85);
 RooGaussian gauss_Mix("gauss", "gauss", x, mu, sigMix);
 
-//PDF UWlosses
-//FIXING sigRay to the value from the fit to the model (see analysisMLE.cpp)
-RooRealVar sigRay("sigRay", "sigma", 1.722,1.722);
+RooRealVar sigRay("sigRay", "#sigma_{rayleigh}", 1.722,1.722); // fixing sigma from the fit value
 RooGenericPdf Rayleigh("line", "linear model", " TMath::Abs(x)/(sigRay*sigRay) * TMath::Exp(-(x*x)/(2*sigRay*sigRay))", RooArgSet(x,sigRay));
 
-//PDF Cosmic
-//RooRealVar q("q", "q",0.25, 0.25 - 200);
-RooGenericPdf linearFit("linearFit", "linear model", "TMath::Abs((0.125)*x)", RooArgSet(x));
+RooGenericPdf linearFit("linearFit", "linear model", "TMath::Abs((0.125)*x)", RooArgSet(x)); //PDF Cosmic
 
 //Model to generate the data
-RooRealVar Nmix_t("Nmix","Nmix",a*N, -(2*N), +(2*N));
-RooRealVar Nuw_a ("Ngas", "Ngas", b*N, -(2*N), +(2*N));
-RooRealVar Nbk_a ("Ncosmic", "Ncosmic", c*N, -(2*N), +(2*N));
-RooAddPdf model_gen("model", "model", RooArgList{/*PdfMixing*/ gauss_Mix,Rayleigh,linearFit}, RooArgList{Nmix_t,Nuw_a,Nbk_a});
+RooRealVar Nmix_t("Nmix",    "Nmix", 	0, -(2*N), +(2*N));
+RooRealVar Nuw_a ("Ngas",    "Ngas", 	0, -(2*N), +(2*N));
+RooRealVar Nbk_a ("Ncosmic", "Ncosmic", 0, -(2*N), +(2*N));
+RooAddPdf model_gen("model", "model", RooArgList{ gauss_Mix,Rayleigh,linearFit}, RooArgList{Nmix_t,Nuw_a,Nbk_a});
 
-//create the fit model
-RooRealVar Nmix_f("Nmix fit","Nmix",a*N,-(2*N), +(2*N));
-RooRealVar Nuw_f ("Ngas fit", "Ngas", b*N,-(2*N), +(2*N));
-//RooRealVar Nuw_f ("Nuwf", "Nuw", 0);
-RooRealVar Nbk_f ("Ncosmic fit", "Ncosmic", c*N,-(2*N), +(2*N));
-RooAddPdf model_forfit("model2", "model", RooArgList{/*PdfMixing*/ gauss_Mix,Rayleigh,linearFit},RooArgList{Nmix_f,Nuw_f,Nbk_f});
+//Model for the Fit
+RooRealVar Nmix_f("Nmix fit",    "Nmix",    0,-(2*N), +(2*N));
+RooRealVar Nuw_f ("Ngas fit",    "Ngas",    0,-(2*N), +(2*N));
+RooRealVar Nbk_f ("Ncosmic fit", "Ncosmic", 0,-(2*N), +(2*N));
+RooAddPdf model_forfit("model2", "model", RooArgList{gauss_Mix,Rayleigh,linearFit},RooArgList{Nmix_f,Nuw_f,Nbk_f});
 
 //Arrays to store the data
 vector<double> mix;
@@ -302,25 +286,17 @@ RooMsgService::instance().setGlobalKillBelow(RooFit::INFO);
 RooMsgService::instance().setGlobalKillBelow(RooFit::PROGRESS);
 for(int i = 0; i < Npoint; i++){
 	//Fix the weight of the pdf
-	double wmix = b + static_cast<double>(i)*(1 - 2*b - c)/(Npoint-1);
+	double wmix = 0 + static_cast<double>(i)*(1 - c)/(Npoint-1);
 	weight.push_back(wmix);
-	//Fix Pdf weights
-	Nmix_t.setVal(N*wmix);
-	Nuw_a.setVal(( 1-wmix-c)*N); //Expected event for uw is 1 - wmix - wbk
-	Nbk_a.setVal(N*c);
-	
-	
+	ChangeWeight(&Nmix_t, &Nuw_a, &Nbk_a, wmix, c, N); // Change the weight
 	for(int j = 0; j < Nnested; j++){
 		//generate the data
 		std::unique_ptr<RooDataSet> dataLoop{model_gen.generate(x,Extended())};
 		if(j%10 == 0 ){
 		std::cout << "Event gen " << dataLoop->numEntries() << std::endl;}
 		model_forfit.fitTo(*dataLoop, Save(), PrintLevel(-1));
-		//save the data
-		//set parameter of the fit
-		SetVectors(j,mix_l,uw_l,bk_l,Nmix_f,Nuw_f,Nbk_f,Nmix_t,Nuw_a,Nbk_a);
-		//set error of the parameters
-		mixErrors_l.push_back(Nmix_f.errorVar()->getVal());
+		SetVectors(j,mix_l,uw_l,bk_l,Nmix_f,Nuw_f,Nbk_f,Nmix_t,Nuw_a,Nbk_a); //set parameter of the fit
+		mixErrors_l.push_back(Nmix_f.errorVar()->getVal()); //set error of the parameters
 	}
 	//save and store the fit values
 	mix.push_back(media(mix_l));
@@ -334,31 +310,36 @@ for(int i = 0; i < Npoint; i++){
 	bk_l.clear();
 	mixErrors_l.clear();
 	if(i%1 == 0){
-	std::cout << "Event LOOP N°" << i  <<std::endl;
-	std::cout << "weight Mix: " << wmix << std::endl;
-	std::cout << "fit:      " << "Nmix: " << mix[i] << " Nuw: " << uw[i] << " Nbk " << bk[i] << std::endl;
-	std::cout << "Expected: " << "Nmix: " << Nmix_t.getVal() << " Nuw: " << Nuw_a.getVal() << " Nbk: " << Nbk_a.getVal() << std::endl;
+	PrintInfo(Nmix_f,Nuw_f,Nbk_f,Nmix_t, Nuw_a, Nbk_a, wmix, i);
 	}
 }
 
 //Visualize the Montecarlo
 vector<double> errorx(30,0);
 auto g = new TGraphErrors(weight.size(), weight.data(), mix.data(),errorx.data(),Errors.data());
+auto cosmic_g = new TGraph(weight.size(), weight.data(),bk.data());
 std::ostringstream s; s << "MIX: N_{gen} - N_{fit} averaged over " << Nnested << " trials";
 g->SetTitle(s.str().c_str());
 g->GetYaxis()->SetTitle("<N_{gen} - N_{fit}>");
 g->GetXaxis()->SetTitle("a");
+
 if(N > 500){
-g->SetMinimum(-50);
-g->SetMaximum(50);}
+	g->SetMinimum(-50);
+	g->SetMaximum(50);
+}
 else{
-g->SetMinimum(-30);
-g->SetMaximum(+30);}
+	g->SetMinimum(-30);
+	g->SetMaximum(+30);
+}
+
 g->GetYaxis()->SetLimits(-30,30);
 g->SetMarkerStyle(21);
+cosmic_g->SetMarkerStyle(20);
+cosmic_g->SetMarkerColor(2);
 
 auto canvas0 = new TCanvas("canvas0", "Nmix vs weight",1000,1000);
 g->Draw("ap");
+cosmic_g->Draw("p");
 
 TString percorso = TString::Format("PlotMLEfit/N%d/",N);
 TString nameFile0 = TString::Format("Nmix_minus_Nfit(%d,%d,%d).pdf",static_cast<int>(a*100),static_cast<int>(b*100),static_cast<int>(c*100));
@@ -401,15 +382,4 @@ TString nameFile1 = TString::Format("Nmix_and_Sigma(%d,%d,%d).pdf", static_cast<
 canvas1->SaveAs(percorso + nameFile1);
 }
 
-}
-
-void SetVectors(int i,std::vector<double> &mix,std::vector<double> &uw, std::vector<double> &bk, RooRealVar a,RooRealVar b,RooRealVar c,RooRealVar aa,RooRealVar bb,RooRealVar cc){
-		mix.push_back(a.getVal() - aa.getVal());
-		uw.push_back(b.getVal() - bb.getVal());
-		bk.push_back(c.getVal() - cc.getVal());}
-		
-
-Double_t media(std::vector<Double_t>&v) {
-if(v.size()<=0.) return 0.;
-return (Double_t)std::accumulate(v.begin(), v.end(), 0.0) / (Double_t)v.size();
 }
