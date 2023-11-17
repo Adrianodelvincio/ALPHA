@@ -33,7 +33,7 @@ void PrintInfo(RooRealVar Nmix_f,RooRealVar Nuw_f,RooRealVar Nbk_f,RooRealVar Nm
 std::cout << "\nEvent LOOP N°" << i  <<std::endl;
 	std::cout << "weight Mix: " << wmix << std::endl;
 	std::cout << "fit:      " << "Nmix: " << Nmix_f.getVal() << " Nuw: " << Nuw_f.getVal() << " Nbk " << Nbk_f.getVal() << std::endl;
-	std::cout << "Expected: " << "Nmix: " << Nmix_t.getVal() << " Nuw: " << Nuw_a.getVal() << " Nbk: " << Nbk_a.getVal() << std::endl;
+	std::cout << "Expected: " << "Nmix: " << Nmix_t.getVal() << " Nuw: " << Nuw_a.getVal() << " Nbk: " << Nbk_a.getVal() << "\n" <<std::endl;
 	}
 
 #endif

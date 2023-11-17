@@ -5,38 +5,18 @@
 #include <TMath.h>
 #include "TGraphErrors.h"
 #include <string>
+#include "Headers/fitAllFrequency.h"
+#include <fstream>
 using namespace RooFit;
-
-std::vector<std::string> getFiles(TString);
-std::vector<std::string> getFiles(TString RunNumber){
-	std::vector<string> elenco;
-	TString Directory = "DataSetROOT/";
-	int numFile = 1;
-	std::cout << "Creating list of files" << std::endl;
-	while(numFile < 100){
-		TString endfile = TString::Format("_f%d.root", numFile);
-		TString namefile = Directory + RunNumber + endfile;
-		std::cout << namefile << std::endl;
-		if(!gSystem->AccessPathName(namefile)){
-			std::string lastfile(namefile.Data());
-			elenco.push_back(lastfile);
-		}
-		else{
-			break;
-		}
-		numFile += 1;
-	}
-	return elenco;
-}
 
 void fitAllFrequency(){
 // DATA TO FIT
-TString cartella = TString::Format("Dataset/");
+TString cartella = TString::Format("DataSetROOT/");
 //TString firstpart = TString::Format("r68465_uw_exp_freq");
 //TString firstpart = TString::Format("r68481_uw_exp_freq");
-TString firstpart = TString::Format("r68481_uw_exp_freq");
+TString firstpart = TString::Format("r68481_f");
 
-TString formato = TString::Format(".csv");
+TString formato = TString::Format(".root");
 vector<int> vi{1,2,3,4,5,6,7,8};
 vector<double> frequency;
 vector<int> Counts;
@@ -44,6 +24,9 @@ vector<double> resGas;
 vector<double> errorx;
 vector<double> errGas;
 TCanvas *c[8];
+
+//Generate dictionary
+gInterpreter->GenerateDictionary("fitAllFrequency", "Headers/fitAllFrequency.h");
 
 //Fit distributions
 RooRealVar x("x", "r [cm]", 0, 4);
@@ -67,13 +50,20 @@ RooAddPdf model_analytic("model", "model", RooArgList{gauss_Mix,Rayleigh,linearF
 RooMsgService::instance().setGlobalKillBelow(RooFit::INFO);
 RooMsgService::instance().setGlobalKillBelow(RooFit::PROGRESS);
 
-for (int i : vi){
-	TString secondpart = TString::Format("%d.vertex", i);
-	frequency.push_back(i);
+int i = 1; // i frequency
+while(1){
+	
+	TString frequence = TString::Format("%d", i); 
+	frequency.push_back(i); i += 1;
+	std::cout << cartella + firstpart + frequence + formato << std::endl;
+	if(gSystem->AccessPathName(cartella + firstpart + frequence + formato)){
+		break;
+	}
+	if(CheckEmpty(cartella + firstpart + frequence + formato)){
+		continue;
+	}
 	//ROOTDATAFRAME MACHINERY
-	auto rdf = ROOT::RDF::MakeCsvDataFrame(cartella + firstpart+ secondpart + formato);
-	//auto displ = rdf.Display({"CutsType0","CutsType1","CutsType2", "X", "Y", "Z"}, 5);
-    	//displ->Print();
+	ROOT::RDataFrame rdf("myTree", cartella + firstpart + frequence + formato);
 	auto rdf2 = rdf.Define("Radius", "TMath::Sqrt(X*X + Y*Y)").Filter("CutsType1 ==  \" 1\"");
 	auto Hist = rdf2.Histo1D({"Counts Frequency 4","Counts",30u,0.,4.}, "Radius");
 	//Save the entries
@@ -82,7 +72,7 @@ for (int i : vi){
 	errGas.push_back(static_cast<int> (Ngas.errorVar()->getVal()));
 	errorx.push_back(0.);
 	RooDataHist hh("dh3", "dh3", x, Import(*Hist));
-	RooPlot *analyticframe = x.frame(Title(firstpart +  secondpart));
+	RooPlot *analyticframe = x.frame(Title(firstpart +  frequence));
 	analyticframe->GetYaxis()->SetTitle("Counts");
 	model_analytic.fitTo(hh, PrintLevel(-1));
 	hh.plotOn(analyticframe);
@@ -115,8 +105,9 @@ gres->Draw("p");
 
 void AllDataFit(){
 
-//"DataSetROOT/r68465_cut1.root" "DataSetROOT/r68481_cut1.root" "DataSetROOT/r68489_cut1.root" "DataSetROOT/r68498_cut1.root"
-TString runNumber = "r68498";
+//Generate dictionary
+gInterpreter->GenerateDictionary("fitAllFrequency", "Headers/fitAllFrequencyh");
+TString runNumber = "r68498"; // runlist r68465 r68481 r68489 r68498
 std::vector<std::string> FileList;
 FileList = getFiles(runNumber);
 
@@ -129,7 +120,6 @@ double ExpectedRateMuons = (10.2)*FileList.size();
 
 RooRealVar Ncosmic("Nfit_{cosmic}", "Nfit_{cosmic}" , ExpectedRateMuons, ExpectedRateMuons);
 ROOT::RDataFrame rdf("myTree", FileList);
-//Display some data
 auto displ = rdf.Display({"CutsType0","CutsType1","CutsType2", "X", "Y", "Z"}, 5);
 displ->Print();
 auto rdf2 = rdf.Define("Radius", "TMath::Sqrt(X*X + Y*Y)").Filter("CutsType1 ==  \" 1\"");
