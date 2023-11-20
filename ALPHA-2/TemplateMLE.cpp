@@ -1,8 +1,8 @@
 #include <iostream>
+#include <TMath.h>
 #include "RooAddPdf.h"
 #include "RooPlot.h"
 #include "RooHistPdf.h"
-#include <TMath.h>
 using namespace RooFit;
 
 void AnalysisMLE(){

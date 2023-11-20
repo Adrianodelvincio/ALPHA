@@ -12,12 +12,9 @@ using namespace RooFit;
 void fitAllFrequency(){
 // DATA TO FIT
 TString cartella = TString::Format("DataSetROOT/");
-//TString firstpart = TString::Format("r68465_uw_exp_freq");
-//TString firstpart = TString::Format("r68481_uw_exp_freq");
 TString firstpart = TString::Format("r68481_f");
-
 TString formato = TString::Format(".root");
-vector<int> vi{1,2,3,4,5,6,7,8};
+vector<int> vi;
 vector<double> frequency;
 vector<int> Counts;
 vector<double> resGas;
@@ -54,7 +51,7 @@ int i = 1; // i frequency
 while(1){
 	
 	TString frequence = TString::Format("%d", i); 
-	frequency.push_back(i); i += 1;
+	frequency.push_back(i); vi.push_back(i); i += 1;
 	std::cout << cartella + firstpart + frequence + formato << std::endl;
 	if(gSystem->AccessPathName(cartella + firstpart + frequence + formato)){
 		break;
