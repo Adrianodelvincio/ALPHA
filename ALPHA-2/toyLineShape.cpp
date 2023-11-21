@@ -10,12 +10,20 @@
 using namespace RooFit;
 
 void toyLineShape(){
-
+/////
 int Nbin = 30; 		// Number of Bins
-int Ntot = 1000;	// Number of Total Events
-double pMix = 0;	// Weight Mix
-
-double pGas = 1 - pMix; // Weight Gas
+int Ntot = 10000;	// Number of Total Events
+int Ncosmic = 100;	// Number of Cosmic Events
+double pMix_c = 1;	// Weight MIx pdf1
+double pMix_d = 1;	// Weight Mix pdf2
+/////
+double c = 0.5;
+double d = 1 - c;
+Ntot = Ntot - Ncosmic;
+double Nc = Ntot*c;
+double Nd = Ntot*d;
+double pGas_d = 1 - pMix_d; // Weight Gas
+double pGas_c = 1 - pMix_c;
 gInterpreter->GenerateDictionary("ToyLine", "Headers/toyLineShape.h");
 TNtuple file_pdf1("pdf1", "pdf1","x:y");
 TNtuple file_pdf2("pdf2", "pdf2","x:y");
@@ -59,6 +67,7 @@ Double_t factor = 1.;
 histpdf1->Scale(factor/histpdf1->GetEntries());
 histpdf2->Scale(factor/histpdf2->GetEntries());
 
+//Visualize spline
 TCanvas *a1 = new TCanvas("a1","Spiline interpolation");
 auto pad = new TPad("pad", "pad",0,0,1,1);
 pad->Divide(2,1,0.,0.); pad->Draw();
@@ -84,13 +93,12 @@ histpdf1->Draw();
 pad1->cd(2);
 histpdf2->Draw();
 
-TRandom3 r;
 
 RooRealVar x("x","r [cm]",0.,4.);
 //x.setBins(Nbin);
 
 RooMsgService::instance().setGlobalKillBelow(RooFit::INFO);
-RooMsgService::instance().setGlobalKillBelow(RooFit::INFO);
+RooMsgService::instance().setGlobalKillBelow(RooFit::PROGRESS);
 
 //MIXING analytic model
 RooRealVar mu("mu", "mu", 2.38);
@@ -107,81 +115,110 @@ RooGenericPdf Rayleigh("line", "linear model", " TMath::Abs(x)/(sigRay*sigRay) *
 RooGenericPdf linearFit("linearFit", "linear model", "TMath::Abs((0.125)*x)", RooArgSet(x));
 
 RooRealVar Nmix("Nmix","Nmix",100, -3000, +1000000);
-RooRealVar Nuw ("Ngas", "Ngas",100, -3000, +3000);
+RooRealVar Ngas ("Ngas", "Ngas",100, -3000, +3000);
 RooRealVar Nbk ("Ncosmic", "Ncosmic", 100, -3000, +3000);
 //Model to generate the data
 RooAddPdf genMix("model", "model", RooArgList{gauss_Mix}, RooArgList{Nmix});
-RooAddPdf genGas("model1", "model1", RooArgList{Rayleigh}, RooArgList{Nuw});
+RooAddPdf genGas("model1", "model1", RooArgList{Rayleigh}, RooArgList{Ngas});
 RooAddPdf genCosmic("model3", "model3", RooArgList{linearFit}, RooArgList{Nbk});
 
 vector<double> f1; 	// Frequencies pdf1
 vector<double> v1Nmix;	// Counts Nmix 
 vector<double> v1Ngas;	// Counts Ngas
-vector<double> v1Tot;
+vector<double> v1Nbk;	// Cosmic Events
+vector<double> v1Tot;	// Total Counts
+vector<int>    v1Type;	// Type of Event
 
 vector<double> f2;	// Frequencies pdf2
 vector<double> v2Nmix;  // Counts Nmix
 vector<double> v2Ngas;	// Counts Ngas
-vector<double> v2Tot;
+vector<double> v2Nbk;	// Cosmic events
+vector<double> v2Tot;	// Total Counts
+vector<int>    v2Type;	// Type of Event
 
-
-RooDataSet data("data", "data", RooArgSet(x));
+TRandom3 r;
+RooDataSet data("data", "data", RooArgSet(x)); // Dataset to store the events
+RooDataSet dati("dati", "dati", RooArgSet(x));
 
 // LOOP, Assign the Nmix and Ngas per frequence
 for(int i = 1; i <= Nbin; i++){
 	//Pdf1
-	Double_t width = histpdf1->GetBinWidth(i);
-	Double_t prob = histpdf1->GetBinContent(i);
-	prob = prob*width; 			// Probability of the bin
-	Nmix.setVal((pMix*Ntot)*prob); 		// Set Nmix
-	Nuw.setVal((pGas*Ntot)/Nbin);		// Set Ngas
-	int gasCount = 0; int mixCount = 0;
-	if(pMix != 0){ // If Nmix different from 0
-		RooDataSet *dataLoopMix = genMix.generate(x,Extended()); // Generate data
-		data.append(*dataLoopMix); 				 // Append to big dataset
-		mixCount = dataLoopMix->sumEntries();
-		v1Nmix.push_back(dataLoopMix->sumEntries()); 	// save counts
-	}else{
-		v1Nmix.push_back(0);
-	}
-	
-	if( pGas != 0){ // If Ngas different from 0
-		RooDataSet *dataLoopGas = genGas.generate(x,Extended());
+	double prob = ComputeProb(histpdf1,i);	// Probability of the bin
+	SetCoefficients((pMix_c*Nc)*prob,(pGas_c*Nc)/Nbin,Ncosmic/Nbin, &Nmix,&Ngas,&Nbk);
+	int gasCount = 0; int mixCount = 0; int CosmicCount = 0;
+	// MIX
+	RooDataSet *dataLoopMix = genMix.generate(x,Extended());
+	if(dataLoopMix){			// If Nmix different from 0
+		data.append(*dataLoopMix);	// Append to big dataset
+		SetVectors(dataLoopMix, v1Nmix, v1Type, mixCount, 0);
+	}else {v1Nmix.push_back(0);}
+	//GAS 
+	RooDataSet *dataLoopGas = genGas.generate(x,Extended());
+	if(dataLoopGas){			// If Ngas different from 0
 		data.append(*dataLoopGas);
-		v1Ngas.push_back(dataLoopGas->sumEntries());
-		gasCount = dataLoopGas->sumEntries();
-		}
-	else{
-		v1Ngas.push_back(0);
-	}
+		SetVectors(dataLoopGas,v1Ngas,v1Type,gasCount,1);
+	}else{ v1Ngas.push_back(0);}
+	//COSMIC
+	RooDataSet *dataCosmic = genCosmic.generate(x, Extended());
+	if(dataCosmic){ data.append(*dataCosmic);}
+	SetVectors(dataCosmic,v1Nbk,v1Type,CosmicCount,2);
+	
 	f1.push_back(histpdf1->GetBinCenter(i)); 	// save frequency
-	v1Tot.push_back(mixCount + gasCount);
+	v1Tot.push_back(mixCount + gasCount + CosmicCount);
+	
 	//Pdf2
-	width = histpdf2->GetBinWidth(i);
-	prob = histpdf2->GetBinContent(i);
-	prob = prob*width;
+	prob = ComputeProb(histpdf2,i);
+	SetCoefficients((pMix_d*Nd)*prob,(pGas_d*Nd)/Nbin,Ncosmic/Nbin, &Nmix,&Ngas,&Nbk);
+	// MIX
+	RooDataSet *dataLoopMix2 = genMix.generate(x,Extended());// Generate data
+	if(dataLoopMix){	// Append to big dataset
+		dati.append(*dataLoopMix2);		
+		SetVectors(dataLoopMix2, v2Nmix, v2Type, mixCount, 0);
+	}else{ v2Nmix.push_back(0);}
+	//GAS
+	RooDataSet *dataLoopGas2 = genGas.generate(x,Extended());
+	if(dataLoopGas){	// If Ngas different from 0
+		dati.append(*dataLoopGas2);
+		SetVectors(dataLoopGas2,v2Ngas,v2Type,gasCount,1);
+	}else{ v2Ngas.push_back(0);}
+	//COSMIC
+	if(dataCosmic){ dati.append(*dataCosmic);}
+	SetVectors(dataCosmic,v2Nbk,v2Type,CosmicCount,2);
+	
 	f2.push_back(histpdf2->GetBinCenter(i));
-	v2Nmix.push_back(r.Poisson((pMix*Ntot)*prob));
-	v2Tot.push_back(r.Poisson((pMix*Ntot)*prob) + r.Poisson((pGas*Ntot)/Nbin));
+	v2Tot.push_back(mixCount + gasCount + CosmicCount);
 }
 
 int trueTot = 0; 
 for(int i = 0; i < v1Nmix.size(); i++){ // Total number of events generated from pdf1
 	trueTot += v1Nmix[i];
 	trueTot += v1Ngas[i];
+	trueTot += v1Nbk[i];
 	if( i == v1Nmix.size()){
 	std::cout << "Events generated : " << trueTot << std::endl;
 	}
 }
 
 
-// Save the data in RDataFrame
-ROOT::RDataFrame d(trueTot-1);
+ROOT::RDataFrame d1(trueTot-1); // PDF1
+
+trueTot = 0;
+for(int i = 0; i < v2Nmix.size(); i++){ // Total number of events generated from pdf1
+	trueTot += v2Nmix[i];
+	trueTot += v2Ngas[i];
+	trueTot += v2Nbk[i];
+	if( i == v2Nmix.size()){
+	std::cout << "Events generated : " << trueTot << std::endl;
+	}
+}
+ROOT::RDataFrame d2(trueTot -1); // PDF2
+
+// 
 int j(0); 	// Variable for loop
 int k(1); 	// Inner Loop, Events belonging to a single frequence
 int bin(1);	// Bin number 
-TString datafileName = TString::Format("LineShape/ToyShape1f%d.root", static_cast<int>(pMix*100));
-d.Define("id", [&j](){ // Id of the events
+TString datafileName = TString::Format("LineShape/ToyShape1f%d.root", static_cast<int>(pMix_c*100));
+d1.Define("id", [&j](){		// Id of the events
 		return j; 
 		})
 	.Define("frequence",	// Frequence of the event
@@ -189,44 +226,62 @@ d.Define("id", [&j](){ // Id of the events
 		return histpdf1->GetBinCenter(bin); 
 		})
 	.Define("Type", //
-		[&v1Nmix, &v1Ngas, &k, &bin, &Nbin](){
-		
-		while(v1Nmix[bin-1] + v1Ngas[bin-1] <= 0 && (bin-1) < v1Ngas.size()){ // Check Bin empty
-			++bin;
-		}
-			if(k <= v1Nmix[bin-1]){
-				return 0;
-			}
-			else if( k - v1Nmix[bin-1] > 0){
-			std::cout << k <<   " v1Nmix " << v1Nmix[bin-1] << std::endl;
-				return 1;
-			}
+		[&v1Type, &j](){
+		return v1Type[j];
 		})
 	.Define("radius",	// Generated radius
-		[&j, &v1Nmix, &v1Ngas, &data, &bin, &k, &Nbin](){
-		if(k >=  v1Nmix[bin-1] + v1Ngas[bin-1]){
+		[&j,&v1Tot, &data, &bin, &k](){
+		if(k >=  v1Tot[bin-1]){
 			++bin; 	// All counts per freq. are saved, update the bin
 			k = 1;	// Set k to 0 for the next frequence inner loop
 		}else{
 			++k;	// Update inner loop
 		}
 		std::cout << "Event id: " << j << std::endl; 
-		std::cout << "Bin: " << bin <<std::endl;
-		std::cout << "Counts per frequence " << v1Nmix[bin-1] + v1Ngas[bin-1] << " and k: " << k << std::endl; 
-		
-		//data.get(j)->Print("V");
+		std::cout << "Bin: " << bin-1 << " Counts per freq: " << v1Tot[bin -1] << " k event: " << k; 
+		data.get(j)->Print("V");
 		const RooArgSet &argSet = *(data.get(j));
 		++j;		// Update event id
 		return static_cast<RooAbsReal&>(argSet["x"]).getVal();
 		})
 	.Snapshot("pdf1", datafileName);
 
+TString datafile = TString::Format("LineShape/ToyShape2f%d.root", static_cast<int>(pMix_d*100));
+j = 0; k = 1; bin = 1;
+d2.Define("id", [&j](){		// Id of the events
+		return j; 
+		})
+	.Define("frequence",	// Frequence of the event
+	[&bin, &histpdf2](){
+		return histpdf2->GetBinCenter(bin); 
+		})
+	.Define("Type", //
+		[&v2Type, &j](){
+		return v2Type[j];
+		})
+	.Define("radius",	// Generated radius
+		[&j,&v2Tot, &dati, &bin, &k](){
+		if(k >=  v2Tot[bin-1]){
+			++bin; 	// All counts per freq. are saved, update the bin
+			k = 1;	// Set k to 0 for the next frequence inner loop
+		}else{
+			++k;	// Update inner loop
+		}
+		std::cout << "Event id: " << j << std::endl; 
+		std::cout << "Bin: " << bin-1 << " Counts per freq: " << v2Tot[bin -1] << " k event: " << k; 
+		dati.get(j)->Print("V");
+		const RooArgSet &argSet = *(dati.get(j));
+		++j;		// Update event id
+		return static_cast<RooAbsReal&>(argSet["x"]).getVal();
+		})
+	.Snapshot("pdf2", datafile);
+
 
 auto a3 = new TCanvas("a3", "Mix versus Frequencies Normalized");
 
 for(int i = 0; i< f1.size(); i++){
-//v1Nmix[i] = v1Nmix[i]/Ntot;
-//v2Nmix[i] = v2Nmix[i]/Ntot;
+//v1Nmix[i] = v1Nmix[i]/Nc;
+//v2Nmix[i] = v2Nmix[i]/Nc;
 }
 auto g1 = new TGraph(f1.size(),f1.data(),v1Nmix.data());
 auto g2 = new TGraph(f2.size(),f2.data(),v2Nmix.data());
