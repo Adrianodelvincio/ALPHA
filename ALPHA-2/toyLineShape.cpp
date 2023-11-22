@@ -9,15 +9,23 @@
 #include "TRandom.h"
 using namespace RooFit;
 
-void toyLineShape(){
+void toyLineShape(int Flag = 0, double Mix_c = 0.5, double Mix_d = 0.5, double C = 0.5){
 /////
 int Nbin = 30; 		// Number of Bins
 int Ntot = 10000;	// Number of Total Events
-int Ncosmic = 100;	// Number of Cosmic Events
+int Ncosmic = static_cast<int>(0.492 * Nbin);	// Number of Cosmic Events
+//int Ncosmic = 100;	// Number of Cosmic Events
 double pMix_c = 1;	// Weight MIx pdf1
 double pMix_d = 1;	// Weight Mix pdf2
+double c = 0.5;		// Percentage of division two datasets
 /////
-double c = 0.5;
+
+if(Flag){ // Pass from command line
+pMix_c = Mix_c;
+pMix_d = Mix_d;
+c = C;
+}
+
 double d = 1 - c;
 Ntot = Ntot - Ncosmic;
 double Nc = Ntot*c;
@@ -160,8 +168,11 @@ for(int i = 1; i <= Nbin; i++){
 	}else{ v1Ngas.push_back(0);}
 	//COSMIC
 	RooDataSet *dataCosmic = genCosmic.generate(x, Extended());
-	if(dataCosmic){ data.append(*dataCosmic);}
-	SetVectors(dataCosmic,v1Nbk,v1Type,CosmicCount,2);
+	if(dataCosmic){
+		data.append(*dataCosmic);
+		SetVectors(dataCosmic,v1Nbk,v1Type,CosmicCount,2);
+	}else{v1Nbk.push_back(0);}
+	
 	
 	f1.push_back(histpdf1->GetBinCenter(i)); 	// save frequency
 	v1Tot.push_back(mixCount + gasCount + CosmicCount);
@@ -182,8 +193,11 @@ for(int i = 1; i <= Nbin; i++){
 		SetVectors(dataLoopGas2,v2Ngas,v2Type,gasCount,1);
 	}else{ v2Ngas.push_back(0);}
 	//COSMIC
-	if(dataCosmic){ dati.append(*dataCosmic);}
-	SetVectors(dataCosmic,v2Nbk,v2Type,CosmicCount,2);
+	if(dataCosmic){
+		dati.append(*dataCosmic);
+		SetVectors(dataCosmic,v2Nbk,v2Type,CosmicCount,2);
+	}else{v2Nbk.push_back(0);}
+	
 	
 	f2.push_back(histpdf2->GetBinCenter(i));
 	v2Tot.push_back(mixCount + gasCount + CosmicCount);
@@ -198,7 +212,6 @@ for(int i = 0; i < v1Nmix.size(); i++){ // Total number of events generated from
 	std::cout << "Events generated : " << trueTot << std::endl;
 	}
 }
-
 
 ROOT::RDataFrame d1(trueTot-1); // PDF1
 
