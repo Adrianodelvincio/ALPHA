@@ -9,23 +9,15 @@
 #include "TRandom.h"
 using namespace RooFit;
 
-void toyLineShape(int Flag = 0, double Mix_c = 0.5, double Mix_d = 0.5, double C = 0.5){
+void toyLineShape(double Mix_c = 0.5, double Mix_d = 0.5, double C = 0.5){
 /////
 int Nbin = 30; 		// Number of Bins
 int Ntot = 10000;	// Number of Total Events
 int Ncosmic = static_cast<int>(0.492 * Nbin);	// Number of Cosmic Events
-//int Ncosmic = 100;	// Number of Cosmic Events
-double pMix_c = 0.5;	// Weight MIx pdf1
-double pMix_d = 0.5;	// Weight Mix pdf2
-double c = 0.5;		// Percentage of division two datasets
+double pMix_c = Mix_c;	// Weight MIx pdf1
+double pMix_d = Mix_d;	// Weight Mix pdf2
+double c = C;		// Percentage of division two datasets
 /////
-
-if(Flag){ // Pass from command line
-pMix_c = Mix_c;
-pMix_d = Mix_d;
-c = C;
-}
-
 double d = 1 - c;
 Ntot = Ntot - Ncosmic;
 double Nc = Ntot*c;
@@ -76,16 +68,18 @@ histpdf1->Scale(factor/histpdf1->GetEntries());
 histpdf2->Scale(factor/histpdf2->GetEntries());
 
 //Visualize spline
-TCanvas *a1 = new TCanvas("a1","Spiline interpolation");
+TCanvas *a1 = new TCanvas("a1","Spline interpolation");
 auto pad = new TPad("pad", "pad",0,0,1,1);
-pad->Divide(2,1,0.,0.); pad->Draw();
+pad->Divide(2,1,0.001,0.001); pad->Draw();
 pad->cd(1);
 file_pdf1.SetMarkerStyle(21);
+//file_pdf1.SetTitle("Data Pdf 1");
 file_pdf1.Draw("y:x");
 spline1->SetLineColor(kRed);
 spline1->SetLineWidth(3);
 spline1->Draw("same");
 pad->cd(2);
+//file_pdf2.SetTitle("Data Pdf 2");
 file_pdf2.SetMarkerStyle(21);
 file_pdf2.Draw("y:x");
 spline2->SetLineColor(kRed);
@@ -95,7 +89,7 @@ spline2->Draw("same");
 
 TCanvas *a2 = new TCanvas("a2", "Extracted histogram");
 auto pad1 = new TPad("pad1", "pad",0,0,1,1);
-pad1->Divide(2,1,0.,0.); pad1->Draw();
+pad1->Divide(2,1,0.001,0.001); pad1->Draw();
 pad1->cd(1);
 histpdf1->Draw();
 pad1->cd(2);
@@ -306,35 +300,35 @@ for(int i = 0; i< f1.size(); i++){
 auto g1 = new TGraph(f1.size(),f1.data(),v1Nmix.data());
 auto g2 = new TGraph(f2.size(),f2.data(),v2Nmix.data());
 auto pad2 = new TPad("pad2", "pad",0,0,1,1);
-pad2->Divide(2,1,0.,0.); pad2->Draw();
+pad2->Divide(2,1,0.001,0.001); pad2->Draw();
 pad2->cd(1);
 g1->SetMarkerStyle(21);
-g1->SetTitle("MIX");
+g1->SetTitle("Pdf 1, mix lineshape");
 g1->GetYaxis()->SetTitle("Counts");
-g1->GetXaxis()->SetTitle("frequencies [#MHz]");
+g1->GetXaxis()->SetTitle("frequencies [MHz]");
 g1->Draw();
 pad2->cd(2);
 g2->SetMarkerStyle(21);
-g2->SetTitle("MIX");
+g2->SetTitle("Pdf 2, mix lineshape");
 g2->GetYaxis()->SetTitle("Counts");
-g2->GetXaxis()->SetTitle("frequencies [#MHz]");
+g2->GetXaxis()->SetTitle("frequencies [MHz]");
 g2->Draw();
 
 auto a4 = new TCanvas("a4", "Counts versus Frequencies");
 auto g3 = new TGraph(f1.size(),f1.data(),v1Tot.data());
 auto g4 = new TGraph(f2.size(),f2.data(),v2Tot.data());
 auto pad3 = new TPad("pad2", "pad",0,0,1,1);
-pad3->Divide(2,1,0.,0.); pad3->Draw();
+pad3->Divide(2,1,0.001,0.001); pad3->Draw();
 pad3->cd(1);
 g3->SetMarkerStyle(21);
-g3->SetTitle("MIX");
+g3->SetTitle("Pdf 1, total count");
 g3->GetYaxis()->SetTitle("Counts");
-g3->GetXaxis()->SetTitle("frequencies [#MHz]");
+g3->GetXaxis()->SetTitle("frequencies [MHz]");
 g3->Draw();
 pad3->cd(2);
 g4->SetMarkerStyle(21);
-g4->SetTitle("MIX");
+g4->SetTitle("Pdf 2, total count");
 g4->GetYaxis()->SetTitle("Counts");
-g4->GetXaxis()->SetTitle("frequencies [#MHz]");
+g4->GetXaxis()->SetTitle("frequencies [MHz]");
 g4->Draw();
 }
