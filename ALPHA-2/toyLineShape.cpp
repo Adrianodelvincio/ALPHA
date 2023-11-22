@@ -15,8 +15,8 @@ int Nbin = 30; 		// Number of Bins
 int Ntot = 10000;	// Number of Total Events
 int Ncosmic = static_cast<int>(0.492 * Nbin);	// Number of Cosmic Events
 //int Ncosmic = 100;	// Number of Cosmic Events
-double pMix_c = 1;	// Weight MIx pdf1
-double pMix_d = 1;	// Weight Mix pdf2
+double pMix_c = 0.5;	// Weight MIx pdf1
+double pMix_d = 0.5;	// Weight Mix pdf2
 double c = 0.5;		// Percentage of division two datasets
 /////
 
@@ -230,7 +230,10 @@ ROOT::RDataFrame d2(trueTot -1); // PDF2
 int j(0); 	// Variable for loop
 int k(1); 	// Inner Loop, Events belonging to a single frequence
 int bin(1);	// Bin number 
-TString datafileName = TString::Format("LineShape/ToyShape1f%d.root", static_cast<int>(pMix_c*100));
+TString datafileName = TString::Format("LineShape/ToyShape1_%d_%d_c%d.root", static_cast<int>(pMix_c*100),
+static_cast<int>(pMix_d*100),
+static_cast<int>(c*100));
+
 d1.Define("id", [&j](){		// Id of the events
 		return j; 
 		})
@@ -257,9 +260,12 @@ d1.Define("id", [&j](){		// Id of the events
 		++j;		// Update event id
 		return static_cast<RooAbsReal&>(argSet["x"]).getVal();
 		})
-	.Snapshot("pdf1", datafileName);
+	.Snapshot("myTree", datafileName);
 
-TString datafile = TString::Format("LineShape/ToyShape2f%d.root", static_cast<int>(pMix_d*100));
+TString datafile = TString::Format("LineShape/ToyShape2_%d_%d_c%d.root", static_cast<int>(pMix_c*100),
+static_cast<int>(pMix_d*100),
+static_cast<int>(c*100));
+
 j = 0; k = 1; bin = 1;
 d2.Define("id", [&j](){		// Id of the events
 		return j; 
@@ -287,7 +293,7 @@ d2.Define("id", [&j](){		// Id of the events
 		++j;		// Update event id
 		return static_cast<RooAbsReal&>(argSet["x"]).getVal();
 		})
-	.Snapshot("pdf2", datafile);
+	.Snapshot("myTree", datafile);
 
 
 auto a3 = new TCanvas("a3", "Mix versus Frequencies Normalized");
@@ -296,6 +302,7 @@ for(int i = 0; i< f1.size(); i++){
 //v1Nmix[i] = v1Nmix[i]/Nc;
 //v2Nmix[i] = v2Nmix[i]/Nc;
 }
+
 auto g1 = new TGraph(f1.size(),f1.data(),v1Nmix.data());
 auto g2 = new TGraph(f2.size(),f2.data(),v2Nmix.data());
 auto pad2 = new TPad("pad2", "pad",0,0,1,1);
