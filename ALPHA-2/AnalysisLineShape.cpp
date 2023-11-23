@@ -5,7 +5,6 @@ using namespace RooFit;
 
 
 void AnalysisLineShape(double Mix_c = 0.5, double Mix_d = 0.5, double C = 0.5){
-	
 	double pMix_c = Mix_c;
 	double pMix_d = Mix_d;
 	double c = C;	
