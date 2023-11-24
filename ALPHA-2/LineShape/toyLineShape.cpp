@@ -5,7 +5,7 @@
 #include "TGraphErrors.h"
 #include "TSpline.h"
 #include <TMath.h>
-#include "Headers/toyLineShape.h"
+#include "../Headers/toyLineShape.h"
 
 using namespace RooFit;
 
@@ -22,11 +22,11 @@ double c = C;			// Percentage of division two datasets
 double d = 1 - c; double Nc = Ntot*c; double Nd = Ntot*d;
 double pGas_d = 1 - pWall_d; double pGas_c = 1 - pWall_c;
 
-gInterpreter->GenerateDictionary("ToyLine", "Headers/toyLineShape.h");
+gInterpreter->GenerateDictionary("ToyLine", "../Headers/toyLineShape.h");
 TNtuple file_pdf1("pdf1", "pdf1","x:y");
 TNtuple file_pdf2("pdf2", "pdf2","x:y");
-file_pdf1.ReadFile("LineShape/lineShape1.csv");
-file_pdf2.ReadFile("LineShape/lineShape2.csv");
+file_pdf1.ReadFile("lineShape1.csv");
+file_pdf2.ReadFile("lineShape2.csv");
 
 vector<double> v1; // Frequency pd1
 vector<double> v2; // Counts per frequence pdf1
@@ -170,10 +170,10 @@ for(int i = 1; i <= Nbin; i++){
 ROOT::RDataFrame d1(trueTot1-1); // PDF1
 ROOT::RDataFrame d2(trueTot2-1); // PDF2
 
-TString datafileName = TString::Format("LineShape/ToyShape1_%d_%d_c%d.root", static_cast<int>(pWall_c*100),
+TString datafileName = TString::Format("ToyShape1_%d_%d_c%d.root", static_cast<int>(pWall_c*100),
 static_cast<int>(pWall_d*100),
 static_cast<int>(c*100));
-TString datafile = TString::Format("LineShape/ToyShape2_%d_%d_c%d.root", static_cast<int>(pWall_c*100),
+TString datafile = TString::Format("ToyShape2_%d_%d_c%d.root", static_cast<int>(pWall_c*100),
 static_cast<int>(pWall_d*100),
 static_cast<int>(c*100));
 

@@ -5,15 +5,15 @@
 #include "TGraphErrors.h"
 #include "TSpline.h"
 #include <TMath.h>
-#include "Headers/toyLineShape.h"
+#include "../Headers/toyLineShape.h"
 
 void PlotLineShape(int NBin = 30){
 	int Nbin = NBin;
 	TNtuple file_pdf1("pdf1", "pdf1","x:y");
 	TNtuple file_pdf2("pdf2", "pdf2","x:y");
-	file_pdf1.ReadFile("LineShape/lineShape1.csv");
-	file_pdf2.ReadFile("LineShape/lineShape2.csv");
-	gInterpreter->GenerateDictionary("ToyLine", "Headers/toyLineShape.h");
+	file_pdf1.ReadFile("lineShape1.csv");
+	file_pdf2.ReadFile("lineShape2.csv");
+	gInterpreter->GenerateDictionary("ToyLine", "../Headers/toyLineShape.h");
 	vector<double> v1; // Frequency pd1
 	vector<double> v2; // Counts per frequence pdf1
 	vector<double> t1; // Frequence pdf2
