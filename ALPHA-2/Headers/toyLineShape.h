@@ -18,7 +18,6 @@ void ConvertTNtutpla(TNtuple &file_pdf, vector<double> &v1, vector<double> &v2){
 	v1.push_back(file_pdf.GetArgs()[0]); 	// Extract frequence
 	v2.push_back(file_pdf.GetArgs()[1]);	// Extract Nls
 	}
-	
 }
 
 void SetContent(TH1 * histpdf, int Nbin, TSpline3 * spline){
@@ -30,6 +29,10 @@ void SetContent(TH1 * histpdf, int Nbin, TSpline3 * spline){
 		}
 }
 
+void SetNormalization(TH1 * histpdf){
+	histpdf->Scale(1./histpdf->Integral(), "width");
+}
+
 double ComputeProb(TH1 * histpdf, int i){
 	Double_t width = histpdf->GetBinWidth(i);
 	Double_t prob = histpdf->GetBinContent(i);
@@ -37,11 +40,12 @@ double ComputeProb(TH1 * histpdf, int i){
 	return prob;
 }
 
-void SetVectors(RooDataSet *data, vector<double> &a,vector<int> &b, int &Counts , int flag ){
+void SetVectors(RooDataSet *data, vector<double> &a,vector<int> &b, int &Counts, vector<double> &f ,double frequence, int flag ){
 	if(data){a.push_back(data->sumEntries());}
 	Counts = data->sumEntries();
 	for(int i = 0; i < data->sumEntries(); ++i){
 	b.push_back(flag);
+	f.push_back(frequence);
 	}
 }
 
@@ -85,6 +89,31 @@ void FillDataFrame(ROOT::RDataFrame &d1, TString datafileName, TH1 * histpdf, Ro
 	if(SaveData){
 	rdf.Snapshot("myTree", datafileName);
 	}
+}
+
+auto FillDataFrame(ROOT::RDataFrame &d1, RooDataSet &data, vector<double> &f , vector<int> &vType, vector<double> &vTot,int &j, bool SaveData = true){
+	// Return the node of the RDataFrame
+	auto rdf = d1.Define("id", [&j](){		// Id of the events
+		return j;
+		})
+	.Define("frequence",	// Frequence of the event
+	[&j, &f](){
+		return f[j]; 
+		})
+	.Define("Type", //
+		[&j, &vType](){
+		return vType[j];
+		})
+	.Define("radius",	// Generated radius
+	[&data, &j, &vTot, &f](){
+		std::cout << "Event id: " << j << " f: " << f[j] << std::endl; 
+		data.get(j)->Print("V");
+		const RooArgSet &argSet = *(data.get(j));
+		++j;		// Update event id
+		return static_cast<RooAbsReal&>(argSet["x"]).getVal();
+		});
+	
+	return rdf;
 }
 
 #endif

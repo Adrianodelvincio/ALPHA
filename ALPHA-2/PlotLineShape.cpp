@@ -42,16 +42,15 @@ void PlotLineShape(int NBin = 30){
 	// Interpolate the data with spline
 	TSpline3 *spline1 = new TSpline3("LineShape1", frequence, pdf1, v1.size());
 	TSpline3 *spline2 = new TSpline3("LineShape2", frequence2, pdf2, t1.size());
-	TH1F *histpdf1 = new TH1F("hist1", "pdf1", Nbin,frequence[0], frequence[v1.size() -1]);
-	TH1F *histpdf2 = new TH1F("hist2", "pdf2", Nbin,frequence2[0], frequence2[t1.size() -1]);
+	TH1F *histpdf1 = new TH1F("hist1", "pdf1", Nbin,frequence[0], 2);
+	TH1F *histpdf2 = new TH1F("hist2", "pdf2", Nbin,frequence2[0], 1424);
 
 	// Set Content Histograms
 	SetContent(histpdf1,Nbin,spline1);
 	SetContent(histpdf2,Nbin,spline2);
 	// Normalize histograms
-	Double_t factor = 1.;
-	histpdf1->Scale(factor/histpdf1->GetEntries());
-	histpdf2->Scale(factor/histpdf2->GetEntries());
+	SetNormalization(histpdf1);
+	SetNormalization(histpdf2);
 
 	// Fit the data with a function
 	auto g1 = new TGraph(v1.size(), frequence,pdf1);
@@ -95,7 +94,7 @@ void PlotLineShape(int NBin = 30){
 	myGaus->Draw("same");
 	myExp->Draw("same");
 	
-	/*
+	
 	//Visualize spline
 	TCanvas *a1 = new TCanvas("a1","Spline");
 	auto pad = new TPad("pad", "pad",0,0,1,1);
@@ -122,5 +121,5 @@ void PlotLineShape(int NBin = 30){
 	pad1->cd(1);
 	histpdf1->Draw();
 	pad1->cd(2);
-	histpdf2->Draw();*/
+	histpdf2->Draw();
 }

@@ -9,7 +9,7 @@
 
 using namespace RooFit;
 
-void LoopLineShape(double Mix_c = 0.5, double Mix_d = 0.5, double C = 0.5, int NBin = 30, int NTOT = 10000, int Nloop = 1, bool Save = false){
+void LoopLineShape(double Mix_c = 0.5, double Mix_d = 0.5, double C = 0.5, int NBin = 30, int NTOT = 5000, int Nloop = 5, bool Save = false){
 	/* Parameters of the Simulation */
 int Nbin = NBin;		// Number of Bins
 int Ntot = NTOT;		// Number of Total Events
@@ -52,9 +52,9 @@ TH1F *histpdf2 = new TH1F("hist2", "pdf2", Nbin,frequence2[0], frequence2[t1.siz
 SetContent(histpdf1,Nbin,spline1);
 SetContent(histpdf2,Nbin,spline2);
 // Normalize histograms
-Double_t factor = 1.;
-histpdf1->Scale(factor/histpdf1->GetEntries());
-histpdf2->Scale(factor/histpdf2->GetEntries());
+SetNormalization(histpdf1);
+SetNormalization(histpdf2);
+
 
 RooRealVar x("x","r [cm]",0.,4.);
 //x.setBins(Nbin);
@@ -102,112 +102,79 @@ RooDataSet data("data", "data", RooArgSet(x)); // Dataset to store the events
 RooDataSet dati("dati", "dati", RooArgSet(x));
 
 //External Toy Loop
-	for(int j = 0; j < Ntrial; j++){
+	for(int l = 0; l < Ntrial; l++){
 		
 		// LOOP, Assign the Nmix and Ngas per frequence
 		int trueTot1 = 0; int trueTot2 = 0;
 		for(int i = 1; i <= Nbin; i++){
 			//Pdf1
 			double prob = ComputeProb(histpdf1,i);	// Probability of the bin
+
 			SetCoefficients((pWall_c*Nc)*prob,(pGas_c*Nc)/Nbin,Ncosmic/Nbin, &Nmix,&Ngas,&Nbk);
 			int gasCount = 0; int mixCount = 0; int CosmicCount = 0;
 			// MIX
 			RooDataSet *dataLoopWall = genMix.generate(x,Extended());
+			RooDataSet *dataLoopGas = genGas.generate(x, Extended());
+			RooDataSet *dataCosmic = genCosmic.generate(x, Extended());
 			if(dataLoopWall){			// If Nmix different from 0
 				data.append(*dataLoopWall);	// Append to big dataset
-				SetVectors(dataLoopWall, v1Nmix, v1Type, mixCount, 0);
-			}else {v1Nmix.push_back(0);}
+				SetVectors(dataLoopWall, v1Nmix, v1Type, mixCount,f1,histpdf1->GetBinCenter(i), 0);
+			}else {v1Nmix.push_back(0);mixCount = 0;}
 			//GAS 
-			RooDataSet *dataLoopGas = genGas.generate(x,Extended());
 			if(dataLoopGas){			// If Ngas different from 0
 				data.append(*dataLoopGas);
-				SetVectors(dataLoopGas,v1Ngas,v1Type,gasCount,1);
-			}else{ v1Ngas.push_back(0);}
+				SetVectors(dataLoopGas,v1Ngas,v1Type,gasCount,f1,histpdf1->GetBinCenter(i),1);
+			}else{ v1Ngas.push_back(0);gasCount = 0;}
 			//COSMIC
-			RooDataSet *dataCosmic = genCosmic.generate(x, Extended());
+			
 			if(dataCosmic){
 				data.append(*dataCosmic);
-				SetVectors(dataCosmic,v1Nbk,v1Type,CosmicCount,2);
-			}else{v1Nbk.push_back(0);}
-			
-			
-			f1.push_back(histpdf1->GetBinCenter(i)); 	// save frequency
+				SetVectors(dataCosmic,v1Nbk,v1Type,CosmicCount,f1,histpdf1->GetBinCenter(i),2);
+			}else{v1Nbk.push_back(0); CosmicCount = 0;}
 			v1Tot.push_back(mixCount + gasCount + CosmicCount);
 			trueTot1 += mixCount + gasCount + CosmicCount;
+			mixCount = 0; gasCount = 0; CosmicCount = 0;
+			
 			
 			//Pdf2
 			prob = ComputeProb(histpdf2,i);
+			
 			SetCoefficients((pWall_d*Nd)*prob,(pGas_d*Nd)/Nbin,Ncosmic/Nbin, &Nmix,&Ngas,&Nbk);
 			// MIX
 			RooDataSet *dataLoopWall2 = genMix.generate(x,Extended());// Generate data
 			if(dataLoopWall){	// Append to big dataset
 				dati.append(*dataLoopWall2);		
-				SetVectors(dataLoopWall2, v2Nmix, v2Type, mixCount, 0);
-			}else{ v2Nmix.push_back(0);}
+				SetVectors(dataLoopWall2, v2Nmix, v2Type, mixCount,f2,histpdf2->GetBinCenter(i),0);
+			}else{ v2Nmix.push_back(0); mixCount = 0;}
 			//GAS
 			RooDataSet *dataLoopGas2 = genGas.generate(x,Extended());
 			if(dataLoopGas){	// If Ngas different from 0
 				dati.append(*dataLoopGas2);
-				SetVectors(dataLoopGas2,v2Ngas,v2Type,gasCount,1);
-			}else{ v2Ngas.push_back(0);}
+				SetVectors(dataLoopGas2,v2Ngas,v2Type,gasCount,f2,histpdf2->GetBinCenter(i),1);
+			}else{ v2Ngas.push_back(0); gasCount = 0;}
 			//COSMIC
 			if(dataCosmic){
 				dati.append(*dataCosmic);
-				SetVectors(dataCosmic,v2Nbk,v2Type,CosmicCount,2);
-			}else{v2Nbk.push_back(0);}
-			f2.push_back(histpdf2->GetBinCenter(i));
+				SetVectors(dataCosmic,v2Nbk,v2Type,CosmicCount,f2,histpdf2->GetBinCenter(i),2);
+			}else{v2Nbk.push_back(0); CosmicCount = 0;}
 			v2Tot.push_back(mixCount + gasCount + CosmicCount);
 			trueTot2 += mixCount + gasCount + CosmicCount;
-		
 		}
+	
+	std::cout << "Total Event Gen. pdf1: " << trueTot1 << std::endl;
+	std::cout << "Total Event Gen. pdf2: " << trueTot2 << std::endl;
+	
+	//ROOT::RDataFrame d1(trueTot1 -1); // PDF1
+	ROOT::RDataFrame d1(trueTot1 -1);
+	ROOT::RDataFrame d2(trueTot2 -1); // PDF2
+	int j(0);
+	auto FilledFrame1 = FillDataFrame(d1, data ,f1,v2Type,v2Tot,j,Save);
+	FilledFrame1.Snapshot("myTree", "prova1.root");
+	j = 0;
+	auto FilledFrame2 = FillDataFrame(d2, dati,f2 , v2Type, v2Tot,j, Save);
+	FilledFrame2.Snapshot("myTree", "prova2.root");
 
-	ROOT::RDataFrame d1(trueTot-1); // PDF1
-	ROOT::RDataFrame d2(trueTot -1); // PDF2
-
-	// 
-	int j(0); 	// Variable for loop
-	int k(1); 	// Inner Loop, Events belonging to a single frequence
-	int bin(1);	// Bin number 
-	TString datafileName = TString::Format("LineShape/ToyShape1_%d_%d_c%d.root", static_cast<int>(pWall_c*100),
-	static_cast<int>(pWall_d*100),
-	static_cast<int>(c*100));
-
-	d1.Define("id", [&j](){return j;})
-		.Define("frequence",[&bin, &histpdf1](){return histpdf1->GetBinCenter(bin);})
-		.Define("Type",[&v1Type, &j](){return v1Type[j];})
-		.Define("radius",[&j,&v1Tot, &data, &bin, &k](){
-			if(k >=  v1Tot[bin-1]){
-				++bin; 	// All counts per freq. are saved, update the bin
-				k = 1;	// Set k to 0 for the next frequence inner loop
-			}else{
-				++k;	// Update inner loop
-			}
-			const RooArgSet &argSet = *(data.get(j));
-			++j;		// Update event id
-			return static_cast<RooAbsReal&>(argSet["x"]).getVal();
-			});
-
-	TString datafile = TString::Format("LineShape/ToyShape2_%d_%d_c%d.root", static_cast<int>(pWall_c*100),
-	static_cast<int>(pWall_d*100),
-	static_cast<int>(c*100));
-
-	j = 0; k = 1; bin = 1;
-	d2.Define("id", [&j](){return j;})
-		.Define("frequence", [&bin, &histpdf2](){ return histpdf2->GetBinCenter(bin);})
-		.Define("Type", [&v2Type, &j](){return v2Type[j];})
-		.Define("radius",[&j,&v2Tot, &dati, &bin, &k](){
-			if(k >=  v2Tot[bin-1]){
-				++bin; 	// All counts per freq. are saved, update the bin
-				k = 1;	// Set k to 0 for the next frequence inner loop
-			}else{
-				++k;	// Update inner loop
-			}
-			const RooArgSet &argSet = *(dati.get(j));
-			++j;		// Update event id
-			return static_cast<RooAbsReal&>(argSet["x"]).getVal();
-			});
-		
-		} // Loop Trials
+	} // Loop Trials
 	
 } // End program
 

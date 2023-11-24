@@ -62,8 +62,8 @@ SetContent(histpdf1,Nbin,spline1);
 SetContent(histpdf2,Nbin,spline2);
 // Normalize histograms
 Double_t factor = 1.;
-histpdf1->Scale(factor/histpdf1->GetEntries());
-histpdf2->Scale(factor/histpdf2->GetEntries());
+SetNormalization(histpdf1);
+SetNormalization(histpdf2);
 
 RooRealVar x("x","r [cm]",0.,4.);
 //x.setBins(Nbin);
