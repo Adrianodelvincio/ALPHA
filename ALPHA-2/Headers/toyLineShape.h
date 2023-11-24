@@ -90,19 +90,17 @@ void SetVectors(RooDataSet &Global,RooDataSet *data, vector<double> &a,vector<in
 		a.push_back(data->sumEntries());
 		Counts = data->sumEntries();
 		Global.append(*data);
+		for(int i = 0; i < data->sumEntries(); ++i){
+		b.push_back(flag);
+		f.push_back(frequence);
 		}
-	else{ // If the dataset is Empy push back 0
+	} else{ // If the dataset is Empy push back 0
 	a.push_back(0);
 	Counts = 0;
 	}
-	for(int i = 0; i < data->sumEntries(); ++i){
-	b.push_back(flag);
-	f.push_back(frequence);
-	}
 }
 
-void SetVectors(RooDataSet *data, vector<double> &a,vector<int> &b, int &Counts, vector<double> &f ,double frequence, int flag ){
-	// FILL VECTORS, DATASET...
+void SetVectors(RooDataSet *data, vector<double> &a,vector<int> &b, int &Counts, vector<double> &f ,double frequence, int flag ){	// FILL VECTORS, DATASET...
 	if(data){a.push_back(data->sumEntries());}
 	Counts = data->sumEntries();
 	for(int i = 0; i < data->sumEntries(); ++i){

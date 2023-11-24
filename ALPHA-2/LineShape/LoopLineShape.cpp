@@ -9,7 +9,19 @@
 
 using namespace RooFit;
 
-void LoopLineShape(double Mix_c = 0.5, double Mix_d = 0.5, double C = 0.5, int NBin = 30, int NTOT = 5000, int Nloop = 5, bool Save = false, bool MethodSpline = true){
+double model1(double x){
+	if(x <= 0){ return 0;}
+	else if( x > 0 && x <= 1){ return 2*x;}
+	else {return 0;}
+}
+
+double model2(double x){
+	if(x <= 1420){ return 0;}
+	else if( x > 1420 && x <= 1422){ return 2*x;}
+	else {return 0;}
+}
+
+void LoopLineShape(double Mix_c = 0.5, double Mix_d = 0.5, double C = 0.5, int NBin = 30, int NTOT = 5000, int Nloop = 5, bool Save = false, bool MethodSpline = false){
 	/* Parameters of the Simulation */
 int Nbin = NBin;		// Number of Bins
 int Ntot = NTOT;		// Number of Total Events
@@ -28,9 +40,15 @@ gInterpreter->GenerateDictionary("ToyLine","../Headers/toyLineShape.h");
 TH1F *histpdf1 = new TH1F("hist1", "pdf1", Nbin, -1.2096, 1.80480 );
 TH1F *histpdf2 = new TH1F("hist2", "pdf2", Nbin, 1419.20962, 1423.86533);
 
-if(MethodSPline){
+if(MethodSpline){
 	SplineMethod(histpdf1,histpdf2, Nbin);
 }
+
+if(!MethodSpline){
+	SetContent(histpdf1,Nbin,model1);
+	SetContent(histpdf2,Nbin,model2);
+}
+
 SetNormalization(histpdf1);
 SetNormalization(histpdf2);
 
@@ -71,14 +89,16 @@ RooDataSet dataPdf2("dati", "dati", RooArgSet(x));
 			SetCoefficients((pWall_c*Nc)*prob,(pGas_c*Nc)/Nbin,Ncosmic/Nbin, &Nmix,&Ngas,&Nbk);
 			int gasCount = 0; int mixCount = 0; int CosmicCount = 0;
 			
-			// GENERATE THE DATA
-			RooDataSet *dataLoopWall = genMix.generate(x,Extended());
+			if(prob > 0){
+			RooDataSet *dataLoopWall = genMix.generate(x,Extended()); // GENERATE THE DATA
+			SetVectors(dataPdf1,dataLoopWall,v1Nmix, v1Type, mixCount,   f1,histpdf1->GetBinCenter(i),0); // FILL DATASET
+			}else { mixCount = 0; v1Nmix.push_back(0);}
+			
 			RooDataSet *dataLoopGas = genGas.generate(x, Extended());
 			RooDataSet *dataCosmic = genCosmic.generate(x, Extended());
-			// FILL DATASET
-			SetVectors(dataPdf1,dataLoopWall,v1Nmix, v1Type, mixCount,   f1,histpdf1->GetBinCenter(i),0);
 			SetVectors(dataPdf1,dataLoopGas, v1Ngas, v1Type, gasCount,   f1,histpdf1->GetBinCenter(i),1);
 			SetVectors(dataPdf1,dataCosmic,  v1Nbk,  v1Type, CosmicCount,f1,histpdf1->GetBinCenter(i),2);
+			
 			// STORE SOME USEFUL QUANTITIES
 			v1Tot.push_back(mixCount + gasCount + CosmicCount);
 			
@@ -87,11 +107,13 @@ RooDataSet dataPdf2("dati", "dati", RooArgSet(x));
 			prob = ComputeProb(histpdf2,i);	// Probability of the bin
 			SetCoefficients((pWall_d*Nd)*prob,(pGas_d*Nd)/Nbin,Ncosmic/Nbin, &Nmix,&Ngas,&Nbk);
 			
-			// GENERATE THE DATA
+			if(prob > 0){
 			RooDataSet *dataLoopWall2 = genMix.generate(x,Extended());	// Generate Wall data
+			SetVectors(dataPdf2,dataLoopWall2,v2Nmix, v2Type, mixCount,   f2,histpdf2->GetBinCenter(i),0);
+			} else{  mixCount = 0 ; v2Nmix.push_back(0);}
 			RooDataSet *dataLoopGas2 = genGas.generate(x,Extended());	// Generate Gas counts
 			// FILL THE DATASET
-			SetVectors(dataPdf2,dataLoopWall2,v2Nmix, v2Type, mixCount,   f2,histpdf2->GetBinCenter(i),0);
+			
 			SetVectors(dataPdf2,dataLoopGas2, v2Ngas, v2Type, gasCount,   f2,histpdf2->GetBinCenter(i),1);
 			SetVectors(dataPdf2,dataCosmic,   v2Nbk,  v2Type, CosmicCount,f2,histpdf2->GetBinCenter(i),2);
 			// STORE USEFUL QUANTITIES
@@ -116,6 +138,3 @@ RooDataSet dataPdf2("dati", "dati", RooArgSet(x));
 	} // Loop Trials
 	
 } // End program
-
-
-
