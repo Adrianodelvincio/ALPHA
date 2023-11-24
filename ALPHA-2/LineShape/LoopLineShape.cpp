@@ -31,6 +31,7 @@ TNtuple *file2;
 
 LoadLineShapeData(file1,file2);
 
+
 TNtuple file_pdf1("pdf1", "pdf1","x:y");
 TNtuple file_pdf2("pdf2", "pdf2","x:y");
 file_pdf1.ReadFile("lineShape1.csv");
@@ -108,8 +109,8 @@ RooDataSet dataPdf2("dati", "dati", RooArgSet(x));
 			// STORE SOME USEFUL QUANTITIES
 			v1Tot.push_back(mixCount + gasCount + CosmicCount);
 			Tot1 += mixCount + gasCount + CosmicCount;
-			mixCount = 0; gasCount = 0; CosmicCount = 0;
 			
+			mixCount = 0; gasCount = 0; CosmicCount = 0;
 			// PDF 2
 			prob = ComputeProb(histpdf2,i);
 			SetCoefficients((pWall_d*Nd)*prob,(pGas_d*Nd)/Nbin,Ncosmic/Nbin, &Nmix,&Ngas,&Nbk);
@@ -118,8 +119,8 @@ RooDataSet dataPdf2("dati", "dati", RooArgSet(x));
 			RooDataSet *dataLoopWall2 = genMix.generate(x,Extended());	// Generate Wall data
 			RooDataSet *dataLoopGas2 = genGas.generate(x,Extended());	// Generate Gas counts
 			// FILL THE DATASET
-			SetVectors(dataPdf2,dataLoopWall,v2Nmix, v2Type, mixCount,   f2,histpdf2->GetBinCenter(i),0);
-			SetVectors(dataPdf2,dataLoopGas, v2Ngas, v2Type, gasCount,   f2,histpdf2->GetBinCenter(i),1);
+			SetVectors(dataPdf2,dataLoopWall2,v2Nmix, v2Type, mixCount,   f2,histpdf2->GetBinCenter(i),0);
+			SetVectors(dataPdf2,dataLoopGas2, v2Ngas, v2Type, gasCount,   f2,histpdf2->GetBinCenter(i),1);
 			SetVectors(dataPdf2,dataCosmic,  v2Nbk,  v2Type, CosmicCount,f2,histpdf2->GetBinCenter(i),2);
 			// STORE USEFUL QUANTITIES
 			v2Tot.push_back(mixCount + gasCount + CosmicCount);
