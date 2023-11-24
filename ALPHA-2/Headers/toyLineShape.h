@@ -22,8 +22,45 @@ void ConvertTNtutpla(TNtuple &file_pdf, vector<double> &v1, vector<double> &v2){
 	}
 }
 
+void LoadLineShapeData(TNtuple &file_pdf1, TNtuple &file_pdf2,vector<double> &v1, vector<double> &v2,vector<double> &t1, vector<double> &t2, TString file1 = "lineShape1.csv" , TString file2 = "lineShape2.csv" ){
+	//Load the data and fill the vectors
+	file_pdf1.ReadFile(file1);
+	file_pdf2.ReadFile(file2);
+	ConvertTNtutpla(file_pdf1,v1,v2);
+	ConvertTNtutpla(file_pdf2,t1,t2);
+}
+
+void SetContent(TH1 * histpdf, int Nbin, TSpline3 * spline){
+	// USING SPLINE, EVALUATE THE SPLINE AT X AND FILL HISTOGRAMS
+	for(int i = 1; i <= Nbin; ++i){
+		if(spline->Eval(histpdf->GetBinCenter(i)) > 0.){
+		histpdf->SetBinContent(i,spline->Eval(histpdf->GetBinCenter(i)));}
+		else{
+		histpdf->SetBinContent(i,0.);}
+		}
+}
+
+void SplineMethod(TH1 * histpdf1,TH1 * histpdf2, int Nbin){
+	TNtuple file_pdf1("pdf1", "pdf1","x:y");
+	TNtuple file_pdf2("pdf2", "pdf2","x:y");
+	vector<double> v1,v2,t1,t2; // Frequency pd1, Counts pdf1, Frequence pdf2, Counts pdf2
+	LoadLineShapeData(file_pdf1,file_pdf2, v1, v2, t1, t2);
+
+	Double_t frequence[v1.size()]; Double_t pdf1[v2.size()];
+	Double_t frequence2[t1.size()]; Double_t pdf2[t2.size()];
+	std::copy(v1.begin(),v1.end(),frequence);  std::copy(v2.begin(),v2.end(),pdf1);
+	std::copy(t1.begin(),t1.end(),frequence2); std::copy(t2.begin(),t2.end(),pdf2);
+
+	// Interpolate the data with spline
+	TSpline3 *spline1 = new TSpline3("LineShape1", frequence,  pdf1, v1.size());
+	TSpline3 *spline2 = new TSpline3("LineShape2", frequence2, pdf2, t1.size());
+	// Set Content Histograms, Normalize histograms
+	SetContent(histpdf1,Nbin,spline1);
+	SetContent(histpdf2,Nbin,spline2);
+}
+
 void SetContent(TH1 * histpdf, int Nbin, double (*f)(double)){
-	// IF USING SPLINE, EVALUATE THE SPLINE AT X AND FILL HISTOGRAMS
+	//USING A FUNCTION, EVALUATE THE FUNCTION AT X AND FILL HISTOGRAMS
 	for(int i = 1; i <= Nbin; ++i){
 		if(f(histpdf->GetBinCenter(i)) > 0.){
 			histpdf->SetBinContent(i,f(histpdf->GetBinCenter(i)));
@@ -32,16 +69,6 @@ void SetContent(TH1 * histpdf, int Nbin, double (*f)(double)){
 			histpdf->SetBinContent(i,0.);
 		}
 	}
-}
-
-void SetContent(TH1 * histpdf, int Nbin, TSpline3 * spline){
-	// IF USING SPLINE, EVALUATE THE SPLINE AT X AND FILL HISTOGRAMS
-	for(int i = 1; i <= Nbin; ++i){
-		if(spline->Eval(histpdf->GetBinCenter(i)) > 0.){
-		histpdf->SetBinContent(i,spline->Eval(histpdf->GetBinCenter(i)));}
-		else{
-		histpdf->SetBinContent(i,0.);}
-		}
 }
 
 void SetNormalization(TH1 * histpdf){

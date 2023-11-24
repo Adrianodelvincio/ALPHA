@@ -9,9 +9,7 @@
 
 using namespace RooFit;
 
-void LoadLineShapeData(TNtuple*,TNtuple*, TString file1 = "lineShape1.csv" , TString file2 = "lineShape2.csv"); 
-
-void LoopLineShape(double Mix_c = 0.5, double Mix_d = 0.5, double C = 0.5, int NBin = 30, int NTOT = 5000, int Nloop = 5, bool Save = false){
+void LoopLineShape(double Mix_c = 0.5, double Mix_d = 0.5, double C = 0.5, int NBin = 30, int NTOT = 5000, int Nloop = 5, bool Save = false, bool MethodSpline = true){
 	/* Parameters of the Simulation */
 int Nbin = NBin;		// Number of Bins
 int Ntot = NTOT;		// Number of Total Events
@@ -26,35 +24,13 @@ double pGas_d = 1 - pWall_d; double pGas_c = 1 - pWall_c;
 
 gInterpreter->GenerateDictionary("ToyLine","../Headers/toyLineShape.h");
 
-TNtuple *file1;
-TNtuple *file2;
+//Histogram to store the distributions
+TH1F *histpdf1 = new TH1F("hist1", "pdf1", Nbin, -1.2096, 1.80480 );
+TH1F *histpdf2 = new TH1F("hist2", "pdf2", Nbin, 1419.20962, 1423.86533);
 
-LoadLineShapeData(file1,file2);
-
-
-TNtuple file_pdf1("pdf1", "pdf1","x:y");
-TNtuple file_pdf2("pdf2", "pdf2","x:y");
-file_pdf1.ReadFile("lineShape1.csv");
-file_pdf2.ReadFile("lineShape2.csv");
-
-vector<double> v1,v2,t1,t2; // Frequency pd1, Counts per frequence pdf1, Frequence pdf2,Counts per frequence pdf2
-
-ConvertTNtutpla(file_pdf1,v1,v2);
-ConvertTNtutpla(file_pdf2,t1,t2);
-Double_t frequence[v1.size()]; Double_t pdf1[v2.size()];
-Double_t frequence2[t1.size()]; Double_t pdf2[t2.size()];
-std::copy(v1.begin(),v1.end(),frequence); std::copy(v2.begin(),v2.end(),pdf1);
-std::copy(t1.begin(),t1.end(),frequence2); std::copy(t2.begin(),t2.end(),pdf2);
-
-// Interpolate the data with spline
-TSpline3 *spline1 = new TSpline3("LineShape1", frequence, pdf1, v1.size());
-TSpline3 *spline2 = new TSpline3("LineShape2", frequence2, pdf2, t1.size());
-TH1F *histpdf1 = new TH1F("hist1", "pdf1", Nbin,frequence[0], frequence[v1.size() -1]);
-TH1F *histpdf2 = new TH1F("hist2", "pdf2", Nbin,frequence2[0], frequence2[t1.size() -1]);
-
-// Set Content Histograms, Normalize histograms
-SetContent(histpdf1,Nbin,spline1);
-SetContent(histpdf2,Nbin,spline2);
+if(MethodSPline){
+	SplineMethod(histpdf1,histpdf2, Nbin);
+}
 SetNormalization(histpdf1);
 SetNormalization(histpdf2);
 
@@ -89,10 +65,7 @@ RooDataSet dataPdf2("dati", "dati", RooArgSet(x));
 
 //External Toy Loop
 	for(int l = 0; l < Ntrial; l++){
-		
-		// LOOP, Assign the Nmix and Ngas per frequence
-		int Tot1 = 0; int Tot2 = 0;
-		for(int i = 1; i <= Nbin; i++){
+		for(int i = 1; i <= Nbin; i++){ // Inner loop, assign counts to each frequency
 			//Pdf1
 			double prob = ComputeProb(histpdf1,i);	// Probability of the bin
 			SetCoefficients((pWall_c*Nc)*prob,(pGas_c*Nc)/Nbin,Ncosmic/Nbin, &Nmix,&Ngas,&Nbk);
@@ -108,11 +81,10 @@ RooDataSet dataPdf2("dati", "dati", RooArgSet(x));
 			SetVectors(dataPdf1,dataCosmic,  v1Nbk,  v1Type, CosmicCount,f1,histpdf1->GetBinCenter(i),2);
 			// STORE SOME USEFUL QUANTITIES
 			v1Tot.push_back(mixCount + gasCount + CosmicCount);
-			Tot1 += mixCount + gasCount + CosmicCount;
 			
 			mixCount = 0; gasCount = 0; CosmicCount = 0;
 			// PDF 2
-			prob = ComputeProb(histpdf2,i);
+			prob = ComputeProb(histpdf2,i);	// Probability of the bin
 			SetCoefficients((pWall_d*Nd)*prob,(pGas_d*Nd)/Nbin,Ncosmic/Nbin, &Nmix,&Ngas,&Nbk);
 			
 			// GENERATE THE DATA
@@ -121,12 +93,13 @@ RooDataSet dataPdf2("dati", "dati", RooArgSet(x));
 			// FILL THE DATASET
 			SetVectors(dataPdf2,dataLoopWall2,v2Nmix, v2Type, mixCount,   f2,histpdf2->GetBinCenter(i),0);
 			SetVectors(dataPdf2,dataLoopGas2, v2Ngas, v2Type, gasCount,   f2,histpdf2->GetBinCenter(i),1);
-			SetVectors(dataPdf2,dataCosmic,  v2Nbk,  v2Type, CosmicCount,f2,histpdf2->GetBinCenter(i),2);
+			SetVectors(dataPdf2,dataCosmic,   v2Nbk,  v2Type, CosmicCount,f2,histpdf2->GetBinCenter(i),2);
 			// STORE USEFUL QUANTITIES
 			v2Tot.push_back(mixCount + gasCount + CosmicCount);
-			Tot2 += mixCount + gasCount + CosmicCount;
 		}
 	
+	int Tot1 = std::accumulate(v1Tot.begin(), v1Tot.end(), 0);
+	int Tot2 = std::accumulate(v2Tot.begin(), v2Tot.end(), 0);
 	std::cout << "Total Event Gen. pdf1: " << Tot1 << std::endl;
 	std::cout << "Total Event Gen. pdf2: " << Tot2 << std::endl;
 	
@@ -135,20 +108,14 @@ RooDataSet dataPdf2("dati", "dati", RooArgSet(x));
 	ROOT::RDataFrame d1(Tot1 -1);
 	ROOT::RDataFrame d2(Tot2 -1); // PDF2
 	int j(0);
-	auto FilledFrame1 = FillDataFrame(d1, dataPdf1 ,f1,v2Type,v2Tot,j); // Fill RDataFrame
+	auto FilledFrame1 = FillDataFrame(d1, dataPdf1, f1, v1Type, v1Tot,j); // Fill RDataFrame
 	FilledFrame1.Snapshot("myTree", "prova1.root");
 	j = 0;
-	auto FilledFrame2 = FillDataFrame(d2, dataPdf2,f2 , v2Type, v2Tot,j); // Fill RDataFrame
+	auto FilledFrame2 = FillDataFrame(d2, dataPdf2, f2, v2Type, v2Tot,j); // Fill RDataFrame
 	FilledFrame2.Snapshot("myTree", "prova2.root");
 	} // Loop Trials
 	
 } // End program
 
 
-void LoadLineShapeData(TNtuple *file_pdf1, TNtuple *file_pdf2,TString file1 = "lineShape1.csv" , TString file2 = "lineShape2.csv" ){
-	file_pdf1 = new TNtuple("pdf1", "pdf1","x:y");
-	file_pdf2 = new TNtuple("pdf2", "pdf2","x:y");
-	file_pdf1->ReadFile(file1);
-	file_pdf2->ReadFile(file2);
-}
 
