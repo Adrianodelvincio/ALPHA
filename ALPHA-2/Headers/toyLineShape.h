@@ -59,11 +59,11 @@ void SplineMethod(TH1 * histpdf1,TH1 * histpdf2, int Nbin){
 	SetContent(histpdf2,Nbin,spline2);
 }
 
-void SetContent(TH1 * histpdf, int Nbin, double (*f)(double)){
+void SetContent(TH1 * histpdf, int Nbin, double (*f)(double, double), double Rising){
 	//USING A FUNCTION, EVALUATE THE FUNCTION AT X AND FILL HISTOGRAMS
 	for(int i = 1; i <= Nbin; ++i){
-		if(f(histpdf->GetBinCenter(i)) > 0.){
-			histpdf->SetBinContent(i,f(histpdf->GetBinCenter(i)));
+		if(f(histpdf->GetBinCenter(i),Rising) > 0.){
+			histpdf->SetBinContent(i,f(histpdf->GetBinCenter(i),Rising));
 		}
 		else{
 			histpdf->SetBinContent(i,0.);
@@ -84,10 +84,9 @@ double ComputeProb(TH1 * histpdf, int i){
 	return prob;
 }
 
-void SetVectors(RooDataSet &Global,RooDataSet *data, vector<double> &a,vector<int> &b, int &Counts, vector<double> &f ,double frequence, int flag ){
+void SetVectors(RooDataSet &Global,RooDataSet *data,vector<int> &b, int &Counts, vector<double> &f ,double frequence, int flag ){
 	// FILL VECTORS, DATASET...
 	if(data){  
-		a.push_back(data->sumEntries());
 		Counts = data->sumEntries();
 		Global.append(*data);
 		for(int i = 0; i < data->sumEntries(); ++i){
@@ -95,7 +94,6 @@ void SetVectors(RooDataSet &Global,RooDataSet *data, vector<double> &a,vector<in
 		f.push_back(frequence);
 		}
 	} else{ // If the dataset is Empy push back 0
-	a.push_back(0);
 	Counts = 0;
 	}
 }
@@ -147,12 +145,11 @@ void FillDataFrame(ROOT::RDataFrame &d1, TString datafileName, TH1 * histpdf, Ro
 		const RooArgSet &argSet = *(data.get(j));
 		++j;	// Update event id
 		return static_cast<RooAbsReal&>(argSet["x"]).getVal();
-		}); 
+		});
 	rdf.Snapshot("myTree", datafileName);
 }
 
 auto FillDataFrame(ROOT::RDataFrame &d1, RooDataSet &data, vector<double> &f , vector<int> &vType, vector<double> &vTot,int &j){
-	
 	auto rdf = d1.Define("id",// Id of the events
 	 [&j](){		
 		return j;
@@ -172,10 +169,9 @@ auto FillDataFrame(ROOT::RDataFrame &d1, RooDataSet &data, vector<double> &f , v
 			data.get(j)->Print("V");
 			}
 		const RooArgSet &argSet = *(data.get(j));
-		++j;		// Update event id
+		++j;	// Update event id
 		return static_cast<RooAbsReal&>(argSet["x"]).getVal();
 		});
-	return rdf;	// Return the node of the RDataFrame
+	return rdf; // Return the node of the RDataFrame
 }
-
 #endif

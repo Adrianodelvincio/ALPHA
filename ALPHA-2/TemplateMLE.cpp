@@ -24,7 +24,7 @@ ROOT::RDataFrame mix_rdf("myTree", {"DataSetROOT/r68814_mixing.vertex.root",
 
 auto mix2_rdf = mix_rdf.Define("Radius", "TMath::Sqrt(X*X + Y*Y)").Filter("CutsType1 ==  \" 1\"");
 auto histMix = mix2_rdf.Histo1D({"Mixing","Counts",30u,0.,4.}, "Radius");
-mix2_rdf.Snapshot("myTree", "RootCut1Data/MixCut1.root", {"X","Y","Radius"});
+mix2_rdf.Snapshot("myTree", "DataSetROOT/MixCut1.root", {"X","Y","Radius"});
 
 RooRealVar x("x", "r [cm]", 0, 4);
 x.setBins(30);
@@ -51,7 +51,7 @@ ROOT::RDataFrame uw_rdf("myTree",{"DataSetROOT/r68814_uwlosses_160.vertex.root",
 
 auto uw2_rdf = uw_rdf.Define("Radius", "TMath::Sqrt(X*X + Y*Y)").Filter("CutsType1 ==  \" 1\"");
 auto histUw = uw2_rdf.Histo1D({"UWlosses","Counts",30u,0.,4.}, "Radius");
-uw2_rdf.Snapshot("myTree", "RootCut1Data/UWCut1.root", {"X","Y","Radius"});
+uw2_rdf.Snapshot("myTree", "DataSetROOT/UWCut1.root", {"X","Y","Radius"});
 
 RooDataHist Uw_h("dh1", "dh1", x, Import(*histUw));
 RooPlot *frame2 = x.frame(Title("GAS losses PDF"));
@@ -88,7 +88,7 @@ ROOT::RDataFrame cosmic_rdf("myTree",{"DataSetROOT/r68949_cosmics.vertex.root",
 
 auto cosmic2_rdf = cosmic_rdf.Define("Radius", "TMath::Sqrt(X*X + Y*Y)").Filter("CutsType1 ==  \" 1\"");
 auto histCosmic = cosmic2_rdf.Histo1D({"Cosmic","Counts",30u,0.,4.}, "Radius");
-cosmic2_rdf.Snapshot("myTree", "RootCut1Data/CosmicCut1.root", {"X","Y","Radius"});
+cosmic2_rdf.Snapshot("myTree", "DataSetROOT/CosmicCut1.root", {"X","Y","Radius"});
 
 RooDataHist cosm_h("dh2", "dh2", x, Import(*histCosmic));
 RooPlot *frame3 = x.frame(Title("Cosmic PDF"));
