@@ -36,8 +36,9 @@ double parabola2(double x, double xmin = 1420){
 }
 
 double algorithm(ROOT::RDF::RResultPtr<TH1D> histpdf, double threshold);
+double doubleThreshold(ROOT::RDF::RResultPtr<TH1D> histpdf, double threshold);
 
-void LoopLineShape(double Mix_c = 0.5, double Mix_d = 0.5, double C = 0.5, int NBin = 30, int NTOT = 200, int Nloop = 5, double Rising1 = 0, double Rising2 = 1420 ,bool Save = false, bool MethodSpline = false){
+void LoopLineShape(int Nloop = 400, double Mix_c = 1, double Mix_d = 1, double C = 0.5, int NBin = 30, int NTOT = 400, double Rising1 = 0, double Rising2 = 1420 ,bool Save = false, bool MethodSpline = false){
 	/* Parameters of the Simulation */
 int Nbin = NBin;		// Number of Bins
 int Ntot = NTOT;		// Number of Total Events
@@ -91,7 +92,8 @@ RooAddPdf genMix("model", "model", RooArgList{gauss_Mix}, RooArgList{Nmix});
 RooAddPdf genGas("model1", "model1", RooArgList{Rayleigh}, RooArgList{Ngas});
 RooAddPdf genCosmic("model2", "model2", RooArgList{linearFit}, RooArgList{Nbk});
 
-vector<double> onset1, onset2;  // Reconstructed onsets
+vector<double> onset1v, onset2v;  // Reconstructed onsets
+vector<double> deltaOnset;
 
 //External Toy Loop
 	for(int l = 0; l < Ntrial; l++){
@@ -157,15 +159,14 @@ vector<double> onset1, onset2;  // Reconstructed onsets
 		int j(0); // FROM HERE, APPLY THE ALGORITHM TO PDF1
 		auto FilledFrame1 = FillDataFrame(d1, dataPdf1, f1, v1Type, v1Tot,j); // Fill RDataFrame
 		auto histF1 = FilledFrame1.Histo1D({"Counts","Frequence", 60u,rangepdf1[0], rangepdf1[1]}, "frequence");
-		auto ww = FilledFrame1.Display({"id", "frequence", "Type", "radius"}, 1); ww->Print();
+		auto ww = FilledFrame1.Display({"frequence", "Type"}, 1); ww->Print();
 		
-		double onset; int bin;			// Reconstructed onset and bin of the onset
+		double onset1; int bin;			// Reconstructed onset and bin of the onset
 		double threshold = 5*Ncosmic/Nbin;// threshold considering the cosmic background
-		std::cout << "Find onset with threshold: " << threshold <<std::endl;
-		onset = algorithm(histF1, threshold); 
-		onset1.push_back(onset - Rising1);
+		onset1 = doubleThreshold(histF1, threshold); 
+		onset1v.push_back(onset1 - Rising1);
 		
-		if(true && l == 0){ //save dataframe
+		if(l == 0){ //save dataframe
 			j= 0;
 			std::cout << "Save LoopData1.root" << std::endl;
 			auto rdf = FilledFrame1;
@@ -175,32 +176,38 @@ vector<double> onset1, onset2;  // Reconstructed onsets
 		j = 0; // FROM HERE APPLY THE ALGORITHM TO PDF2
 		auto FilledFrame2 = FillDataFrame(d2, dataPdf2, f2, v2Type, v2Tot,j); // Fill RDataFrame
 		auto histF2 = FilledFrame2.Histo1D({"Counts","Frequence", 60u,rangepdf2[0], rangepdf2[1]}, "frequence");
-		auto hh = FilledFrame2.Display({"id", "frequence", "Type", "radius"}, 1); hh->Print();
+		auto hh = FilledFrame2.Display({"frequence", "Type", "radius"}, 1); hh->Print();
 		
-		onset = 0; bin = 0;			// Reconstructed onset and bin of the onset
-		threshold = 5*Ncosmic/Nbin;	// threshold considering the cosmic background
-		std::cout << "Find onset with threshold: " << threshold <<std::endl;
-		onset = algorithm(histF2, threshold); 
-		onset2.push_back(onset - Rising2);
+		double onset2; bin = 0;			// Reconstructed onset and bin of the onset
+		threshold = 5*Ncosmic/Nbin;		// threshold considering the cosmic background
+		onset2 = doubleThreshold(histF2, threshold); 
+		onset2v.push_back(onset2 - Rising2);
 		
-		if(Save && l == 0){ // Save dataframe
+		deltaOnset.push_back((onset2 - onset1) - (Rising2 - Rising1));
+		
+		if(l == 0){ // Save dataframe
 			j = 0;
 			std::cout << "Save LoopData2.root" << std::endl;
 			auto rdf = FilledFrame2;
 			rdf.Snapshot("myTree", "LoopData_2.root");
 		}
-
-		std::cout << "Total Event Gen. pdf1: " << Tot1 << std::endl;
-		std::cout << "Total Event Gen. pdf2: " << Tot2 << std::endl;
-		std::cout << "	Onset pdf1 : " << onset1[l] << std::endl;
-		std::cout << "	Onset pdf2 : " << onset2[l] << std::endl;
+		//std::cout << "Total Event Gen. pdf1: " << Tot1 << std::endl;
+		//std::cout << "Total Event Gen. pdf2: " << Tot2 << std::endl;
+		std::cout << "Find onset with threshold: " << threshold <<std::endl;
+		std::cout << "	Onset pdf1 : " << onset1 << std::endl;
+		std::cout << "	Onset pdf2 : " << onset2 << std::endl;
+		std::cout << "	delta Onset - MC truth : " << deltaOnset[l] << std::endl; 
 	} // Loop Trials
-	std::vector<double> w(onset1.size(),1); // weights vector
-	auto h1 = new TH1D("h1","#onset_{algorithm} - onset_{true}",30,-2.,2.);
-   	h1->FillN(onset1.size(),onset1.data(), w.data());
-   	auto h2 = new TH1D("h2","#onset_{algorithm} - onset_{true}",30,-2.,2.);
-   	h2->FillN(onset2.size(),onset2.data(), w.data());
-
+	
+	// Create the histograms
+	std::vector<double> w(onset1v.size(),1); // weights vector
+	auto h1 = new TH1D("h1","onset_{algorithm} - onset_{true}",20,-1.5,1);
+   	h1->FillN(onset1v.size(),onset1v.data(), w.data());
+   	auto h2 = new TH1D("h2","onset_{algorithm} - onset_{true}",20,-1.5,1);
+   	h2->FillN(onset2v.size(),onset2v.data(), w.data());
+   	auto h3 = new TH1D("h3","(onset_{1} - onset_{2}) - MC truth",20,-1.5,1);
+   	h3->FillN(deltaOnset.size(),deltaOnset.data(), w.data());
+   	
    	auto canvas = new TCanvas("d", "Toy Result", 1000,550);
 	auto pad = new TPad("pad", "pad",0,0,1,1);
 	gStyle->SetOptStat(1);
@@ -217,7 +224,11 @@ vector<double> onset1, onset2;  // Reconstructed onsets
 	h2->SetLineWidth(2);
 	h2->Draw();
 	//legend->Draw();
+	canvas->SaveAs("ToyResult_doubleThreshold.pdf");
 	 	
+	auto canvas1 = new TCanvas("d1", "Toy Result", 1000,550);
+	h3->SetLineColor(3);
+	h3->Draw(); 
 } // End program
 
 double algorithm(ROOT::RDF::RResultPtr<TH1D> histpdf, double threshold){
@@ -229,6 +240,23 @@ double algorithm(ROOT::RDF::RResultPtr<TH1D> histpdf, double threshold){
 			onset = histpdf->GetBinCenter(i);
 			bin = i;
 			break;
+		}
+	}
+	std::cout << "		i: " << bin  << " bin content: " << histpdf->GetBinContent(bin) << std::endl;
+	return onset;
+}
+
+double doubleThreshold(ROOT::RDF::RResultPtr<TH1D> histpdf, double threshold){
+	// bin 0 is underflow
+	double onset = 0;	// onset value 
+	double bin = 0;		// bin onset
+	for(int i = 1; i < histpdf->GetNbinsX(); i++){
+		if(histpdf->GetBinContent(i) >= threshold){
+			if(histpdf->GetBinContent(i+1) >= threshold){
+				onset = histpdf->GetBinCenter(i);
+				bin = i;
+				break;
+			}
 		}
 	}
 	std::cout << "		i: " << bin  << " bin content: " << histpdf->GetBinContent(bin) << std::endl;

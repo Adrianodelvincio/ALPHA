@@ -33,17 +33,12 @@ void AnalysisLineShape(double Mix_c = 0.5, double Mix_d = 0.5, double C = 0.5, b
 	ROOT::RDataFrame rdf("myTree", {file1,file2});
 	auto histF = rdf.Filter("Type == 0").Filter("frequence <= 3.6").Histo1D({"Counts","Frequence",120u,-1.2,3.6}, "frequence");
 	auto histF2 = rdf.Filter("Type == 0").Filter("frequence >= 3.6").Histo1D({"Counts","Frequence",120u,1419.2,1424.0}, "frequence");
-	auto histF3 = rdf.Filter("frequence <= 3.6").Histo1D({"Counts","Frequence",60u,-1.2096, 1.80480}, "frequence");
-	auto histF4 = rdf.Filter("frequence >= 3.6").Histo1D({"Counts","Frequence",120u,1419.2,1424.0}, "frequence");
+	auto histF3 = rdf.Filter("frequence <= 3.6").Histo1D({"Counts","Pdf1",60u,-1.2,2}, "frequence");
+	auto histF4 = rdf.Filter("frequence >= 3.6").Histo1D({"Counts","Pdf2",60u,1419.2,1424.0}, "frequence");
 	auto d1 = rdf.Display({"id", "frequence", "Type", "radius"}, 10); d1->Print();
 
 	//histF3->Scale(1./histF3->Integral(), "width");
-	histF4->Scale(1./histF4->Integral(), "width");
-	
-	for(int i = 1; i <= 60 ; ++i){
-		std::cout << histF3->GetBinContent(i) << std::endl;
-		}
-	
+	//histF4->Scale(1./histF4->Integral(), "width");
 	auto b = new TCanvas("b1", "Counts versus Frequencies");
 	auto pad = new TPad("pad1", "pad",0,0,1,1);
 	pad->Divide(2,1,0.001,0.001); pad->Draw();

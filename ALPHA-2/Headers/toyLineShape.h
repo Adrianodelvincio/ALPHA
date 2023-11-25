@@ -118,10 +118,7 @@ void FillDataFrame(ROOT::RDataFrame &d1, TString datafileName, TH1 * histpdf, Ro
 	int j(0); 	// Variable for loop
 	int k(1); 	// Inner Loop, Events belonging to a single frequence
 	int bin(1);	// Bin number 
-	auto rdf = d1.Define("id", [&j](){		// Id of the events
-		return j; 
-		})
-	.Define("frequence",	// Frequence of the event
+	auto rdf = d1.Define("frequence",	// Frequence of the event
 	[&bin, &histpdf](){
 		return histpdf->GetBinCenter(bin); 
 		})
@@ -150,11 +147,7 @@ void FillDataFrame(ROOT::RDataFrame &d1, TString datafileName, TH1 * histpdf, Ro
 }
 
 auto FillDataFrame(ROOT::RDataFrame &d1, RooDataSet &data, vector<double> &f , vector<int> &vType, vector<double> &vTot,int &j){
-	auto rdf = d1.Define("id",// Id of the events
-	 [&j](){		
-		return j;
-		})
-	.Define("frequence",// Frequence of the event
+	auto rdf = d1.Define("frequence",// Frequence of the event
 	[&j, &f](){
 		return f[j]; 
 		})
