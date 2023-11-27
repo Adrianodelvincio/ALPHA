@@ -12,6 +12,7 @@
 #include "RooAbsReal.h"
 #include "TString.h"
 #include "TNtuple.h"
+#include <TRandom3.h>
 
 void ConvertTNtutpla(TNtuple &file_pdf, vector<double> &v1, vector<double> &v2){
 	// CONVERT TNtuple IN A STD::VECTOR
@@ -59,15 +60,13 @@ void SplineMethod(TH1 * histpdf1,TH1 * histpdf2, int Nbin){
 	SetContent(histpdf2,Nbin,spline2);
 }
 
-void SetContent(TH1 * histpdf, int Nbin, double (*f)(double, double), double Rising){
+void SetContent(TH1 * histpdf, int Nbin, double (*f)(double, double, double), double x0, double y0){
 	//USING A FUNCTION, EVALUATE THE FUNCTION AT X AND FILL HISTOGRAMS
 	for(int i = 1; i <= Nbin; ++i){
-		if(f(histpdf->GetBinCenter(i),Rising) > 0.){
-			histpdf->SetBinContent(i,f(histpdf->GetBinCenter(i),Rising));
-		}
-		else{
-			histpdf->SetBinContent(i,0.);
-		}
+		double x = histpdf->GetBinCenter(i);	// Point to be evaluated
+		if(f(x, x0, y0) > 0.){					// Check the function is > 0
+			histpdf->SetBinContent(i,f(x, x0, y0));
+		} else{ histpdf->SetBinContent(i,0.);}	// Set to 0
 	}
 }
 
@@ -146,23 +145,29 @@ void FillDataFrame(ROOT::RDataFrame &d1, TString datafileName, TH1 * histpdf, Ro
 	rdf.Snapshot("myTree", datafileName);
 }
 
-auto FillDataFrame(ROOT::RDataFrame &d1, RooDataSet &data, vector<double> &f , vector<int> &vType, vector<double> &vTot,int &j){
-	auto rdf = d1.Define("frequence",// Frequence of the event
+auto FillDataFrame(ROOT::RDataFrame &d1, RooDataSet &data, vector<double> &f , vector<int> &vType, vector<double> &vTot,int &j, vector<Double_t> &rn){
+	
+	auto rdf = d1
+	.Define("random",
+	[&rn, &j](){			//To subsample and randomize 
+		return rn[j];
+		})
+	.Define("frequence",	// Frequence of the event
 	[&j, &f](){
 		return f[j]; 
 		})
-	.Define("Type", //
+	.Define("Type", 		// Type of the event (0 wall, 1 res gas, 2 cosmic)
 		[&j, &vType](){
 		return vType[j];
 		})
-	.Define("radius",// Generated radius
+	.Define("radius",		// Generated radius
 		[&data, &j, &vTot, &f](){
-		if(VERBOSE){ // PRINT INFO ABOUT EVENTS
+		if(VERBOSE){ 		// PRINT INFO ABOUT EVENTS
 			std::cout << "Event id: " << j << " f: " << f[j] << std::endl; 
 			data.get(j)->Print("V");
 			}
 		const RooArgSet &argSet = *(data.get(j));
-		++j;	// Update event id
+		++j;				// Update event id
 		return static_cast<RooAbsReal&>(argSet["x"]).getVal();
 		});
 	return rdf; // Return the node of the RDataFrame
