@@ -7,29 +7,25 @@ using namespace RooFit;
 double algorithm(ROOT::RDF::RResultPtr<TH1D> histpdf, double threshold);
 double doubleThreshold(ROOT::RDF::RResultPtr<TH1D> histpdf, double threshold);
 
-void AnalysisLineShape(int start = 0, int stop = 999){
+void AnalysisLineShape(TString directory = "Linear/",int start = 0, int stop = 999, double CosmicMean = 0.407, double Sigma = 3){
 
 	gInterpreter->GenerateDictionary("ReadFiles", "../Headers/AnalysisLineShape.h");
 	std::vector<std::string> FileList;
-	TString directory = "Quadratic/";
 	FileList = getFiles(start,stop, directory);
 	//std::cout << FileList[0] << std::endl;
 	ROOT::RDataFrame rdf("myTree", FileList);
-	auto histF = rdf.Filter("Type == 0").Filter("frequence <= 80").Histo1D({"Counts","Frequence",60u,-40,60}, "frequence");
-	auto histF2 = rdf.Filter("Type == 0").Filter("frequence >= 80").Histo1D({"Counts","Frequence",60u,80,200}, "frequence");
 	auto histF3 = rdf.Filter("frequence <= 80").Histo1D({"Counts","Pdf1",60u,-40,60}, "frequence");
-	auto histF4 = rdf.Filter("frequence >= 80").Histo1D({"Counts","Pdf2",60u,80,200}, "frequence");
+	auto histF4 = rdf.Filter("frequence >= 80").Histo1D({"Counts","Pdf2",60u, 1420000 - 40 ,1420000 +100}, "frequence");
 
-	double CosmicMean = 2.0;
-	double threshold = 5*CosmicMean;	// threshold considering the cosmic background
+	double threshold = Sigma*CosmicMean;	// threshold considering the cosmic background
 	vector<double> onset1v,onset2v;
 	// IMPLEMENTING THE TOY FOR THE ALGORITHM
 	for(int i = 0; i < FileList.size(); i += 2){
 		std::cout << "Analizzo DataFrame " << i << std::endl;
 		ROOT::RDataFrame frame("myTree", {FileList[i], FileList[i+1]});		// Load i-th dataset
 		auto Spectra1 = frame.Filter("frequence <= 80").Histo1D({"Counts","Frequence", 60u,-40, 60}, "frequence");
-		auto Spectra2 = frame.Filter("frequence >= 80").Histo1D({"Counts","Frequence", 60u, 80, 160}, "frequence");
-		auto d = frame.Display({"frequence","random", "Type", "radius"},1); d->Print();
+		auto Spectra2 = frame.Filter("frequence >= 80").Histo1D({"Counts","Frequence", 60u, -40 + 1420000, 1420000 + 160}, "frequence");
+		auto d = frame.Display({"frequence","random", "type", "radius"},1); d->Print();
 				
 		double onset1;		// Reconstructed onset and bin of the onset
 		double onset2;
@@ -39,11 +35,12 @@ void AnalysisLineShape(int start = 0, int stop = 999){
 		onset1v.push_back(onset1);
 		onset2v.push_back(onset2);
 	}
+
 	//histF3->Scale(1./histF3->Integral(), "width");
 	//histF4->Scale(1./histF4->Integral(), "width");
-	
-	histF3->Scale(1./(FileList.size()/2), "width");
-	histF4->Scale(1./(FileList.size()/2), "width");
+	//histF3->Scale(1./(FileList.size()/2), "width");
+	//histF4->Scale(1./(FileList.size()/2), "width");
+
 	auto b = new TCanvas("b1", "Counts versus Frequencies");
 	auto pad = new TPad("pad1", "pad",0,0,1,1);
 	pad->Divide(2,1,0.001,0.001); pad->Draw();
@@ -57,7 +54,7 @@ void AnalysisLineShape(int start = 0, int stop = 999){
 	std::vector<double> w(onset1v.size(),1); // weights vector
 	auto h1 = new TH1D("h1","onset_{algorithm} - onset_{true}",30,-15,15);
    	h1->FillN(onset1v.size(),onset1v.data(), w.data());
-   	auto h2 = new TH1D("h2","onset_{algorithm} - onset_{true}",30,110,140);
+   	auto h2 = new TH1D("h2","onset_{algorithm} - onset_{true}",30,-40 + 1420000, 1420000 + 160);
    	h2->FillN(onset2v.size(),onset2v.data(), w.data());
    	
    	auto canvas = new TCanvas("d", "Toy Result", 1000,550);

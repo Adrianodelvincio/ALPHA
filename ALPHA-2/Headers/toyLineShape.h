@@ -14,6 +14,22 @@
 #include "TNtuple.h"
 #include <TRandom3.h>
 
+struct row { 
+    double f; 
+ 	double Type;
+    double x_cb_start;
+    double run_number;
+    double randomize;
+    void Set(double b, double c, double d, double e, double h) {
+        f = b;
+        Type = c;
+        x_cb_start = d;
+        run_number = e;
+        randomize = h;
+   }
+};
+
+
 void ConvertTNtutpla(TNtuple &file_pdf, vector<double> &v1, vector<double> &v2){
 	// CONVERT TNtuple IN A STD::VECTOR
 	for (int row = 0; row < file_pdf.GetEntries(); ++row) {
@@ -60,12 +76,12 @@ void SplineMethod(TH1 * histpdf1,TH1 * histpdf2, int Nbin){
 	SetContent(histpdf2,Nbin,spline2);
 }
 
-void SetContent(TH1 * histpdf, int Nbin, double (*f)(double, double, double), double x0, double y0){
+void SetContent(TH1 * histpdf, int Nbin, double (*f)(double, double, double, double), double x0,double peak, double y0){
 	//USING A FUNCTION, EVALUATE THE FUNCTION AT X AND FILL HISTOGRAMS
 	for(int i = 1; i <= Nbin; ++i){
 		double x = histpdf->GetBinCenter(i);	// Point to be evaluated
-		if(f(x, x0, y0) > 0.){					// Check the function is > 0
-			histpdf->SetBinContent(i,f(x, x0, y0));
+		if(f(x, x0,peak, y0) > 0.){					// Check the function is > 0
+			histpdf->SetBinContent(i,f(x, x0, peak, y0));
 		} else{ histpdf->SetBinContent(i,0.);}	// Set to 0
 	}
 }
@@ -83,7 +99,15 @@ double ComputeProb(TH1 * histpdf, int i){
 	return prob;
 }
 
-void SetVectors(RooDataSet &Global,RooDataSet *data,vector<int> &b, int &Counts, vector<double> &f ,double frequence, int flag ){
+void SetVectors(RooDataSet &Global,
+				RooDataSet *data,
+				vector<int> &b,
+				int flag,
+				int &Counts,
+				vector<double> &f,
+				double frequence,
+				vector<int> &RunNumber,
+				int run){
 	// FILL VECTORS, DATASET...
 	if(data){  
 		Counts = data->sumEntries();
@@ -91,6 +115,7 @@ void SetVectors(RooDataSet &Global,RooDataSet *data,vector<int> &b, int &Counts,
 		for(int i = 0; i < data->sumEntries(); ++i){
 		b.push_back(flag);
 		f.push_back(frequence);
+		RunNumber.push_back(run);
 		}
 	} else{ // If the dataset is Empy push back 0
 	Counts = 0;
@@ -145,18 +170,33 @@ void FillDataFrame(ROOT::RDataFrame &d1, TString datafileName, TH1 * histpdf, Ro
 	rdf.Snapshot("myTree", datafileName);
 }
 
-auto FillDataFrame(ROOT::RDataFrame &d1, RooDataSet &data, vector<double> &f , vector<int> &vType, vector<double> &vTot,int &j, vector<Double_t> &rn){
+auto FillDataFrame(ROOT::RDataFrame &d1, RooDataSet &data,
+				 	vector<double> &f,
+				 	vector<int> &vType,
+				 	vector<double> &vTot,
+				 	int &j,
+				 	vector<Double_t> &rn,
+				 	vector<int> &RunNumber,
+				 	vector<double> &freqDelay
+				 	){
 	
 	auto rdf = d1
+	.Define("runNumber", 
+	[&RunNumber, &j](){
+		return RunNumber[j];
+	})
 	.Define("random",
 	[&rn, &j](){			//To subsample and randomize 
 		return rn[j];
 		})
+	.Define("delay", [&freqDelay, &RunNumber, &j](){
+		return freqDelay[RunNumber[j]];
+	})
 	.Define("frequence",	// Frequence of the event
 	[&j, &f](){
 		return f[j]; 
 		})
-	.Define("Type", 		// Type of the event (0 wall, 1 res gas, 2 cosmic)
+	.Define("type", 		// Type of the event (0 wall, 1 res gas, 2 cosmic)
 		[&j, &vType](){
 		return vType[j];
 		})
