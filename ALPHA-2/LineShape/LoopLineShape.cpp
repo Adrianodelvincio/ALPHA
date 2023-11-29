@@ -8,6 +8,7 @@
 #include <TRandom3.h>
 #include <math.h> 
 #include "../Headers/toyLineShape.h"
+#include "../Headers/ConfigurationParser.h"
 
 using namespace RooFit;
 
@@ -27,67 +28,48 @@ double parabola1(double x, double xmin = 0, double xmax = 0){
 	else {return 0;}
 }
 
-void LoopLineShape(TString folder = "Linear/",
-				int Nloop = 1,
-				double mix_cb = 1,
-				double mix_ad = 1,
-				double C = 0.5,
-				int Nstack = 20,
-				int NHbar = 14,
-				int Repetition = 5,
-				double FrequencyStep = 5,
-				int timeStep = 8,
-				int SweepStep = 24,
-				double x_cb_start = 0,
-				double x_cb_peak = 20,
-				double x_cb_end = 40,
-				double x_da_start = 1420000,
-				double x_da_peak = 1420020,	
-				double x_da_end = 1420040,
-				double CosmicRate = 1786./35000.,
-				double Efficiency = 1,
-				bool MethodSpline = false){
-
-	/* Parameters of the Simulation */
-int Ntot = Nstack * NHbar * Efficiency;	// Number of Total Events
-double pWall_c = mix_cb;				// Weight annihilation on walls for pdf1 (transition c -> b)
-double pWall_d = mix_ad;				// Weight annihilation on walls for pdf2 (transition d -> a)
-double c = C;							// Percentage of division two datasets
-FrequencyStep = FrequencyStep;			// Kilo hertz
-	/*				*/
-
-int Ntrial = Nloop;									// Ntrial
-double d = 1 - c; 									// Percentage of event for lineshape1
-double Nc = Ntot*c; 								// Expected event for lineshape1
-double Nd = Ntot*d; 								// Expected event for lineshape2
-double pGas_d = 1 - pWall_d; 						// Percentage of annihilation on residual gas
-double pGas_c = 1 - pWall_c; 						// Percentage of annihilation on residual gas
-double Ncosmic = SweepStep * timeStep * CosmicRate;	// Number of Cosmic Events
-double startPdf1 = x_cb_start -(FrequencyStep)*5;	// Start of frequency sweep c-b
-double startPdf2 = x_da_start -(FrequencyStep)*5;	// Start of frequency sweep d-a
-
+void LoopLineShape(	int Nloop = 1,
+					TString folder = "Linear/",
+					TString ConfFile = "ToyConfiguration.txt",					
+					bool MethodSpline = false){
 
 gInterpreter->GenerateDictionary("ToyLine","../Headers/toyLineShape.h");
+gInterpreter->GenerateDictionary("ToyParser","../Headers/ConfigurationParser.h");
 ROOT::EnableImplicitMT();
+// ReadConfigurationFiles;
+ReadConfFile Params(ConfFile);
+Params.Print();
+
+//	 Parameters of the Simulation 
+int Ntot = Params.Nstack * Params.NHbar * Params.Efficiency;// Number of Total Events
+int FrequencyStep = Params.FrequencyStep;					// Kilo hertz
+int SweepStep = Params.SweepStep;
+int Repetition = Params.Repetition;
+double pWall_c = Params.mix_cb;								// Weight annihilation on walls for pdf1 (transition c -> b)
+double pWall_d = Params.mix_ad;								// Weight annihilation on walls for pdf2 (transition d -> a)
+double Ncosmic = Params.timeStep * Params.CosmicRate;		// Number of Cosmic Events
+double x_cb_start = Params.x_cb_start;
+double x_cb_end = Params.x_cb_end;
+double x_cb_peak = Params.x_cb_peak;
+double x_da_start = Params.x_cb_start;
+double x_da_end = Params.x_cb_end;
+double x_da_peak = Params.x_cb_peak;
+
+	
+double startPdf1 = Params.x_cb_start - (FrequencyStep)*5;	// Start of frequency sweep c-b
+double startPdf2 = Params.x_da_start - (FrequencyStep)*5;	// Start of frequency sweep d-a
+int Ntrial = Nloop;											// Ntrial
+double Nc = Ntot*Params.C; 									// Expected event for lineshape1
+double Nd = Ntot*(1 - Params.C); 							// Expected event for lineshape2
+double pGas_d = 1 - pWall_d; 								// Percentage of annihilation on residual gas
+double pGas_c = 1 - pWall_c; 								// Percentage of annihilation on residual gas
 
 int Nbin1 = SweepStep;	// FIX NUMBER BIN EQUAL TO SWEEPSTEP
 int Nbin2 = SweepStep;	// FIX NUMBER BIN EQUAL TO SWEEPSTEP
-//Histogram to store the distributions
-//TH1F *histpdf1 = new TH1F("hist1", "pdf1", Nbin1, startPdf1, startPdf1 + Nbin1*(FrequencyStep));
-//TH1F *histpdf2 = new TH1F("hist2", "pdf2", Nbin2, startPdf2, startPdf2 + Nbin2*(FrequencyStep));
 
-/*if(MethodSpline){ // Set the lineshape with the Spline method
-	SplineMethod(histpdf1,histpdf2, Nbin);
-}
+//if(MethodSpline){ SplineMethod(histpdf1,histpdf2, Nbin);}
 
-if(!MethodSpline){ // DEFINE CUSTOM LINESHAPES
-	SetContent(histpdf1,Nbin1,linear, x_cb_start,x_cb_peak ,x_cb_end);
-	SetContent(histpdf2,Nbin2,linear, x_da_start,x_da_peak ,x_da_end);
-}
 
-SetNormalization(histpdf1);
-SetNormalization(histpdf2);
-*/
 RooMsgService::instance().setGlobalKillBelow(RooFit::INFO);
 RooMsgService::instance().setGlobalKillBelow(RooFit::PROGRESS);
 
@@ -137,7 +119,7 @@ TRandom3 *r = new TRandom3();
 			for(int bin = 1; bin <= SweepStep; bin++){ 	//LOOP ON BINS
 				//PDF1
 				double prob = ComputeProb(histpdf1,bin);	// Probability of the bin
-				SetCoefficients((pWall_c*Nc)*prob,(pGas_c*Nc)/Nbin1,Ncosmic/Nbin1, &Nwall,&Ngas,&Nbk);
+				SetCoefficients((pWall_c*Nc)*prob,(pGas_c*Nc)/Nbin1,Ncosmic, &Nwall,&Ngas,&Nbk);
 				int gasCount = 0; int mixCount = 0; int CosmicCount = 0;
 				int frequence = histpdf1->GetBinCenter(bin);
 				if(prob > 0){
@@ -147,8 +129,8 @@ TRandom3 *r = new TRandom3();
 							mixCount,
 							f1,frequence,
 							RunNumber1,run); // FILL DATASET
+				delete dataLoopWall;
 				}else { mixCount = 0;}
-				
 				if(Ngas.getVal() != 0){
 				RooDataSet *dataLoopGas = genGas.generate(x, Extended());
 				SetVectors(dataPdf1,dataLoopGas,
@@ -156,15 +138,15 @@ TRandom3 *r = new TRandom3();
 							gasCount,
 							f1,frequence,
 							RunNumber1,run);
+				delete dataLoopGas;
 				}else {gasCount = 0;}
-				
 				RooDataSet *dataCosmic = genCosmic.generate(x, Extended());
 				SetVectors(dataPdf1,dataCosmic,
 							v1Type, 2,
 							CosmicCount,
 							f1,frequence,
 							RunNumber1,run);
-				
+				delete dataCosmic;
 				// STORE SOME USEFUL QUANTITIES
 				v1Tot.push_back(mixCount + gasCount + CosmicCount);
 				
@@ -172,7 +154,7 @@ TRandom3 *r = new TRandom3();
 				mixCount = 0; gasCount = 0; CosmicCount = 0;
 				prob = ComputeProb(histpdf2,bin);	// Probability of the bin
 				frequence = histpdf2->GetBinCenter(bin);
-				SetCoefficients((pWall_d*Nd)*prob,(pGas_d*Nd)/Nbin2,Ncosmic/Nbin2, &Nwall,&Ngas,&Nbk);
+				SetCoefficients((pWall_d*Nd)*prob,(pGas_d*Nd)/Nbin2,Ncosmic, &Nwall,&Ngas,&Nbk);
 				
 				if(prob > 0){
 				RooDataSet *dataLoopWall2 = genMix.generate(x,Extended());	// Generate Wall data
@@ -181,6 +163,7 @@ TRandom3 *r = new TRandom3();
 							mixCount,
 							f2,frequence,
 							RunNumber2,run);
+				delete dataLoopWall2;
 				} else{  mixCount = 0;}
 				if(Ngas.getVal() != 0){
 				RooDataSet *dataLoopGas2 = genGas.generate(x,Extended());	// Generate Gas counts
@@ -189,6 +172,7 @@ TRandom3 *r = new TRandom3();
 							gasCount,
 							f2,frequence,
 							RunNumber2,run);
+				delete dataLoopGas2;
 				} else{ gasCount = 0;}
 				RooDataSet *dataCosmic2 = genCosmic.generate(x, Extended());			
 				SetVectors(dataPdf2,dataCosmic2,
@@ -196,6 +180,7 @@ TRandom3 *r = new TRandom3();
 							CosmicCount,
 							f2,frequence,
 							RunNumber2, run);
+				delete dataCosmic2;
 				// STORE USEFUL QUANTITIES
 				v2Tot.push_back(mixCount + gasCount + CosmicCount);
 			} // Loop on Bin
@@ -241,11 +226,10 @@ TRandom3 *r = new TRandom3();
 										RunNumber2,
 										freqDelay); // Fill RDataFrame
 		std::cout << "Save " << folder + nameFile2 << std::endl;
-		FilledFrame2.Snapshot("myTree", folder + nameFile2);
-
+		FilledFrame2.Snapshot("myTree", folder + nameFile2);		
 		std::cout << "Total Event Gen. pdf1: " << Tot1 << std::endl;
-		std::cout << "Total Event Gen. pdf2: " << Tot2 << std::endl; 
-
+		std::cout << "Total Event Gen. pdf2: " << Tot2 << std::endl;
+		dataPdf1.Delete(); dataPdf2.Delete();
 	} // Loop Trials
 } // End program
 
