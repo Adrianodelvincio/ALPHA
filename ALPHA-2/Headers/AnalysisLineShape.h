@@ -17,8 +17,10 @@ std::vector<std::string> getFiles(int start, int stop, TString Directory){
 		TString endfile = TString::Format("%d.root", i);
 		TString namefile1 = Directory + Namefile1 + endfile;
 		TString namefile2 = Directory + Namefile2 + endfile;
+		if(i%10 == 0){
 		std::cout << namefile1 << std::endl;
 		std::cout << namefile2 << std::endl;
+		}
 		if(!gSystem->AccessPathName(namefile1) && !gSystem->AccessPathName(namefile2)){
 			std::string lastfile1(namefile1.Data());
 			std::string lastfile2(namefile2.Data());

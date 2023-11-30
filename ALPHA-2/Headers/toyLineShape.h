@@ -76,12 +76,12 @@ void SplineMethod(TH1 * histpdf1,TH1 * histpdf2, int Nbin){
 	SetContent(histpdf2,Nbin,spline2);
 }
 
-void SetContent(TH1 * histpdf, int Nbin, double (*f)(double, double, double, double), double x0,double peak, double y0){
+void SetContent(TH1 * histpdf, int Nbin, double (*f)(double, double, double, double), double x0,double peak, double x1){
 	//USING A FUNCTION, EVALUATE THE FUNCTION AT X AND FILL HISTOGRAMS
 	for(int i = 1; i <= Nbin; ++i){
 		double x = histpdf->GetBinCenter(i);	// Point to be evaluated
-		if(f(x, x0,peak, y0) > 0.){					// Check the function is > 0
-			histpdf->SetBinContent(i,f(x, x0, peak, y0));
+		if(f(x, x0,peak, x1) > 0.){					// Check the function is > 0
+			histpdf->SetBinContent(i,f(x, x0, peak, x1));
 		} else{ histpdf->SetBinContent(i,0.);}	// Set to 0
 	}
 }

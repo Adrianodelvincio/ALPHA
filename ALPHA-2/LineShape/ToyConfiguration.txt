@@ -1,17 +1,21 @@
 Nstack = 20
 NHbar = 14
 Repetition = 5
-CosmicRate = 1786./35000.
-Efficiency = 1
-mix_cb = 1
-mix_ad = 1
-C = 0.5
-FrequencyStep = 5
-timeStep = 8
 SweepStep = 24
+CosmicRate = 0.
+Efficiency = 1
+pwall_cb = 1
+pwall_ad = 1
+C = 0.5
+TimeStep = 8
+# cosmic rate is expressed in event/second
+CosmicRate = 0.051028571
+# The following are in kHz units
 x_cb_start = 0
 x_cb_end = 40
 x_cb_peak = 20
 x_da_start = 1420000
 x_da_peak = 1420020
 x_da_end = 1420040
+FrequencyStep = 5
+delay = 2.5
