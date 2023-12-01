@@ -28,25 +28,25 @@ double parabola1(double x, double xmin = 0, double xmax = 0){
 }
 
 void LoopLineShape(	int Nloop = 1,
-					TString folder = "linear/",
-					TString ConfFile = "ToyConfiguration.txt",					
-					bool MethodSpline = false){
+			TString folder = "linear/",
+			TString ConfFile = "ToyConfiguration.txt",					
+			bool MethodSpline = false){
 
 gInterpreter->GenerateDictionary("ToyLine","../Headers/toyLineShape.h");
 gInterpreter->GenerateDictionary("ToyParser","../Headers/ConfigurationParser.h");
-ROOT::EnableImplicitMT();
+ROOT::EnableImplicitMT(20);
 // ReadConfigurationFiles;
 ReadConfFile Params(ConfFile);
 Params.Print();
 
 //	 Parameters of the Simulation 
-int Ntot = Params.Nstack * Params.NHbar * Params.Efficiency;// Number of Total Events
+int Ntot = Params.Nstack * Params.NHbar * Params.Efficiency;		// Number of Total Events
 double FrequencyStep = Params.FrequencyStep;				// Kilo hertz
-int SweepStep = Params.SweepStep;							// Number of FrequencyStepS
-int Repetition = Params.Repetition;							// Repetition of the single run
-double pWall_c = Params.pwall_cb;							// Weight annihilation on walls for pdf1 (transition c -> b)
-double pWall_d = Params.pwall_ad;							// Weight annihilation on walls for pdf2 (transition d -> a)
-double Ncosmic = Params.TimeStep * Params.CosmicRate;		// Number of Cosmic Events
+int SweepStep = Params.SweepStep;					// Number of FrequencyStepS
+int Repetition = Params.Repetition;					// Repetition of the single run
+double pWall_c = Params.pwall_cb;					// Weight annihilation on walls for pdf1 (transition c -> b)
+double pWall_d = Params.pwall_ad;					// Weight annihilation on walls for pdf2 (transition d -> a)
+double Ncosmic = Params.TimeStep * Params.CosmicRate;			// Number of Cosmic Events
 double x_cb_start = Params.x_cb_start;
 double x_cb_end = Params.x_cb_end;
 double x_cb_peak = Params.x_cb_peak;

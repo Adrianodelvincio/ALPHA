@@ -11,10 +11,10 @@ using namespace RooFit;
 double algorithm(ROOT::RDF::RResultPtr<TH1D> histpdf, double threshold);
 double doubleThreshold(ROOT::RDF::RResultPtr<TH1D> histpdf, double threshold);
 
-void AnalysisLineShape(TString directory = "Linear/", TString ConfFile = "ToyConfiguration.txt" ,
+void AnalysisLineShape(TString directory = "linear/", TString ConfFile = "ToyConfiguration.txt" ,
 					int start = 0,
 					int stop = 999,
-					double Sigma = 3,
+					double mu = 3,
 					bool Subtract = false){
 	
 	gInterpreter->GenerateDictionary("ToyParser","../Headers/ConfigurationParser.h");
@@ -35,8 +35,8 @@ void AnalysisLineShape(TString directory = "Linear/", TString ConfFile = "ToyCon
 	auto histF3 = rdf.Filter("frequence <= 80").Histo1D({"Counts","Pdf1",static_cast<int>(SweepStep),startPdf1, startPdf1 + SweepStep*FrequencyStep }, "frequence");
 	auto histF4 = rdf.Filter("frequence >= 80").Histo1D({"Counts","Pdf2",static_cast<int>(SweepStep), startPdf2, startPdf2 + SweepStep*FrequencyStep}, "frequence");
 
-	double threshold = Sigma*CosmicBackground;	// threshold considering the cosmic background
-	//threshold = Sigma * (0.00001);
+	double threshold = mu*CosmicBackground;	// threshold considering the cosmic background
+	//threshold = mu * (0.00001);
 	vector<double> onset1v,onset2v;
 	vector<double> deltaOnset;
 	
