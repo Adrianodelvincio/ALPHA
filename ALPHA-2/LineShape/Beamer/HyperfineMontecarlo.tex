@@ -25,6 +25,7 @@
 \includegraphics[width = 0.25\textwidth ]{../../../logo/1_Pisa_LOGO_SIGLA.pdf}
 \end{figure}
 } 
+\beamertemplatenavigationsymbolsempty
 \begin{document}
 
 \begin{frame}
@@ -105,7 +106,7 @@ The onset is fixed ad $f = \SI{0}{\kilo \hertz}$. In this sample the cosmic back
 
 \begin{frame}{A simple Onset finding Algorithm}
 
-The first algorithm that is tested is quite simple: {\color{red}{ \textbf{the onset is identified by the first bin with a content over a given threshold}} ($> \mu_{cosmic} + N \sigma_{cosmic}$)} \footnote{Where the $\sigma_{cosmic}$ is computed from the Poisson distribution of the cosmic counts expected per bin.}
+The first algorithm that is tested is quite simple: {\color{red}{ \textbf{the onset is identified by the first bin with a content over a given threshold}} ($> N\mu_{cosmic}$)} \footnote{Where the $\mu_{cosmic}$ is computed from the Poisson distribution of the cosmic counts expected per bin.}
 
 Before showing the plot with the simulated data, it is useful to remind how this algorithm deals with the frequency step:
 
@@ -140,7 +141,7 @@ With the delay, two bins ( $frequency = \SI{0}{\kilo \hertz}$ and $frequency = \
 \end{figure}
 \end{frame}
 
-\begin{frame}{algorithm test: threshold $ > 3 \sigma_{cosmic}$}
+\begin{frame}{algorithm test: threshold $ > 3 \mu_{cosmic}$}
 
 In this case, we have applied the algorithm to simulated data with cosmic background (using a rate of $0.051 \frac{event}{s}$, from passcut1). Each bin has an expected cosmic background of $dwelltime \cdot rate = 0.408$.
 The delay is uniform distributed in $\SI{-2.5}{\kilo \hertz}$ and $\SI{+2.5}{\kilo \hertz}$. 
@@ -149,7 +150,7 @@ The delay is uniform distributed in $\SI{-2.5}{\kilo \hertz}$ and $\SI{+2.5}{\ki
 \end{figure}
 \end{frame}
 
-\begin{frame}{algorithm test: threshold $ > 5 \sigma_{cosmic}$}
+\begin{frame}{algorithm test: threshold $ > 5 \mu_{cosmic}$}
 
 In this case, we have applied the algorithm to simulated data with cosmic background (using a rate of $0.051 \frac{event}{s}$, from passcut1). Each bin has an expected cosmic content of $dwelltime \cdot rate = 0.408$.
 The delay is uniform distributed in $\SI{-2.5}{\kilo \hertz}$ and $\SI{+2.5}{\kilo \hertz}$. 
@@ -160,7 +161,7 @@ The delay is uniform distributed in $\SI{-2.5}{\kilo \hertz}$ and $\SI{+2.5}{\ki
 \end{frame}
 
 
-\begin{frame}{algorithm test: threshold $ > 8 \sigma_{cosmic}$}
+\begin{frame}{algorithm test: threshold $ > 8 \mu_{cosmic}$}
 
 In this case, we have applied the algorithm to simulated data with cosmic background (using a rate of $0.051 \frac{event}{s}$, from passcut1). Each bin has an expected cosmic content of $dwelltime \cdot rate = 0.408$.
 The delay is uniform distributed in $\SI{-2.5}{\kilo \hertz}$ and $\SI{+2.5}{\kilo \hertz}$. 
@@ -176,6 +177,11 @@ The delay is uniform distributed in $\SI{-2.5}{\kilo \hertz}$ and $\SI{+2.5}{\ki
 \item different onset-finding algorithm
 \item simulation of repetition/runs with Bfield drift.
 \end{itemize}
+\end{frame}
+
+\begin{frame}
+
+Prob algorithm is triggered by the cosmic for threshold $> 3 \mu_{cosmic}$ baseline over threshold is $P = 6.37$\% (Poisson distribution, 1 - P(k=0) - P(k = 1)), calculation bring to 6.37\% 
 
 \end{frame}
 

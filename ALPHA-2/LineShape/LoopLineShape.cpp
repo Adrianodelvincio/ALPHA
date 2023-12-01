@@ -123,7 +123,7 @@ TRandom3 *r = new TRandom3();
 				SetCoefficients((pWall_c*Nc)*prob,(pGas_c*Nc)/Nbin1,Ncosmic, &Nwall,&Ngas,&Nbk);
 				int gasCount = 0; int mixCount = 0; int CosmicCount = 0;
 				double frequence = histpdf1->GetBinCenter(bin);
-				//std::cout << histpdf1->GetBinCenter(bin) << std::endl;
+				
 				if(prob > 0){
 				RooDataSet *dataLoopWall = genMix.generate(x,Extended()); // GENERATE THE DATA
 				SetVectors(dataPdf1,dataLoopWall,
