@@ -2,13 +2,16 @@ Nstack = 20
 NHbar = 14
 Repetition = 5
 SweepStep = 24
-Efficiency = 1
 pwall_cb = 1
 pwall_ad = 1
 C = 0.5
 TimeStep = 8
 # cosmic rate is expressed in event/second
+# point of work of vertex classificator s = efficiency, b = CosmicRate
+###
 CosmicRate = 0.051028571
+Efficiency = 1
+###
 # The following are in kHz units
 x_cb_start = 0
 x_cb_end = 40
