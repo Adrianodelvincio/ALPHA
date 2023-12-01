@@ -2,7 +2,6 @@ Nstack = 20
 NHbar = 14
 Repetition = 5
 SweepStep = 24
-CosmicRate = 0.
 Efficiency = 1
 pwall_cb = 1
 pwall_ad = 1

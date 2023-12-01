@@ -27,4 +27,8 @@ The software is dived in different scripts, that are
 
 *TemplateMLE.cpp* uses the data **cosmic**, **uwlosses** and **mixing** to build template models of the radius distribution of the anti-hydrogen annihilations. These models are used in combination to fit the data of the annihilation contained in **Dataset** folder.
 
-*AnalyticMLE.cpp*
+---
+**LineShape** simulation
+
+the folder **LineShape** contains the code for a Monte Carlo toy of the hyperfine measurements. The aim of the simulation is to test different onset finding algorithm, studying the bias and statistical uncertainty. The main structure of the simulation is presented here:
+![alt text](https://github.com/Adrianodelvincio/ALPHA/blob/main/ALPHA-2/LineShape/Beamer/SimulationScheme.pdf)
