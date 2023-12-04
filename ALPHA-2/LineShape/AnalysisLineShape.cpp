@@ -6,10 +6,9 @@
 
 using namespace RooFit;
 
-
-
-double algorithm(ROOT::RDF::RResultPtr<TH1D> histpdf, double threshold);
-double doubleThreshold(ROOT::RDF::RResultPtr<TH1D> histpdf, double threshold);
+double firstOverThreshold(ROOT::RDF::RResultPtr<TH1D> histpdf, double threshold);
+double firstWithVeto(ROOT::RDF::RResultPtr<TH1D> histpdf, double threshold);
+double algorithm_2017(ROOT::RDF::RResultPtr<TH1D> histpdf);
 
 void AnalysisLineShape(TString directory = "linear/", TString ConfFile = "ToyConfiguration.txt" ,
 					int start = 0,
@@ -22,7 +21,7 @@ void AnalysisLineShape(TString directory = "linear/", TString ConfFile = "ToyCon
 	
 	ReadConfFile Params(ConfFile);
 	Params.Print();
-	double CosmicBackground = Params.TimeStep * Params.CosmicRate;		// Number of Cosmic Events
+	double CosmicBackground = Params.TimeStep * Params.CosmicRate;	// Number of Cosmic Events
 	double FrequencyStep = Params.FrequencyStep;
 	double startPdf1 = Params.x_cb_start - (FrequencyStep)*5.5;	// Start of frequency sweep c-b
 	double startPdf2 = Params.x_da_start - (FrequencyStep)*5.5;	// Start of frequency sweep d-a
@@ -32,8 +31,8 @@ void AnalysisLineShape(TString directory = "linear/", TString ConfFile = "ToyCon
 	FileList = getFiles(start,stop, directory);
 	//std::cout << FileList[0] << std::endl;
 	ROOT::RDataFrame rdf("myTree", FileList);
-	auto histF3 = rdf.Filter("frequence <= 80").Histo1D({"Counts","Pdf1",static_cast<int>(SweepStep),startPdf1, startPdf1 + SweepStep*FrequencyStep }, "frequence");
-	auto histF4 = rdf.Filter("frequence >= 80").Histo1D({"Counts","Pdf2",static_cast<int>(SweepStep), startPdf2, startPdf2 + SweepStep*FrequencyStep}, "frequence");
+	auto histF3 = rdf.Filter("frequence <= 1000").Histo1D({"Counts","Pdf1",static_cast<int>(SweepStep),startPdf1, startPdf1 + SweepStep*FrequencyStep }, "frequence");
+	auto histF4 = rdf.Filter("frequence >= 1000").Histo1D({"Counts","Pdf2",static_cast<int>(SweepStep), startPdf2, startPdf2 + SweepStep*FrequencyStep}, "frequence");
 
 	double threshold = mu*CosmicBackground;	// threshold considering the cosmic background
 	//threshold = mu * (0.00001);
@@ -54,18 +53,18 @@ void AnalysisLineShape(TString directory = "linear/", TString ConfFile = "ToyCon
 		double delay2 = frame2.GetValue();
 		
 		std::cout << "delay1: " << delay1 << " delay2: " << delay2 << std::endl;
-		double onset1;		// Reconstructed onset and bin of the onset
+		double onset1;			// Reconstructed onset and bin of the onset
 		double onset2;
 		
 		if(Subtract){
-		onset1 = algorithm(Spectra1,threshold);
-		onset2 = algorithm(Spectra2,threshold);
+		onset1 = algorithm_2017(Spectra1);
+		onset2 = algorithm_2017(Spectra2);
 		onset1v.push_back(onset1 - (Params.x_cb_start +  delay1));
 		onset2v.push_back(onset2 - (Params.x_da_start + delay2));
 		deltaOnset.push_back(onset2 - onset1 - (Params.x_da_start + delay1 - Params.x_cb_start - delay2));
 		}else{
-		onset1 = algorithm(Spectra1,threshold);
-		onset2 = algorithm(Spectra2,threshold);
+		onset1 = algorithm_2017(Spectra1);
+		onset2 = algorithm_2017(Spectra2);
 		onset1v.push_back(onset1 - (Params.x_cb_start));
 		onset2v.push_back(onset2 - (Params.x_da_start));
 		deltaOnset.push_back(onset2 - onset1 - (Params.x_da_start - Params.x_cb_start));}
@@ -140,11 +139,9 @@ void AnalysisLineShape(TString directory = "linear/", TString ConfFile = "ToyCon
 	gStyle->SetPadTickX(1);
 	gStyle->SetPadTickY(1);
 	*/
-
-
 }
 
-double algorithm(ROOT::RDF::RResultPtr<TH1D> histpdf, double threshold){
+double firstOverThreshold(ROOT::RDF::RResultPtr<TH1D> histpdf, double threshold){
 	// bin 0 is underflow
 	double onset = 0;	// onset value 
 	double bin = 1;		// bin onset
@@ -160,13 +157,30 @@ double algorithm(ROOT::RDF::RResultPtr<TH1D> histpdf, double threshold){
 	return onset;
 }
 
-double doubleThreshold(ROOT::RDF::RResultPtr<TH1D> histpdf, double threshold){
+double firstWithVeto(ROOT::RDF::RResultPtr<TH1D> histpdf, double threshold){
 	// bin 0 is underflow
 	double onset = 0;	// onset value 
 	double bin = 1;		// bin onset
 	for(int i = 1; i < histpdf->GetNbinsX(); i++){
 		if(histpdf->GetBinContent(i) >= threshold){
 			if(histpdf->GetBinContent(i+1) >= threshold){
+				onset = histpdf->GetBinCenter(i);
+				bin = i;
+				break;
+			}
+		}
+	}
+	std::cout << "		i: " << bin  << " bin content: " << histpdf->GetBinContent(bin) << std::endl;
+	return onset;
+}
+
+double algorithm_2017(ROOT::RDF::RResultPtr<TH1D> histpdf){
+	// bin 0 is underflow
+	double onset = 0;	// onset value 
+	double bin = 1;		// bin onset
+	for(int i = 1; i < histpdf->GetNbinsX(); i++){
+		if(histpdf->GetBinContent(i) > 0){
+			if(histpdf->GetBinContent(i+1) > 1){
 				onset = histpdf->GetBinCenter(i);
 				bin = i;
 				break;

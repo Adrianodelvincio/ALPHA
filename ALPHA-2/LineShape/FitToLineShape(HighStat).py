@@ -32,7 +32,7 @@ def Cruijff(f,x0,sigma0, sigma1, k0, k1,N):
 Cruijff = np.vectorize(Cruijff)
 
 
-plt.figure(1)
+plt.figure(1, figsize = (10,10))
 # bellurie
 plt.grid()
 plt.title("LineShape")
@@ -41,7 +41,7 @@ plt.ylabel("Counts")
 #plot the data
 plt.errorbar(freq,Pass, linestyle = '', marker = 's', color = 'red', markersize = 3)
 plt.step(freq,Pass, linestyle = '-', color = 'black', where='mid')
-
+'''
 ###plot the functions
 peak = 270 ; xpeak = 220
 onset = 175 ; xx = np.linspace(150, xpeak,100)
@@ -54,8 +54,10 @@ plt.plot(xx, quadratic(xx, onset, peak/(xpeak- onset)**2), linestyle = '--', col
 onset = 150 ; xpeak = 215 ; peak = 230
 plt.plot(xx, expRise(xx, onset, np.log(peak)/(xpeak - onset)))
 plt.legend()
-# Beta distribution
+'''
+
 plt.figure(2)
+# Beta distribution
 plt.errorbar(freq,Pass, linestyle = '', marker = 's', color = 'red', markersize = 3)
 plt.step(freq,Pass, linestyle = '-', color = 'black', where='mid')
 Nnorm = 110	#Nnorm = np.sum(Pass);
@@ -96,16 +98,20 @@ ax1.set_xlim(100,320)
 ax1.errorbar(freq,Pass, linestyle = '', marker = 's', color = 'black', markersize = 3)
 ax1.step(freq,Pass, linestyle = '-', color = 'black', where='mid')
 xx = np.linspace(100, 320,1000)
-#ax1.plot(xx,Cruijff(xx,x0,sigma0,sigma1,k0,k1,N), linestyle = '--', color = 'red', label = r"$\sigma_{0} = %.1f$" "\n" r"$\sigma_{1} = %.1f$" "\n" r"$x_{0} = %.1f$" % (sigma0, sigma1, x0))
 ## Fit to the data with Cruijff function
-mask = (Pass >= 3)
+mask = (Pass > 1)
+mask2 = (freq >= 100)
+mask = mask & mask2
 popt, pcovm = fit(Cruijff, freq[mask], Pass[mask], p0 = [x0,sigma0,sigma1,k0,k1,N])
 
-mask = (Pass > 3)
+print("parametri: ", popt)
+print("errori:    ", np.sqrt(pcovm.diagonal()))
+errors = np.sqrt(pcovm.diagonal())
 chisq = ((Pass[mask] - Cruijff(freq[mask],*popt))**2/(Pass[mask])).sum()
 
-ax1.plot(xx,Cruijff(xx,*popt), linestyle = '--', color = 'red', label = r"$\sigma_{0} = %.1f$" "\n" r"$\sigma_{1} = %.1f$" "\n" r"$x_{0} = %.1f$" "\n" r"$k_{0} = %.2f$" "\n" r"$k_{1} = %.2f$" "\n" r"$N = %.1f$" "\n" r"$ \frac{\chi^{2}}{ndof} = \frac{%.1f}{%d} \pm %.1f$" % (popt[1], popt[2], popt[0], popt[3], popt[4], popt[5], chisq, len(Pass[mask]), np.sqrt(2*len(Pass[mask]))))
+ax1.plot(xx,Cruijff(xx,*popt), linestyle = '--', color = 'red', label = r"$\sigma_{0} = %.1f \pm %.2f$" "\n" r"$\sigma_{1} = %.1f \pm %.2f$" "\n" r"$x_{0} = %.1f \pm %.2f$" "\n" r"$k_{0} = %.2f \pm %.2f$" "\n" r"$k_{1} = %.2f \pm %.2f$" "\n" r"$N = %.1f \pm %.2f$" "\n" r"$ \frac{\chi^{2}}{ndof} = \frac{%.1f}{%d} \pm %.1f$" % (popt[1], errors[1] ,popt[2], errors[2], popt[0], errors[0], popt[3], errors[3], popt[4], errors[4], popt[5],errors[5], chisq, len(Pass[mask]), np.sqrt(2*len(Pass[mask]))))
 ax1.legend( fontsize = '13')
+
 
 # residual
 ax2.grid()
@@ -113,8 +119,9 @@ ax2.set_xlim(100,320)
 ax2.set_title("Residuals", fontsize = '12')
 ax2.set_xlabel("frequency [kHz]", fontsize = '12')
 ax2.set_ylabel("Counts", fontsize = '12')
-Residui = Pass - Cruijff(freq,x0,sigma0,sigma1,k0,k1,N)
-ax2.errorbar(freq, Residui,marker = '.', linestyle = 'dotted', color = 'green')
+Residui = (Pass[mask] - Cruijff(freq[mask],*popt))/(np.sqrt(Pass[mask]))
+
+
+ax2.errorbar(freq[mask], Residui[mask],marker = '.', linestyle = 'dotted', color = 'green')
 fig.savefig("Plot/FitToLineShape.pdf", format = 'pdf' , bbox_inches = 'tight')
 plt.show()
-

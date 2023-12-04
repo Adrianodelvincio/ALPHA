@@ -29,7 +29,6 @@ struct row {
    }
 };
 
-
 void ConvertTNtutpla(TNtuple &file_pdf, vector<double> &v1, vector<double> &v2){
 	// CONVERT TNtuple IN A STD::VECTOR
 	for (int row = 0; row < file_pdf.GetEntries(); ++row) {

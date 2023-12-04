@@ -6,6 +6,7 @@
 #include <TMath.h>
 #include <TRandom3.h>
 #include <math.h> 
+#include <cmath>
 #include "../Headers/toyLineShape.h"
 #include "../Headers/ConfigurationParser.h"
 
@@ -21,10 +22,19 @@ double linear(double x, double start = 0, double peak = 0,double end = 0){
 	else { return 0;}
 }
 
-double parabola1(double x, double xmin = 0, double xmax = 0){
-	if(x <= xmin){ return 0;}
-	else if( x > xmin && x <= xmax){ return 3*(x*x);}
-	else {return 0;}
+double parabola(double x, double start = 0, double peak = 0, double end = 0){
+	if(x <= start){ return 0;}
+	else if( x > start && x <= peak){ return pow(x - start,2);}
+	else if( x > peak && x<= end) {
+	double m = -pow(peak - start,2)/(end - peak);
+	return m*(x - peak) + pow(peak - start,2);}
+	else{return 0;}
+}
+
+double Cruijff(double x, double start = 0, double peak){
+	double arg = 0;
+	
+
 }
 
 void LoopLineShape(	int Nloop = 1,
@@ -58,8 +68,8 @@ double RangeDelay = Params.delay;							// Set range delay
 	
 double startPdf1 = Params.x_cb_start - (FrequencyStep)*5.5;	// Start of frequency sweep c-b
 double startPdf2 = Params.x_da_start - (FrequencyStep)*5.5;	// Start of frequency sweep d-a
-int Ntrial = Nloop;												// Ntrial
-double Nc = Ntot*Params.C; 										// Expected event for lineshape1
+int Ntrial = Nloop;										// Ntrial
+double Nc = Ntot*Params.C; 									// Expected event for lineshape1
 double Nd = Ntot*(1 - Params.C); 								// Expected event for lineshape2
 double pGas_d = 1 - pWall_d; 									// Percentage of annihilation on residual gas
 double pGas_c = 1 - pWall_c; 									// Percentage of annihilation on residual gas
@@ -95,13 +105,13 @@ TH1F *histpdf2 = new TH1F("hist2", "pdf2", Nbin2, startPdf2, startPdf2 + Nbin2*(
 //External Toy Loop
 TRandom3 *r = new TRandom3();
 
-	for(int l = 0; l < Ntrial; l++){					//LOOP ON TRIALS
+	for(int l = 0; l < Ntrial; l++){				//LOOP ON TRIALS
 		RooDataSet dataPdf1("data", "data", RooArgSet(x));	// Dataset to store the events
 		RooDataSet dataPdf2("dati", "dati", RooArgSet(x));	// Dataset to store the events
-		vector<double>	f1, f2;								// Frequencies pdf1 , Frequencies pdf2
-		vector<double>	v1Tot, v2Tot;						// Total Counts
-		vector<int>		v1Type,v2Type;						// Type of Event
-		vector<int>		RunNumber1, RunNumber2;				// Run Number (from 0 to Repetition)
+		vector<double>	f1, f2;					// Frequencies pdf1 , Frequencies pdf2
+		vector<double>	v1Tot, v2Tot;				// Total Counts
+		vector<int>	v1Type,v2Type;				// Type of Event
+		vector<int>	RunNumber1, RunNumber2;			// Run Number (from 0 to Repetition)
 		vector<double>  freqDelay;
 		for(int run = 0; run < Repetition; run++){		// LOOP ON REPETITION
 			//DEFINITION OF LINESHAPE
@@ -112,14 +122,14 @@ TRandom3 *r = new TRandom3();
 			double start1 = x_cb_start + delay;
 			double start2 = x_da_start + delay;
 			// SET CONTENT OF THE HISTOGRAMS AND NORMALIZE
-			SetContent(histpdf1,Nbin1,linear, start1,x_cb_peak ,x_cb_end);
-			SetContent(histpdf2,Nbin2,linear, start2,x_da_peak ,x_da_end);
+			SetContent(histpdf1,Nbin1,parabola, start1,x_cb_peak ,x_cb_end);
+			SetContent(histpdf2,Nbin2,parabola, start2,x_da_peak ,x_da_end);
 			SetNormalization(histpdf1);
 			SetNormalization(histpdf2);
 			
 			for(int bin = 1; bin <= SweepStep; bin++){ 	//LOOP ON BINS
 				//PDF1
-				double prob = ComputeProb(histpdf1,bin);	// Probability of the bin
+				double prob = ComputeProb(histpdf1,bin);// Probability of the bin
 				SetCoefficients((pWall_c*Nc)*prob,(pGas_c*Nc)/Nbin1,Ncosmic, &Nwall,&Ngas,&Nbk);
 				int gasCount = 0; int mixCount = 0; int CosmicCount = 0;
 				double frequence = histpdf1->GetBinCenter(bin);
@@ -211,27 +221,27 @@ TRandom3 *r = new TRandom3();
 		
 		int j(0);
 		auto FilledFrame1 = FillDataFrame(d1,
-										dataPdf1,
-										f1,
-										v1Type,
-										v1Tot,
-										j,
-										rn,
-										RunNumber1,
-										freqDelay); // Fill RDataFrame
+						dataPdf1,
+						f1,
+						v1Type,
+						v1Tot,
+						j,
+						rn,
+						RunNumber1,
+						freqDelay); // Fill RDataFrame
 		std::cout << "Save " <<  folder + nameFile1 << std::endl;
 		FilledFrame1.Snapshot("myTree", folder + nameFile1);
 
 		j = 0; // FROM HERE APPLY THE ALGORITHM TO PDF2
 		auto FilledFrame2 = FillDataFrame(d2,
-										dataPdf2,
-										f2,
-										v2Type,
-										v2Tot,
-										j,
-										rn2,
-										RunNumber2,
-										freqDelay); // Fill RDataFrame
+						dataPdf2,
+						f2,
+						v2Type,
+						v2Tot,
+						j,
+						rn2,
+						RunNumber2,
+						freqDelay); // Fill RDataFrame
 		std::cout << "Save " << folder + nameFile2 << std::endl;
 		FilledFrame2.Snapshot("myTree", folder + nameFile2);		
 		std::cout << "Total Event Gen. pdf1: " << Tot1 << std::endl;
