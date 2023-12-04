@@ -39,6 +39,10 @@ ALPHA-2/LineShape/AutoDict_ToyParser.cxx
 ALPHA-2/LineShape/AutoDict_ToyParser_cxx.d
 ALPHA-2/LineShape/AutoDict_ToyParser_cxx.so
 ALPHA-2/LineShape/AutoDict_ToyParser_cxx_ACLiC_dict_rdict.pcm
+ALPHA-2/LineShape/AutoDict_ReadFiles.cxx
+ALPHA-2/LineShape/AutoDict_ReadFiles_cxx.d
+ALPHA-2/LineShape/AutoDict_ReadFiles_cxx.so
+ALPHA-2/LineShape/AutoDict_ReadFiles_cxx_ACLiC_dict_rdict.pcm
 ALPHA-2/LineShape/ToyShape1f0.root
 ALPHA-2/LineShape/ToyShape1f100.root
 ALPHA-2/LineShape/ToyShape1f50.root
@@ -47,7 +51,7 @@ ALPHA-2/LineShape/ToyShape2f50.root
 ALPHA-2/LineShape/prova1.root
 ALPHA-2/LineShape/prova2.root
 ALPHA-2/.ipynb_checkpoints/
-ALPHA-2/LineShape/Linear/
+ALPHA-2/LineShape/linear/
 
 
 s41586-018-0435-1.pdf
