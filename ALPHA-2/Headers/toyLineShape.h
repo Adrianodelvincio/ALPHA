@@ -81,13 +81,17 @@ void SetContent(TH1 * histpdf, int Nbin, double (*f)(double, double, double, dou
 		double x = histpdf->GetBinCenter(i);	// Point to be evaluated
 		if(f(x, x0,peak, x1) > 0.){					// Check the function is > 0
 			histpdf->SetBinContent(i,f(x, x0, peak, x1));
-		} else{ histpdf->SetBinContent(i,0.);}	// Set to 0
+		} 
+		else{
+			histpdf->SetBinContent(i,0.);
+		}// Set to 0
 	}
 }
 
 void SetNormalization(TH1 * histpdf){
 	// NORMALIZE THE HISTOGRAM
 	histpdf->Scale(1./histpdf->Integral(), "width");
+
 }
 
 double ComputeProb(TH1 * histpdf, int i){

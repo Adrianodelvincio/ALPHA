@@ -12,12 +12,12 @@ CosmicRate = 0.051028571
 Efficiency = 1
 ###
 # The following are in kHz units
-x_cb_start = 0
-x_cb_end = 80
-x_cb_peak = 40
-x_da_start = 1420000
-x_da_peak = 1420040
-x_da_end = 1420080
+x_cb_start = 155
+x_cb_end = 320
+x_cb_peak = 220
+x_da_start = 1420155
+x_da_peak = 1420220
+x_da_end = 1420320
 FrequencyStep = 5
 delay = 2.5
 SweepStep = 24

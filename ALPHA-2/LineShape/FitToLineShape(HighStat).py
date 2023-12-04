@@ -99,7 +99,7 @@ ax1.errorbar(freq,Pass, linestyle = '', marker = 's', color = 'black', markersiz
 ax1.step(freq,Pass, linestyle = '-', color = 'black', where='mid')
 xx = np.linspace(100, 320,1000)
 ## Fit to the data with Cruijff function
-mask = (Pass > 1)
+mask = (Pass >= 1)
 mask2 = (freq >= 100)
 mask = mask & mask2
 popt, pcovm = fit(Cruijff, freq[mask], Pass[mask], p0 = [x0,sigma0,sigma1,k0,k1,N])
@@ -118,10 +118,8 @@ ax2.grid()
 ax2.set_xlim(100,320)
 ax2.set_title("Residuals", fontsize = '12')
 ax2.set_xlabel("frequency [kHz]", fontsize = '12')
-ax2.set_ylabel("Counts", fontsize = '12')
+ax2.set_ylabel("Normalized Residual", fontsize = '12')
 Residui = (Pass[mask] - Cruijff(freq[mask],*popt))/(np.sqrt(Pass[mask]))
-
-
-ax2.errorbar(freq[mask], Residui[mask],marker = '.', linestyle = 'dotted', color = 'green')
+ax2.errorbar(freq[mask], Residui,marker = '.', linestyle = 'dotted', color = 'green')
 fig.savefig("Plot/FitToLineShape.pdf", format = 'pdf' , bbox_inches = 'tight')
 plt.show()

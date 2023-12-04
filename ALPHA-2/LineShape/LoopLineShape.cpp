@@ -31,10 +31,24 @@ double parabola(double x, double start = 0, double peak = 0, double end = 0){
 	else{return 0;}
 }
 
-double Cruijff(double x, double start = 0, double peak){
-	double arg = 0;
-	
-
+double Cruijff(double x, double FrequencyStep, double x0, double b){
+        //x0 = 220;
+        double sigma0 = 8.8;
+        double sigma1 = 40.7;
+        double k0 = 0.22;
+        double k1 = -0.03;
+        double arg = 0;
+        double arg2 = x - x0;
+        if (sigma0 != 0 && sigma1 != 0){ // Check the sigma is different from 0
+                if( arg2 <= 0){	// Left tail  
+                        arg = TMath::Exp(-TMath::Power(arg2,2) / (2*sigma0*sigma0 + k0 *TMath::Power(arg2,2)));
+                }
+                else{			// Right tail
+                        arg = TMath::Exp(-TMath::Power(arg2,2) / (2*sigma1*sigma1 + k1 *TMath::Power(arg2,2)));
+                }
+        }
+        double Norm = 0.079771/FrequencyStep;
+        return Norm*arg;
 }
 
 void LoopLineShape(	int Nloop = 1,
@@ -79,7 +93,6 @@ int Nbin2 = SweepStep;	// FIX NUMBER BIN EQUAL TO SWEEPSTEP
 
 //if(MethodSpline){ SplineMethod(histpdf1,histpdf2, Nbin);}
 
-
 RooMsgService::instance().setGlobalKillBelow(RooFit::INFO);
 RooMsgService::instance().setGlobalKillBelow(RooFit::PROGRESS);
 
@@ -122,14 +135,22 @@ TRandom3 *r = new TRandom3();
 			double start1 = x_cb_start + delay;
 			double start2 = x_da_start + delay;
 			// SET CONTENT OF THE HISTOGRAMS AND NORMALIZE
-			SetContent(histpdf1,Nbin1,parabola, start1,x_cb_peak ,x_cb_end);
-			SetContent(histpdf2,Nbin2,parabola, start2,x_da_peak ,x_da_end);
-			SetNormalization(histpdf1);
-			SetNormalization(histpdf2);
-			
+			//SetContent(histpdf1,Nbin1,parabola, start1,x_cb_peak ,x_cb_end);
+			//SetContent(histpdf2,Nbin2,parabola, start2,x_da_peak ,x_da_end);
+			//SetNormalization(histpdf1);
+			//SetNormalization(histpdf2);
+			x_cb_peak = x_cb_peak + delay;
+			x_da_peak = x_da_peak + delay;
+			SetContent(histpdf1,Nbin1,Cruijff, FrequencyStep, x_cb_peak, 0);
+			SetContent(histpdf2,Nbin2,Cruijff, FrequencyStep, x_da_peak, 0);
+			// When the Cruijff is filled, do not normalize the histograms
+			double p = 0;
 			for(int bin = 1; bin <= SweepStep; bin++){ 	//LOOP ON BINS
 				//PDF1
 				double prob = ComputeProb(histpdf1,bin);// Probability of the bin
+				p += prob;
+				std::cout << "prob bin: " << prob << std::endl;
+				std::cout << "p Vale: " << p << std::endl; 
 				SetCoefficients((pWall_c*Nc)*prob,(pGas_c*Nc)/Nbin1,Ncosmic, &Nwall,&Ngas,&Nbk);
 				int gasCount = 0; int mixCount = 0; int CosmicCount = 0;
 				double frequence = histpdf1->GetBinCenter(bin);

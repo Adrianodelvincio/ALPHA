@@ -26,7 +26,7 @@ print("result of the integration: ", result[0] , " +/- ", result[1])
 plt.figure(1)
 plt.title("Cruijff")
 plt.grid()
-start = 0
+start = 130
 stop = 320
 xx = np.linspace(start, stop, 1000)
 plt.plot(xx,(1/result[0])*Cruijff(xx,x0,sigma0,sigma1,k0,k1,N), linestyle = '--', color = 'blue', label = "Cruijff")
@@ -34,17 +34,23 @@ plt.plot(xx,(1/result[0])*Cruijff(xx,x0,sigma0,sigma1,k0,k1,N), linestyle = '--'
 check = integrate.quad(lambda x: (1/result[0])*Cruijff(x,x0,sigma0, sigma1, k0, k1,N), 0, 316)
 print("let's see if it is ok: ", check[0])
 Nstack = 20; Hbar = 14
-Ntot = Nstack*Hbar
-Nstep = 19
+Ntot = Nstack*Hbar/2
+Nstep = 38
 print("total number anti-hydrogen: ", Ntot)
-
 
 x = np.linspace(start,stop,Nstep) # Defining the swipe
 # Binwidth * pdf at center normalized
-y = (np.diff(x)[0]) * (1/result[0])*Cruijff(x,x0,sigma0,sigma1,k0,k1,N)
+y = (1/result[0])*Cruijff(x,x0,sigma0,sigma1,k0,k1,N)
+coefficiente = (N/result[0]) * (1/y.sum())
+print("coefficient for definition of the Cruijff: %f" % coefficiente)
 y = y/y.sum() 	# Normalizzo la lineshape campionata
-y = Ntot*y 	# Scalo con la statistica in esame
+y = Ntot*y 		# Scalo con la statistica in esame
 print("Ma y è normalizzato giusto?: ", y.sum(), " Ntot: ", Ntot)
+
+mask = (x <= 245)
+Hbar_effective = (y[mask]).sum()
+print("Considerando 24 SweepStep, numero di eventi: ", Hbar_effective)
+print("Percentuale: ", Hbar_effective/Ntot)
 
 leftIntegral = np.empty(len(y))
 somma = 0
@@ -55,6 +61,8 @@ for i,item in enumerate(y):
 mask = (y > 0.9)
 mask2 = (leftIntegral > 1)
 plt.figure(2, figsize = (15,10))
+plt.xticks(range(start,stop,5), fontsize = 8)
+plt.yticks(range(0, int(max(y) + 10),2))
 plt.grid()
 plt.title("LineShape for run 4b")
 plt.plot(x,y, linestyle = '-', marker = '.' ,color = 'black', label = "sampling")
