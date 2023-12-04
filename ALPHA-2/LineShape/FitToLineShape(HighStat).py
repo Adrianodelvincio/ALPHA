@@ -22,17 +22,17 @@ def quadratic(f, f0, m):
 	return m*(f-f0)**2
 	
 def Cruijff(f,x0,sigma0, sigma1, k0, k1,N):
+	arg = 0
 	if(f < x0):
 		arg = np.exp(-(f-x0)**2/(2*sigma0**2 + k0*(f-x0)**2))
-	if(f > x0):
+	if(f >= x0):
 		arg = np.exp(-(f-x0)**2/(2*sigma1**2 + k1*(f-x0)**2))
 	return N*arg
 
 Cruijff = np.vectorize(Cruijff)
-peak = 270 ; xpeak = 220
-onset = 175
 
-plt.figure(1)
+
+plt.figure(1, figsize = (10,10))
 # bellurie
 plt.grid()
 plt.title("LineShape")
@@ -41,23 +41,26 @@ plt.ylabel("Counts")
 #plot the data
 plt.errorbar(freq,Pass, linestyle = '', marker = 's', color = 'red', markersize = 3)
 plt.step(freq,Pass, linestyle = '-', color = 'black', where='mid')
-#plot the functions
-xx = np.linspace(150, xpeak,100)
-plt.plot(xx, linearRise(xx, onset, peak/(xpeak - onset) ), linestyle = '--', color = 'purple', label = "linear rise")
-#xx = np.linspace(onset, xpeak, 100)
-xx = np.linspace(175, xpeak,100)
+'''
+###plot the functions
+peak = 270 ; xpeak = 220
+onset = 175 ; xx = np.linspace(150, xpeak,100)
+#linear
+plt.plot(xx, linearRise(xx, onset, peak/(xpeak - onset)), linestyle = '--', color = 'purple', label = "linear rise")
+xx = np.linspace(onset, xpeak,100)
+#quadratic
 plt.plot(xx, quadratic(xx, onset, peak/(xpeak- onset)**2), linestyle = '--', color = 'green', label = "quadratic")
-
+#exponential
 onset = 150 ; xpeak = 215 ; peak = 230
-
 plt.plot(xx, expRise(xx, onset, np.log(peak)/(xpeak - onset)))
 plt.legend()
-
+'''
 
 plt.figure(2)
+# Beta distribution
 plt.errorbar(freq,Pass, linestyle = '', marker = 's', color = 'red', markersize = 3)
 plt.step(freq,Pass, linestyle = '-', color = 'black', where='mid')
-Nnorm = 110#Nnorm = np.sum(Pass);
+Nnorm = 110	#Nnorm = np.sum(Pass);
 onset = 175
 xx = np.linspace(onset, 316, 100)
 
@@ -79,12 +82,46 @@ alpha = 4; b = 8;
 plt.plot(xx, Nnorm*beta.pdf((xx - onset)/(xx.max() - onset), alpha, b), linestyle = '--', label = r'alpha = %.1f ; beta = %.1f' % (alpha, b))
 plt.legend()
 
-plt.figure(3)
-plt.xlabel("frequency [kHz]")
-plt.ylabel("counts")
-plt.xlim(100,320)
-plt.errorbar(freq,Pass, linestyle = '', marker = 's', color = 'black', markersize = 3)
-plt.step(freq,Pass, linestyle = '-', color = 'black', where='mid')
-xx = np.linspace(100, 600,1000)
-plt.plot(xx,Cruijff(xx,225,12,38,0.1,0,270), linestyle = '--', color = 'red', label = r'alpha = %.1f ; beta = %.1f' % (alpha, b))
+#cruijff function
+x0 = 225
+sigma0 = 12
+sigma1 = 38
+k0 = 0.1
+k1 = 0
+N = 270
+fig, (ax1, ax2) = plt.subplots(2, figsize = (15,9), height_ratios=[2, 1] , layout = 'tight')
+ax1.grid()
+ax1.set_title("Cruijff fit to LineShape", fontsize = 18, color = 'blue')
+#ax1.set_xlabel("frequency [kHz]")
+ax1.set_ylabel("Counts", fontsize = '12')
+ax1.set_xlim(100,320)
+ax1.errorbar(freq,Pass, linestyle = '', marker = 's', color = 'black', markersize = 3)
+ax1.step(freq,Pass, linestyle = '-', color = 'black', where='mid')
+xx = np.linspace(100, 320,1000)
+## Fit to the data with Cruijff function
+mask = (Pass > 1)
+mask2 = (freq >= 100)
+mask = mask & mask2
+popt, pcovm = fit(Cruijff, freq[mask], Pass[mask], p0 = [x0,sigma0,sigma1,k0,k1,N])
+
+print("parametri: ", popt)
+print("errori:    ", np.sqrt(pcovm.diagonal()))
+errors = np.sqrt(pcovm.diagonal())
+chisq = ((Pass[mask] - Cruijff(freq[mask],*popt))**2/(Pass[mask])).sum()
+
+ax1.plot(xx,Cruijff(xx,*popt), linestyle = '--', color = 'red', label = r"$\sigma_{0} = %.1f \pm %.2f$" "\n" r"$\sigma_{1} = %.1f \pm %.2f$" "\n" r"$x_{0} = %.1f \pm %.2f$" "\n" r"$k_{0} = %.2f \pm %.2f$" "\n" r"$k_{1} = %.2f \pm %.2f$" "\n" r"$N = %.1f \pm %.2f$" "\n" r"$ \frac{\chi^{2}}{ndof} = \frac{%.1f}{%d} \pm %.1f$" % (popt[1], errors[1] ,popt[2], errors[2], popt[0], errors[0], popt[3], errors[3], popt[4], errors[4], popt[5],errors[5], chisq, len(Pass[mask]), np.sqrt(2*len(Pass[mask]))))
+ax1.legend( fontsize = '13')
+
+
+# residual
+ax2.grid()
+ax2.set_xlim(100,320)
+ax2.set_title("Residuals", fontsize = '12')
+ax2.set_xlabel("frequency [kHz]", fontsize = '12')
+ax2.set_ylabel("Counts", fontsize = '12')
+Residui = (Pass[mask] - Cruijff(freq[mask],*popt))/(np.sqrt(Pass[mask]))
+
+
+ax2.errorbar(freq[mask], Residui[mask],marker = '.', linestyle = 'dotted', color = 'green')
+fig.savefig("Plot/FitToLineShape.pdf", format = 'pdf' , bbox_inches = 'tight')
 plt.show()
