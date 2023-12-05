@@ -179,10 +179,51 @@ The delay is uniform distributed in $\SI{-2.5}{\kilo \hertz}$ and $\SI{+2.5}{\ki
 \end{itemize}
 \end{frame}
 
-\begin{frame}
+\begin{frame}{ Improvements of the week (24/11/30 - 24/12/07)}
 
-Prob algorithm is triggered by the cosmic for threshold $> 3 \mu_{cosmic}$ baseline over threshold is $P = 6.37$\% (Poisson distribution, 1 - P(k=0) - P(k = 1)), calculation bring to 6.37\% 
+\begin{itemize}
+\item Implemented the onset-finding algorithm of 2017 ($first > 0 , second > 1$)
+\item Simulation with a lineShape following the \texttt{ run 69373 } (lineShape with high statistics).
+\item Implementation and test of different onset finding algorithms.
+
+\end{itemize}
 
 \end{frame}
+
+\begin{frame}{Fit to the data of run 69373}
+
+The lineShape is fitted using a Cruijff function, which takes into account the asymmetry of the left-right tails, ($model = N \cdot exp(  \frac{-(x - x_{0})^2}{2\sigma_{0,1} + k_{0,1}(x - x_{0})^{2}})$) 
+
+
+\begin{figure}[hbtp]
+\centering
+\includegraphics[width = 0.8\textwidth ]{../Plot/FitToLineShape.pdf}
+\caption{On top plot, the black line represents data and the red line the fit with the\newline Cruijff function.}
+\end{figure}
+\end{frame}
+
+\begin{figure}
+\begin{figure}[hbtp]
+\centering
+\includegraphics[width = \textwidth]{../Plot/LineshapeSampled.pdf}
+\caption{ Histogram of the generated lineshape for 20 run. The Lineshape is scaled by a\newline factor of 20.}
+\end{figure}
+
+\end{figure}
+
+\begin{frame}{test 2017 algorithm}
+\begin{figure}[hbtp]
+\centering
+\includegraphics[width = 1\textwidth]{../Plot/2017_foward.pdf}
+\end{figure}
+\end{frame}
+\begin{frame}{test 2017 algorithm (reversed)}
+
+\begin{figure}[hbtp]
+\centering
+\includegraphics[width = 1\textwidth]{../Plot/2017_reversed.pdf}
+\end{figure}
+\end{frame}
+
 
 \end{document}

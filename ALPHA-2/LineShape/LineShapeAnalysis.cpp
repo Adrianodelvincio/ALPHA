@@ -9,10 +9,12 @@ using namespace RooFit;
 double firstOverThreshold(ROOT::RDF::RResultPtr<TH1D> histpdf, double threshold);
 double firstWithVeto(ROOT::RDF::RResultPtr<TH1D> histpdf, double threshold);
 double algorithm_2017(ROOT::RDF::RResultPtr<TH1D> histpdf);
+double reverse_2017(ROOT::RDF::RResultPtr<TH1D> histpdf);
 
-void LineShapeAnalysis(TString directory = "linear/", TString ConfFile = "ToyConfiguration.txt" ,
+void LineShapeAnalysis(TString directory = "linear/",
 					int start = 0,
 					int stop = 999,
+					TString ConfFile = "ToyConfiguration.txt",
 					double mu = 3){
 	
 	gInterpreter->GenerateDictionary("ToyParser","../Headers/ConfigurationParser.h");
@@ -30,8 +32,9 @@ void LineShapeAnalysis(TString directory = "linear/", TString ConfFile = "ToyCon
 	FileList = getFiles(start,stop, directory);
 	//std::cout << FileList[0] << std::endl;
 	ROOT::RDataFrame rdf("myTree", FileList);
-	auto histF3 = rdf.Filter("frequence <= 1000").Histo1D({"Counts","Pdf1",static_cast<int>(SweepStep),startPdf1, startPdf1 + SweepStep*FrequencyStep }, "frequence");
-	auto histF4 = rdf.Filter("frequence >= 1000").Histo1D({"Counts","Pdf2",static_cast<int>(SweepStep), startPdf2, startPdf2 + SweepStep*FrequencyStep}, "frequence");
+	auto histF3 = rdf.Filter("runNumber == 1").Filter("frequence <= 1000").Histo1D({"Counts"," c to b",static_cast<int>(SweepStep),startPdf1, startPdf1 + SweepStep*FrequencyStep }, "frequence");
+	auto histF4 = rdf.Filter("runNumber == 1").Filter("frequence >= 1000").Histo1D({"Counts"," d to a",static_cast<int>(SweepStep), startPdf2, startPdf2 + SweepStep*FrequencyStep}, "frequence");
+
 
 	double threshold = mu*CosmicBackground;	// threshold considering the cosmic background
 	vector<double> onset1v,onset2v;
@@ -53,8 +56,10 @@ void LineShapeAnalysis(TString directory = "linear/", TString ConfFile = "ToyCon
 		std::cout << "delay1: " << delay1 << " delay2: " << delay2 << std::endl;
 		double onset1;			// Reconstructed onset and bin of the onset
 		double onset2;
-		onset1 = algorithm_2017(Spectra1);
-		onset2 = algorithm_2017(Spectra2);
+		//onset1 = algorithm_2017(Spectra1);
+		//onset2 = algorithm_2017(Spectra2);
+		onset1 = reverse_2017(Spectra1);
+		onset2 = reverse_2017(Spectra2);
 		onset1v.push_back(onset1 - (Params.x_cb_start));
 		onset2v.push_back(onset2 - (Params.x_da_start));
 		deltaOnset.push_back(onset2 - onset1 - (Params.x_da_start - Params.x_cb_start));
@@ -62,8 +67,8 @@ void LineShapeAnalysis(TString directory = "linear/", TString ConfFile = "ToyCon
 
 	//histF3->Scale(1./histF3->Integral(), "width");
 	//histF4->Scale(1./histF4->Integral(), "width");
-	//histF3->Scale(1./(FileList.size()/2), "width");
-	//histF4->Scale(1./(FileList.size()/2), "width");
+	histF3->Scale(1./(stop));
+	histF4->Scale(1./(stop));
 
 	auto b = new TCanvas("b1", "Spectral lines");
 	auto pad = new TPad("pad1", "pad",0,0,1,1);
@@ -90,12 +95,12 @@ void LineShapeAnalysis(TString directory = "linear/", TString ConfFile = "ToyCon
    	h3->FillN(deltaOnset.size(), deltaOnset.data(), w.data());
    	
    	auto canvas = new TCanvas("d", "Toy Result", 1000,550);
-	auto pad2 = new TPad("pad2", "pad2",0,0,1,1);
+	auto pad2 = new TPad("pad2", "pad2",0,0,0,0);
 	gStyle->SetOptStat(1);
 	gStyle->SetPadTickX(1);
 	gStyle->SetPadTickY(1);
 	//gStyle->SetOptFit(1);
-	pad2->Divide(2,2,0.005,0.005);
+	pad2->Divide(2,2,0.000001,0.000001);
 	pad2->Draw();
 	pad2->cd(1);
 	h1->GetXaxis()->SetTitle("frequency [kHz]");
@@ -180,3 +185,21 @@ double algorithm_2017(ROOT::RDF::RResultPtr<TH1D> histpdf){
 	std::cout << "		i: " << bin  << " bin content: " << histpdf->GetBinContent(bin) << std::endl;
 	return onset;
 }
+
+double reverse_2017(ROOT::RDF::RResultPtr<TH1D> histpdf){
+	// bin 0 is underflow
+	double onset = 0;			// onset value 
+	double bin = histpdf->GetNbinsX();	// bin onset
+	for(int i = histpdf->GetNbinsX(); i > 1; --i){
+		if(histpdf->GetBinContent(i) < 2){
+			if(histpdf->GetBinContent(i-1) < 1){
+				onset = histpdf->GetBinCenter(i);
+				bin = i;
+				break;
+			}
+		}
+	}
+	std::cout << "		i: " << bin  << " bin content: " << histpdf->GetBinContent(bin) << std::endl;
+	return onset;
+}
+
