@@ -3,9 +3,12 @@ from matplotlib import pyplot as plt
 from scipy.optimize import curve_fit as fit
 from scipy.stats import beta
 
-window,freq,power,unixtimestart,runtimestart,stop,duration,Trig,Read,Pass,MVA = np.loadtxt("elog.txt", unpack = True)
+window,freq,power,unixtimestart,runtimestart,stop,duration,Trig,Read,Pass,MVA = np.loadtxt("ToyModelData.txt", unpack = True)
 
 freq = freq * 1e6 - 28.2353e6 # Eliminate the offset and convert to kHz
+
+background = 0.051028571*8
+Pass = Pass - background
 
 def linearRise(f,f0,m):
 	tmp = (f-f0)*m
@@ -88,6 +91,7 @@ configFile.write("\n" "sigma1 = %.2f" % popt[2])
 configFile.write("\n" "k0 = %.2f" % popt[3])
 configFile.write("\n" "k1 = %.2f" % popt[4])
 configFile.write("\n" "Norm = %.2f" % popt[5])
+configFile.close()
 
 #Plot the lineshape and the cruijff
 fig, (ax1, ax2) = plt.subplots(2, figsize = (15,9), height_ratios=[2, 1] , layout = 'tight')

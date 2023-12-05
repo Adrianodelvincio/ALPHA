@@ -62,6 +62,14 @@ ALPHA-2/LineShape/cosmic_0_delay_0/
 ALPHA-2/LineShape/cosmic_0_delay_15/
 ALPHA-2/LineShape/cosmic_0_delay_2.5/
 ALPHA-2/LineShape/cosmic_0_delay_5fix/
+AutoDict_LineShape.cxx
+AutoDict_LineShape_cxx.d
+AutoDict_LineShape_cxx.so
+AutoDict_LineShape_cxx_ACLiC_dict_rdict.pcm
+AutoDict_Parser.cxx
+AutoDict_Parser_cxx.d
+AutoDict_Parser_cxx.so
+AutoDict_Parser_cxx_ACLiC_dict_rdict.pcm
 ALPHA-2/LineShape/linear/
 ALPHA-2/LineShape/quadratic/
 ALPHA-2/LineShape/highStat/

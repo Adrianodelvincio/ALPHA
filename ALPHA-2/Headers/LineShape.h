@@ -24,7 +24,6 @@ double parabola(double x, double start = 0, double peak = 0, double end = 0){
 double Cruijff(double x, double onset, double x0, double sigma0, double sigma1, double k0, double k1, double Norm){
         double result;
         double arg2 = x - x0;
-        std::cout << "Cruijff Onset " << onset << std::endl;
         if(x < onset){
         	result = 0;
         }

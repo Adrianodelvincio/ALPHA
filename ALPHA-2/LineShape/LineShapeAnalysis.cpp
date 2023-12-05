@@ -10,11 +10,10 @@ double firstOverThreshold(ROOT::RDF::RResultPtr<TH1D> histpdf, double threshold)
 double firstWithVeto(ROOT::RDF::RResultPtr<TH1D> histpdf, double threshold);
 double algorithm_2017(ROOT::RDF::RResultPtr<TH1D> histpdf);
 
-void AnalysisLineShape(TString directory = "linear/", TString ConfFile = "ToyConfiguration.txt" ,
+void LineShapeAnalysis(TString directory = "linear/", TString ConfFile = "ToyConfiguration.txt" ,
 					int start = 0,
 					int stop = 999,
-					double mu = 3,
-					bool Subtract = false){
+					double mu = 3){
 	
 	gInterpreter->GenerateDictionary("ToyParser","../Headers/ConfigurationParser.h");
 	gInterpreter->GenerateDictionary("ReadFiles", "../Headers/AnalysisLineShape.h");
@@ -23,8 +22,8 @@ void AnalysisLineShape(TString directory = "linear/", TString ConfFile = "ToyCon
 	Params.Print();
 	double CosmicBackground = Params.TimeStep * Params.CosmicRate;	// Number of Cosmic Events
 	double FrequencyStep = Params.FrequencyStep;
-	double startPdf1 = Params.x_cb_start - (FrequencyStep)*5.5;	// Start of frequency sweep c-b
-	double startPdf2 = Params.x_da_start - (FrequencyStep)*5.5;	// Start of frequency sweep d-a
+	double startPdf1 = Params.x_cb_start - (FrequencyStep)*(Params.BinBeforeOnset + 0.5);	// Start of frequency sweep c-b
+	double startPdf2 = Params.x_da_start - (FrequencyStep)*(Params.BinBeforeOnset + 0.5);	// Start of frequency sweep d-a
 	double SweepStep = Params.SweepStep;
 	
 	std::vector<std::string> FileList;
@@ -35,7 +34,6 @@ void AnalysisLineShape(TString directory = "linear/", TString ConfFile = "ToyCon
 	auto histF4 = rdf.Filter("frequence >= 1000").Histo1D({"Counts","Pdf2",static_cast<int>(SweepStep), startPdf2, startPdf2 + SweepStep*FrequencyStep}, "frequence");
 
 	double threshold = mu*CosmicBackground;	// threshold considering the cosmic background
-	//threshold = mu * (0.00001);
 	vector<double> onset1v,onset2v;
 	vector<double> deltaOnset;
 	
@@ -43,11 +41,11 @@ void AnalysisLineShape(TString directory = "linear/", TString ConfFile = "ToyCon
 	for(int i = 0; i < FileList.size(); i += 2){
 		std::cout << "Analizzo DataFrame " << i << std::endl;
 		ROOT::RDataFrame frame("myTree", {FileList[i], FileList[i+1]});		// Load i-th dataset
-		auto Spectra1 = frame.Filter("runNumber == 1").Filter("frequence <= 80").Histo1D({"Counts","Frequence", static_cast<int>(SweepStep),startPdf1, startPdf1 + SweepStep*FrequencyStep }, "frequence");
+		auto Spectra1 = frame.Filter("runNumber == 1").Filter("frequence <= 1000").Histo1D({"Counts","Frequence", static_cast<int>(SweepStep),startPdf1, startPdf1 + SweepStep*FrequencyStep }, "frequence");
 		auto Spectra2 = frame.Filter("runNumber == 1").Filter("frequence >= 1000").Histo1D({"Counts","Frequence", static_cast<int>(SweepStep), startPdf2, startPdf2 + SweepStep*FrequencyStep}, "frequence");
 		
 		//auto d = frame.Display({"frequence","random", "type", "radius", "delay"},1); d->Print();
-		auto frame1 = frame.Filter("runNumber == 1").Filter("frequence <= 80").Mean<double>("delay");
+		auto frame1 = frame.Filter("runNumber == 1").Filter("frequence <= 1000").Mean<double>("delay");
 		auto frame2 = frame.Filter("runNumber == 1").Filter("frequence >= 1000").Mean<double>("delay");
 		double delay1 = frame1.GetValue();
 		double delay2 = frame2.GetValue();
@@ -55,19 +53,11 @@ void AnalysisLineShape(TString directory = "linear/", TString ConfFile = "ToyCon
 		std::cout << "delay1: " << delay1 << " delay2: " << delay2 << std::endl;
 		double onset1;			// Reconstructed onset and bin of the onset
 		double onset2;
-		
-		if(Subtract){
-		onset1 = algorithm_2017(Spectra1);
-		onset2 = algorithm_2017(Spectra2);
-		onset1v.push_back(onset1 - (Params.x_cb_start +  delay1));
-		onset2v.push_back(onset2 - (Params.x_da_start + delay2));
-		deltaOnset.push_back(onset2 - onset1 - (Params.x_da_start + delay1 - Params.x_cb_start - delay2));
-		}else{
 		onset1 = algorithm_2017(Spectra1);
 		onset2 = algorithm_2017(Spectra2);
 		onset1v.push_back(onset1 - (Params.x_cb_start));
 		onset2v.push_back(onset2 - (Params.x_da_start));
-		deltaOnset.push_back(onset2 - onset1 - (Params.x_da_start - Params.x_cb_start));}
+		deltaOnset.push_back(onset2 - onset1 - (Params.x_da_start - Params.x_cb_start));
 	}
 
 	//histF3->Scale(1./histF3->Integral(), "width");
