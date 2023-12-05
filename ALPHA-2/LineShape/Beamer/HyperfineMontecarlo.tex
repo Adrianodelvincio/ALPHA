@@ -180,20 +180,16 @@ The delay is uniform distributed in $\SI{-2.5}{\kilo \hertz}$ and $\SI{+2.5}{\ki
 \end{frame}
 
 \begin{frame}{ Improvements of the week (24/11/30 - 24/12/07)}
-
 \begin{itemize}
 \item Implemented the onset-finding algorithm of 2017 ($first > 0 , second > 1$)
 \item Simulation with a lineShape following the \texttt{ run 69373 } (lineShape with high statistics).
 \item Implementation and test of different onset finding algorithms.
-
 \end{itemize}
-
 \end{frame}
 
 \begin{frame}{Fit to the data of run 69373}
 
 The lineShape is fitted using a Cruijff function, which takes into account the asymmetry of the left-right tails, ($model = N \cdot exp(  \frac{-(x - x_{0})^2}{2\sigma_{0,1} + k_{0,1}(x - x_{0})^{2}})$) 
-
 
 \begin{figure}[hbtp]
 \centering
@@ -202,28 +198,60 @@ The lineShape is fitted using a Cruijff function, which takes into account the a
 \end{figure}
 \end{frame}
 
-\begin{figure}
+\begin{frame}
 \begin{figure}[hbtp]
 \centering
 \includegraphics[width = \textwidth]{../Plot/LineshapeSampled.pdf}
 \caption{ Histogram of the generated lineshape for 20 run. The Lineshape is scaled by a\newline factor of 20.}
 \end{figure}
+\end{frame}
 
-\end{figure}
-
+\nologo{
 \begin{frame}{test 2017 algorithm}
+
+The algorithm is tested for $N_{trial} = 1000$. In this first scenario the cosmic events are removed from the data.
+
+\begin{figure}[hbtp]
+\centering
+\includegraphics[width = 1\textwidth]{../Plot/2017_foward(cosmic=0).pdf}
+\end{figure}
+\end{frame}
+}
+
+\nologo{
+\begin{frame}{test 2017 algorithm}
+
+The algorithm is tested for $N_{trial} = 1000$. The cosmic background is fixed to $0.41$ events per frequence.
+
 \begin{figure}[hbtp]
 \centering
 \includegraphics[width = 1\textwidth]{../Plot/2017_foward.pdf}
 \end{figure}
 \end{frame}
+}
+
+\nologo{
 \begin{frame}{test 2017 algorithm (reversed)}
+
+The algorithm is tested for $N_{trial} = 1000$. In this scenario the cosmic background is removed.
+
+\begin{figure}[hbtp]
+\centering
+\includegraphics[width = 1\textwidth]{../Plot/2017_reversed(cosmic=0).pdf}
+\end{figure}
+\end{frame}
+}
+
+\nologo{
+\begin{frame}{test 2017 algorithm (reversed)}
+
+The algorithm is tested for $N_{trial} = 1000$. The cosmic background is fixed to $0.41$ events per frequence. 
 
 \begin{figure}[hbtp]
 \centering
 \includegraphics[width = 1\textwidth]{../Plot/2017_reversed.pdf}
 \end{figure}
 \end{frame}
-
+}
 
 \end{document}

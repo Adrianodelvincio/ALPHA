@@ -44,8 +44,15 @@ void LineShapeAnalysis(TString directory = "linear/",
 	for(int i = 0; i < FileList.size(); i += 2){
 		std::cout << "Analizzo DataFrame " << i << std::endl;
 		ROOT::RDataFrame frame("myTree", {FileList[i], FileList[i+1]});		// Load i-th dataset
-		auto Spectra1 = frame.Filter("runNumber == 1").Filter("frequence <= 1000").Histo1D({"Counts","Frequence", static_cast<int>(SweepStep),startPdf1, startPdf1 + SweepStep*FrequencyStep }, "frequence");
-		auto Spectra2 = frame.Filter("runNumber == 1").Filter("frequence >= 1000").Histo1D({"Counts","Frequence", static_cast<int>(SweepStep), startPdf2, startPdf2 + SweepStep*FrequencyStep}, "frequence");
+		auto Spectra1 = frame.Filter("runNumber == 1")
+							 .Filter("frequence <= 1000")
+							 .Filter("type != 2")
+							 .Histo1D({"Counts","Frequence", static_cast<int>(SweepStep),startPdf1, startPdf1 + SweepStep*FrequencyStep }, "frequence");
+		
+		auto Spectra2 = frame.Filter("runNumber == 1")
+							 .Filter("frequence >= 1000")
+							 .Filter("type != 2")
+							 .Histo1D({"Counts","Frequence", static_cast<int>(SweepStep), startPdf2, startPdf2 + SweepStep*FrequencyStep}, "frequence");
 		
 		//auto d = frame.Display({"frequence","random", "type", "radius", "delay"},1); d->Print();
 		auto frame1 = frame.Filter("runNumber == 1").Filter("frequence <= 1000").Mean<double>("delay");
@@ -56,10 +63,10 @@ void LineShapeAnalysis(TString directory = "linear/",
 		std::cout << "delay1: " << delay1 << " delay2: " << delay2 << std::endl;
 		double onset1;			// Reconstructed onset and bin of the onset
 		double onset2;
-		//onset1 = algorithm_2017(Spectra1);
-		//onset2 = algorithm_2017(Spectra2);
-		onset1 = reverse_2017(Spectra1);
-		onset2 = reverse_2017(Spectra2);
+		onset1 = algorithm_2017(Spectra1);
+		onset2 = algorithm_2017(Spectra2);
+		//onset1 = reverse_2017(Spectra1);
+		//onset2 = reverse_2017(Spectra2);
 		onset1v.push_back(onset1 - (Params.x_cb_start));
 		onset2v.push_back(onset2 - (Params.x_da_start));
 		deltaOnset.push_back(onset2 - onset1 - (Params.x_da_start - Params.x_cb_start));

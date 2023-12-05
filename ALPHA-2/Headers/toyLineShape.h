@@ -97,39 +97,6 @@ void SetCoefficients(double a, double b, double c, RooRealVar *Nmix, RooRealVar 
 	Nbk->setVal(c); 
 }
 
-void FillDataFrame(ROOT::RDataFrame &d1, TString datafileName, TH1 * histpdf, RooDataSet data, vector<int> &vType, vector<double> &vTot, bool SaveData = true){
-	
-	int j(0); 	// Variable for loop
-	int k(1); 	// Inner Loop, Events belonging to a single frequence
-	int bin(1);	// Bin number 
-	auto rdf = d1.Define("frequence",	// Frequence of the event
-	[&bin, &histpdf](){
-		return histpdf->GetBinCenter(bin); 
-		})
-	.Define("Type", //
-		[&vType, &j](){
-		return vType[j];
-		})
-	.Define("radius",	// Generated radius
-		[&j,&vTot, &data, &bin, &k](){
-		if(k >=  vTot[bin-1]){
-			++bin; 	// All counts per freq. are saved, update the bin
-			k = 1;	// Set k to 0 for the next frequence inner loop
-		}else{
-			++k;	// Update inner loop
-		}
-		if(VERBOSE){
-		std::cout << "Event id: " << j << std::endl; 
-		std::cout << "Bin: " << bin-1 << " Counts per freq: " << vTot[bin -1] << " k event: " << k; 
-		data.get(j)->Print("V");
-		}
-		const RooArgSet &argSet = *(data.get(j));
-		++j;	// Update event id
-		return static_cast<RooAbsReal&>(argSet["x"]).getVal();
-		});
-	rdf.Snapshot("myTree", datafileName);
-}
-
 auto FillDataFrame(ROOT::RDataFrame &d1, RooDataSet &data,
 				 	vector<double> &f,
 				 	vector<int> &vType,
