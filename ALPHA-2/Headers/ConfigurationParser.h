@@ -20,7 +20,7 @@ class ReadConfFile{
 					if (sscanf(line.c_str(), "%s = %f", sBuffer, &buffer) == 2) {
 						if (strcmp(sBuffer, "pwall_cb") == 0) 		{ pwall_cb = buffer;}
 						if (strcmp(sBuffer, "pwall_ad") == 0) 		{ pwall_ad = buffer;}
-						if (strcmp(sBuffer, "C") == 0) 				{ C = buffer;}
+						if (strcmp(sBuffer, "C") == 0) 			{ C = buffer;}
 						if (strcmp(sBuffer, "x_cb_start") == 0) 	{ x_cb_start = buffer;}
 						if (strcmp(sBuffer, "x_cb_end") == 0) 		{ x_cb_end = buffer;}
 						if (strcmp(sBuffer, "x_cb_peak") == 0) 		{ x_cb_peak = buffer;}
@@ -29,16 +29,24 @@ class ReadConfFile{
 						if (strcmp(sBuffer, "x_da_end") == 0) 		{ x_da_end = buffer;}
 						if (strcmp(sBuffer, "CosmicRate") == 0) 	{ CosmicRate = buffer;}
 						if (strcmp(sBuffer, "Efficiency") == 0) 	{ Efficiency = buffer;}
-						if (strcmp(sBuffer, "delay") == 0) 			{ delay = buffer;}
+						if (strcmp(sBuffer, "delay") == 0) 		{ delay = buffer;}
 						if (strcmp(sBuffer, "FrequencyStep") == 0) 	{ FrequencyStep = buffer;}
+						if (strcmp(sBuffer, "Norm") == 0)		{ Norm = buffer;}
+						if (strcmp(sBuffer, "x0") == 0)			{ x0 = buffer;}
+						if (strcmp(sBuffer, "sigma0") == 0)		{ sigma0 = buffer;}
+						if (strcmp(sBuffer, "sigma1") == 0)		{ sigma1 = buffer;}
+						if (strcmp(sBuffer, "k0") == 0)			{ k0 = buffer;}
+						if (strcmp(sBuffer, "k1") == 0)			{ k1 = buffer;}
 					} // fill the parameters
 					int IntBuffer;
 					if (sscanf(line.c_str(), "%s = %d", sBuffer, &IntBuffer) == 2) {
 						if (strcmp(sBuffer, "Nstack") == 0) 		{ Nstack = IntBuffer;}
-						if (strcmp(sBuffer, "NHbar") == 0) 			{ NHbar = IntBuffer;}
+						if (strcmp(sBuffer, "NHbar") == 0) 		{ NHbar = IntBuffer;}
 						if (strcmp(sBuffer, "Repetition") == 0) 	{ Repetition = IntBuffer;}
 						if (strcmp(sBuffer, "TimeStep") == 0) 		{ TimeStep = IntBuffer;}
 						if (strcmp(sBuffer, "SweepStep") == 0) 		{ SweepStep = IntBuffer;}
+						if (strcmp(sBuffer, "BinBeforeOnset") == 0) 	{ BinBeforeOnset = IntBuffer;}
+						if (strcmp(sBuffer, "TotalStep") == 0) 		{ TotalStep = IntBuffer;}
 					}
 				} // End read line loop
 		} // End Constructor
@@ -49,7 +57,9 @@ class ReadConfFile{
 			std::cout << "NHbar         " << NHbar<< std::endl;
 			std::cout << "Repetition    " << Repetition  << std::endl;
 			std::cout << "TimeStep      " << TimeStep  << std::endl;
-			std::cout << "SweepStep     " << SweepStep<< std::endl;
+			std::cout << "SweepStep     " << SweepStep << std::endl;
+			std::cout << "TotalStep     " << TotalStep << std::endl;
+			std::cout << "BinBefore     " << BinBeforeOnset << std::endl;
 			std::cout << "FrequencyStep " << FrequencyStep << std::endl;
 			std::cout << "Efficiency    " << Efficiency << std::endl;
 			std::cout << "CosmicRate    " << CosmicRate  << std::endl;
@@ -63,6 +73,13 @@ class ReadConfFile{
 			std::cout << "pwall_ad      " << pwall_ad << std::endl;
 			std::cout << "pwall_cb      " <<  pwall_cb << std::endl;
 			std::cout << "delay         " <<  delay << std::endl;
+			std::cout << "Cruijff Paramters" << std::endl;
+			std::cout << "x0	" << x0 << std::endl;
+			std::cout << "sigma0	" << sigma0 << std::endl;
+			std::cout << "sigma1	" << sigma1 << std::endl;
+			std::cout << "k0	" << k0 << std::endl;
+			std::cout << "k1	" << k1 << std::endl;
+			std::cout << "Norm	" << Norm << std::endl;
 			std::cout << "\n" << std::endl;
 		}
 	int Nstack;
@@ -70,6 +87,8 @@ class ReadConfFile{
 	int Repetition;
 	int TimeStep;
 	int SweepStep;
+	int BinBeforeOnset;
+	int TotalStep;
 	double FrequencyStep;
 	double x_cb_start;
 	double x_cb_end;
@@ -83,5 +102,12 @@ class ReadConfFile{
 	double pwall_ad;
 	double C;
 	double delay;
+	// Parameters of the Cruijff Function
+	double x0;
+	double sigma0;
+	double sigma1;
+	double k0;
+	double k1;
+	double Norm;
 };
 #endif

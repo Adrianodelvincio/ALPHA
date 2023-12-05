@@ -9,89 +9,59 @@
 #include <cmath>
 #include "../Headers/toyLineShape.h"
 #include "../Headers/ConfigurationParser.h"
+#include "../Headers/LineShape.h"
 
 using namespace RooFit;
 
-double linear(double x, double start = 0, double peak = 0,double end = 0){
-	//Condizioni raccordo
-	double a = (start - peak)/(end - peak);
-	double b = (peak - start)/(1 - peak/end);
-	if(x <= start){ return 0;}
-	else if(x > start && x <= peak){ return (x - start);}
-	else if(x > peak && x <= end) { return a*x + b;}
-	else { return 0;}
-}
-
-double parabola(double x, double start = 0, double peak = 0, double end = 0){
-	if(x <= start){ return 0;}
-	else if( x > start && x <= peak){ return pow(x - start,2);}
-	else if( x > peak && x<= end) {
-	double m = -pow(peak - start,2)/(end - peak);
-	return m*(x - peak) + pow(peak - start,2);}
-	else{return 0;}
-}
-
-double Cruijff(double x, double FrequencyStep, double x0, double b){
-        //x0 = 220;
-        double sigma0 = 8.8;
-        double sigma1 = 40.7;
-        double k0 = 0.22;
-        double k1 = -0.03;
-        double arg = 0;
-        double arg2 = x - x0;
-        if (sigma0 != 0 && sigma1 != 0){ // Check the sigma is different from 0
-                if( arg2 <= 0){	// Left tail  
-                        arg = TMath::Exp(-TMath::Power(arg2,2) / (2*sigma0*sigma0 + k0 *TMath::Power(arg2,2)));
-                }
-                else{			// Right tail
-                        arg = TMath::Exp(-TMath::Power(arg2,2) / (2*sigma1*sigma1 + k1 *TMath::Power(arg2,2)));
-                }
-        }
-        double Norm = 0.079771/FrequencyStep;
-        return Norm*arg;
-}
-
 void LoopLineShape(	int Nloop = 1,
 			TString folder = "linear/",
-			TString ConfFile = "ToyConfiguration.txt",					
-			bool MethodSpline = false){
+			TString ConfFile = "ToyConfiguration.txt"){
 
 gInterpreter->GenerateDictionary("ToyLine","../Headers/toyLineShape.h");
-gInterpreter->GenerateDictionary("ToyParser","../Headers/ConfigurationParser.h");
+gInterpreter->GenerateDictionary("Parser","../Headers/ConfigurationParser.h");
+gInterpreter->GenerateDictionary("LineShape","../Headers/LineShape.h");
+
 ROOT::EnableImplicitMT(20);
 // ReadConfigurationFiles;
 ReadConfFile Params(ConfFile);
 Params.Print();
 
-//	 Parameters of the Simulation 
+//	Parameters of the Simulation 
 int Ntot = Params.Nstack * Params.NHbar * Params.Efficiency;		// Number of Total Events
 double FrequencyStep = Params.FrequencyStep;				// Kilo hertz
-int SweepStep = Params.SweepStep;					// Number of FrequencyStepS
+int SweepStep = Params.SweepStep;					// Number of FrequencyStep
+int BeforeOnset = Params.BinBeforeOnset;
 int Repetition = Params.Repetition;					// Repetition of the single run
 double pWall_c = Params.pwall_cb;					// Weight annihilation on walls for pdf1 (transition c -> b)
 double pWall_d = Params.pwall_ad;					// Weight annihilation on walls for pdf2 (transition d -> a)
 double Ncosmic = Params.TimeStep * Params.CosmicRate;			// Number of Cosmic Events
+//	Lineshape Parameters
 double x_cb_start = Params.x_cb_start;
 double x_cb_end = Params.x_cb_end;
 double x_cb_peak = Params.x_cb_peak;
 double x_da_start = Params.x_da_start;
 double x_da_end = Params.x_da_end;
 double x_da_peak = Params.x_da_peak;
-double RangeDelay = Params.delay;							// Set range delay
+double range = Params.delay;					// Set range delay
+//	Cruijff Parameters
+double x0 = Params.x0;
+double k0 = Params.k0;
+double k1 = Params.k1;
+double sigma0 = Params.sigma0;
+double sigma1 = Params.sigma1;
+double Norm = Params.Norm;
 
-	
-double startPdf1 = Params.x_cb_start - (FrequencyStep)*5.5;	// Start of frequency sweep c-b
-double startPdf2 = Params.x_da_start - (FrequencyStep)*5.5;	// Start of frequency sweep d-a
-int Ntrial = Nloop;										// Ntrial
-double Nc = Ntot*Params.C; 									// Expected event for lineshape1
-double Nd = Ntot*(1 - Params.C); 								// Expected event for lineshape2
-double pGas_d = 1 - pWall_d; 									// Percentage of annihilation on residual gas
-double pGas_c = 1 - pWall_c; 									// Percentage of annihilation on residual gas
 
-int Nbin1 = SweepStep;	// FIX NUMBER BIN EQUAL TO SWEEPSTEP
-int Nbin2 = SweepStep;	// FIX NUMBER BIN EQUAL TO SWEEPSTEP
+double freqScanStart1 = Params.x_cb_start - (FrequencyStep)*(BeforeOnset + 0.5);	// Start of frequency sweep c-b
+double freqScanStart2 = Params.x_da_start - (FrequencyStep)*(BeforeOnset + 0.5);	// Start of frequency sweep d-a
+int Ntrial = Nloop;						// Ntrial
+double Nc = Ntot*Params.C; 					// Expected event for lineshape1
+double Nd = Ntot*(1 - Params.C); 				// Expected event for lineshape2
+double pGas_d = 1 - pWall_d; 					// Percentage of annihilation on residual gas
+double pGas_c = 1 - pWall_c; 					// Percentage of annihilation on residual gas
 
-//if(MethodSpline){ SplineMethod(histpdf1,histpdf2, Nbin);}
+int Nbin1 = Params.TotalStep;	// FIX NUMBER BIN EQUAL TO SWEEPSTEP
+int Nbin2 = Params.TotalStep;	// FIX NUMBER BIN EQUAL TO SWEEPSTEP
 
 RooMsgService::instance().setGlobalKillBelow(RooFit::INFO);
 RooMsgService::instance().setGlobalKillBelow(RooFit::PROGRESS);
@@ -112,8 +82,8 @@ RooAddPdf genMix("model","model", RooArgList{gauss_Mix}, RooArgList{Nwall});
 RooAddPdf genGas("model1","model1", RooArgList{Rayleigh}, RooArgList{Ngas});
 RooAddPdf genCosmic("model2", "model2", RooArgList{linearFit}, RooArgList{Nbk});
 
-TH1F *histpdf1 = new TH1F("hist1", "pdf1", Nbin1, startPdf1, startPdf1 + Nbin1*(FrequencyStep));
-TH1F *histpdf2 = new TH1F("hist2", "pdf2", Nbin2, startPdf2, startPdf2 + Nbin2*(FrequencyStep));
+TH1F *genLineShape1 = new TH1F("hist1", "pdf1", Nbin1, freqScanStart1, freqScanStart1 + Nbin1*(FrequencyStep));
+TH1F *genLineShape2 = new TH1F("hist2", "pdf2", Nbin2, freqScanStart2, freqScanStart2 + Nbin2*(FrequencyStep));
 
 //External Toy Loop
 TRandom3 *r = new TRandom3();
@@ -126,34 +96,30 @@ TRandom3 *r = new TRandom3();
 		vector<int>	v1Type,v2Type;				// Type of Event
 		vector<int>	RunNumber1, RunNumber2;			// Run Number (from 0 to Repetition)
 		vector<double>  freqDelay;
-		for(int run = 0; run < Repetition; run++){		// LOOP ON REPETITION
-			//DEFINITION OF LINESHAPE
-			// SET DELAY FOR THE ONSET
-			double delay = r->Uniform(-RangeDelay,RangeDelay);
-			//double delay = RangeDelay;
-			freqDelay.push_back(delay);
+		for(int run = 0; run < Repetition; run++){		// loop on repetition
+			
+			double delay = r->Uniform(-range, range); 	// set delay of the lineshape
+			freqDelay.push_back(delay);			// Save delay
 			double start1 = x_cb_start + delay;
 			double start2 = x_da_start + delay;
-			// SET CONTENT OF THE HISTOGRAMS AND NORMALIZE
-			//SetContent(histpdf1,Nbin1,parabola, start1,x_cb_peak ,x_cb_end);
-			//SetContent(histpdf2,Nbin2,parabola, start2,x_da_peak ,x_da_end);
-			//SetNormalization(histpdf1);
-			//SetNormalization(histpdf2);
-			x_cb_peak = x_cb_peak + delay;
-			x_da_peak = x_da_peak + delay;
-			SetContent(histpdf1,Nbin1,Cruijff, FrequencyStep, x_cb_peak, 0);
-			SetContent(histpdf2,Nbin2,Cruijff, FrequencyStep, x_da_peak, 0);
-			// When the Cruijff is filled, do not normalize the histograms
-			double p = 0;
+			double peak1 = x_cb_peak + delay;
+			double peak2 = x_da_peak + delay;
+			double end1 =  x_cb_end + delay;
+			double end2 =  x_da_end + delay;
+			// SetContent(genLineShape1,Nbin1,parabola, start1, peak1, end1);
+			// SetContent(genLineShape2,Nbin2,parabola, start2, peak2 , end2);
+			SetContent(genLineShape1,Nbin1,Cruijff, start1, x_cb_peak, sigma0, sigma1, k0, k1, Norm);
+			SetContent(genLineShape2,Nbin2,Cruijff, start2, x_da_peak, sigma0, sigma1, k0, k1, Norm);
+			
+			double sumProb1 = 0;
+			double sumProb2 = 0; 
 			for(int bin = 1; bin <= SweepStep; bin++){ 	//LOOP ON BINS
-				//PDF1
-				double prob = ComputeProb(histpdf1,bin);// Probability of the bin
-				p += prob;
-				std::cout << "prob bin: " << prob << std::endl;
-				std::cout << "p Vale: " << p << std::endl; 
-				SetCoefficients((pWall_c*Nc)*prob,(pGas_c*Nc)/Nbin1,Ncosmic, &Nwall,&Ngas,&Nbk);
+				// PDF1
+				double prob = ComputeProb(genLineShape1,bin);// Probability of the bin
+				sumProb1 += prob;
+				SetCoefficients((pWall_c*Nc)*prob,(pGas_c*Nc)/SweepStep, Ncosmic, &Nwall,&Ngas,&Nbk);
 				int gasCount = 0; int mixCount = 0; int CosmicCount = 0;
-				double frequence = histpdf1->GetBinCenter(bin);
+				double frequence = genLineShape1->GetBinCenter(bin);
 				
 				if(prob > 0){
 				RooDataSet *dataLoopWall = genMix.generate(x,Extended()); // GENERATE THE DATA
@@ -187,9 +153,10 @@ TRandom3 *r = new TRandom3();
 				
 				// PDF 2
 				mixCount = 0; gasCount = 0; CosmicCount = 0;
-				prob = ComputeProb(histpdf2,bin);	// Probability of the bin
-				frequence = histpdf2->GetBinCenter(bin);
-				SetCoefficients((pWall_d*Nd)*prob,(pGas_d*Nd)/Nbin2,Ncosmic, &Nwall,&Ngas,&Nbk);
+				prob = ComputeProb(genLineShape2,bin);	// Probability of the bin
+				sumProb2 += prob;
+				frequence = genLineShape2->GetBinCenter(bin);
+				SetCoefficients((pWall_d*Nd)*prob,(pGas_d*Nd)/SweepStep,Ncosmic, &Nwall,&Ngas,&Nbk);
 				
 				if(prob > 0){
 				RooDataSet *dataLoopWall2 = genMix.generate(x,Extended());	// Generate Wall data
@@ -221,9 +188,13 @@ TRandom3 *r = new TRandom3();
 				// STORE USEFUL QUANTITIES
 				v2Tot.push_back(mixCount + gasCount + CosmicCount);
 			} // Loop on Bin
+			
 			if(l != Ntrial-1 && run != Repetition -1){
-			histpdf1->Reset("ICESM");
-			histpdf2->Reset("ICESM");}
+				genLineShape1->Reset("ICESM");
+				genLineShape2->Reset("ICESM");
+			}
+			std::cout << "sumProb1: " << sumProb1 << std::endl;
+			std::cout << "sumProb2: " << sumProb2 << std::endl;
 		} // Loop on Repetition
 	
 		int Tot1 = std::accumulate(v1Tot.begin(), v1Tot.end(), 0);
@@ -275,16 +246,16 @@ TRandom3 *r = new TRandom3();
 	pad->Divide(2,1,0.001,0.001); pad->Draw();
 	pad->cd(1);
 	gStyle->SetOptStat(0);
-	histpdf1->GetXaxis()->SetTitle("frequency [kHz]");
-	histpdf1->SetMarkerStyle(21);
-	histpdf1->SetMarkerColor(2);
-	histpdf1->SetLineColor(4);
-	histpdf1->Draw();
+	genLineShape1->GetXaxis()->SetTitle("frequency [kHz]");
+	genLineShape1->SetMarkerStyle(21);
+	genLineShape1->SetMarkerColor(2);
+	genLineShape1->SetLineColor(4);
+	genLineShape1->Draw();
 	pad->cd(2);
-	histpdf2->GetXaxis()->SetTitle("frequency [kHz]");
-	histpdf2->SetMarkerStyle(21);
-	histpdf2->SetMarkerColor(2);
-	histpdf2->SetLineColor(4);
-	histpdf2->Draw();
+	genLineShape2->GetXaxis()->SetTitle("frequency [kHz]");
+	genLineShape2->SetMarkerStyle(21);
+	genLineShape2->SetMarkerColor(2);
+	genLineShape2->SetLineColor(4);
+	genLineShape2->Draw();
 } // End program
 
