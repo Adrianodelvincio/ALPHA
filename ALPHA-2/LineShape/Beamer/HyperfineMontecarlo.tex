@@ -202,7 +202,7 @@ The lineShape is fitted using a Cruijff function, which takes into account the a
 
 \begin{frame}
 
-The Cruijff function is used in the simulation to generate the data. The Cruijff is truncated at $f_{0} = \SI{175}{\kilo \hertz}$. In this way the onset of the lineshape is unambiguously determined. The new model is:
+The Cruijff function is used in the simulation to generate the data. \textbf{The Cruijff is truncated at $f_{0} = \SI{175}{\kilo \hertz}$}. In this way the onset of the lineshape is unambiguously determined. The new model is:
 
 \begin{equation}
 {\small
@@ -225,18 +225,19 @@ N \cdot exp(  \frac{-(x - x_{0})^2}{2\sigma_{1} + k_{1}(x - x_{0})^{2}}) &  f > 
 {\nologo
 \begin{frame}{Discretization of the lineshape}
 
-Here we plot the discretizede lineshape, obtained sampling the Cruijff function with the optimal parameters given by the fit of the previous slide. The lineshape is discretized into a series of 50 points, with a increment step of $\SI{5}{\kilo \hertz}$. The starting frequence is $f = \SI{160}{\kilo \hertz}$ 
+Here we plot the discretized lineshape, obtained sampling the Cruijff function with the optimal parameters by the fit of the previous slide. The lineshape is discretized into a series of 50 points, with a increment step of $\SI{5}{\kilo \hertz}$. The starting frequence is $f = \SI{160}{\kilo \hertz}$ 
 
 \begin{figure}[hbtp]
 \centering
-\includegraphics[width = \textwidth]{../Plot/CruijffLineShapes.pdf}
+\includegraphics[width = 0.9\textwidth]{../Plot/CruijffLineShapes.pdf}
 \end{figure}
+
+Then discretized lineshapes here represents the model which the simulation programs uses to generate the data.
 \end{frame}
 
+\begin{frame}{Generate Counts for each frequency}
 
-\begin{frame}
-
-For illustration purposes, in this plot we show the distribution for a single run with an artificially high number of antihydrogen (50000 in the following plot, and omne single stack):
+For illustration purposes, in this plot we show the distribution for a single run with an artificially high number of antihydrogen (50000 in the following plot, and omne single stack), without adding the cosmic background:
 
 \begin{figure}[hbtp]
 \centering
@@ -256,12 +257,14 @@ We have studies the case of the series of run 4b. The parameters of the simulati
 \item $Repetition = 5$.
 \item $TimeStep = \SI{8}{\second}$
 \item $FrequencyStep = \SI{5}{\kilo \hertz}$.
-\item $\mu_{cosmic} = \SI{0.051}{\second \tothe{-1}}$.
+\item {\color{red}{$\mu_{cosmic} = \SI{0.051}{\second \tothe{-1}}$}}.
 \item $delay = \pm \SI{2.5}{\kilo \hertz}$.
 \end{itemize}
 
-The percentage of events of annihilation to residual gas is set to zero. The amount of anti-hydrogen is divided equally for the two transition c-b and d-a. \newline
-
+The percentage of events of annihilation to residual gas is set to zero. The amount of anti-hydrogen is divided equally for the two transition c-b and d-a.
+\vspace{2pt}
+\hrule 
+\vspace{2pt}
 The first algorithm that we test is the one applied to the data taking of 2017. The onset is exstimated taking the frequence which fulfills the criteria
 
 \begin{equation}
@@ -341,8 +344,12 @@ threshold = p \cdot max\{bin_{i}  \}
 
 where $p$ is a parameter of the algorithm, in the range (0,1).
 
-\end{frame}
+In the end. we have tested another algorithm (\textit{sumNeighbors}), defined is this way:
+\begin{equation}
+f_{i} : bin_{i} + bin_{i+1} + bin_{i +2} > 3\cdot (\mu_{cosmic} + n \cdot sigma_{cosmic}) 
+\end{equation}
 
+\end{frame}
 
 \begin{frame}{Results}
 
@@ -366,7 +373,11 @@ const. fraction ($ p = 10 \% $) & $-0.02$  & $11.56$ & $0.19$   & $16.66$ \\
  
 const. fraction ($ p = 20 \% $) & $-0.215$ & $9.05$  & $0.55$   & $13.06$ \\ 
 
-const. fraction ($ p = 30 \% $) & $+0.08$  & $7.43$  & $0.05$   & $8.84$ \\ 
+const. fraction ($ p = 30 \% $) & $+0.08$  & $7.43$  & $0.05$   & $8.84$ \\
+
+sumNeighbors ($ n = 1 $) & $-0.425$  & $8.83$  & $0.005$   & $12.69$ \\
+
+sumNeighbors ($ n = 2 $) & $-0.19$  & $7.03$  & $0.07$   & $9.61$ \\
 \hline
 \end{tabular}
 \caption{ Result of the simulation for $N_{trials} = 1000$. In the first two column the cosmic background is removed from the data. The last two columns contains the result of the simulation adding the cosmic background. The $\mu$ and $\sigma$ are the quantities computed from the distribution of $(onset_{2} - onset_{1}) - MC_{truth}$.}
