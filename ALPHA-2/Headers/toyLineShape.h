@@ -60,14 +60,14 @@ double ComputeProb(TH1 * histpdf, int i){
 }
 
 void SetVectors(RooDataSet &Global,
-				RooDataSet *data,
-				vector<int> &b,
-				int flag,
-				int &Counts,
-				vector<double> &f,
-				double frequence,
-				vector<int> &RunNumber,
-				int run){
+		RooDataSet *data,
+		vector<int> &b,
+		int flag,
+		int &Counts,
+		vector<double> &f,
+		double frequence,
+		vector<int> &RunNumber,
+		int run){
 	// FILL VECTORS, DATASET...
 	if(data){  
 		Counts = data->sumEntries();

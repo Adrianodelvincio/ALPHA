@@ -59,26 +59,30 @@ window,freq,power,unixtimestart,runtimestart,stop,duration,Trig,Read,Pass,MVA = 
 
 freq = freq * 1e6 - 28.2353e6 # Eliminate the offset and convert to kHz
 background = 0.051028571*8
-Pass = Pass - background
+#Pass = Pass - background
 
-mask = (Pass >= 1)
-mask2 = (freq >= 100)
-mask = mask & mask2
+mask0 = (Pass >= 1)
+mask1 = (freq >= 100)
+mask = mask0 & mask1
 
-def Cruijff(f,baseline,x0,sigma0, sigma1, k0, k1,N):
+def Cruijff(f,x0,sigma0, sigma1, k0, k1,N,baseline):
 	arg = 0
 	if(f < x0):
-		arg = np.exp(-(f-x0)**2/(2*sigma0**2 + k0*(f-x0)**2))
+		arg = N*np.exp(-(f-x0)**2/(2*sigma0**2 + k0*(f-x0)**2))
 	if(f >= x0):
-		arg = np.exp(-(f-x0)**2/(2*sigma1**2 + k1*(f-x0)**2))
+		arg = N*np.exp(-(f-x0)**2/(2*sigma1**2 + k1*(f-x0)**2))
 	onset = 175
-	if( f < onset):
+	if( f <= onset):
 		arg = baseline
-	return N*arg
+	return arg
 
 Cruijff = np.vectorize(Cruijff)
 
-popt, pcovm = fit(Cruijff, freq, Pass, p0 = [1,x0,sigma0,sigma1,k0,k1,Norm])
+yerr = np.sqrt(Pass)
+mask2 = (Pass == 0); mask3 = mask2 & mask1
+ 
+yerr[mask3] = 1
+popt, pcovm = fit(Cruijff, freq[mask1], Pass[mask1], p0 = [x0,sigma0,sigma1,k0,k1,Norm,1], sigma = yerr[mask1])
 
 #Print the result of the fit
 print("parametri: ", popt)
@@ -86,16 +90,27 @@ print("errori:    ", np.sqrt(pcovm.diagonal()))
 errors = np.sqrt(pcovm.diagonal())
 chisq = ((Pass[mask] - Cruijff(freq[mask],*popt))**2/(Pass[mask])).sum()
 
+#save the result on the Configuration file
+configFile = open("ToyConfiguration.txt", "a")
+configFile.write("\n" "x0 = %.2f" % popt[0])
+configFile.write("\n" "sigma0 = %.2f" % popt[1])
+configFile.write("\n" "sigma1 = %.2f" % popt[2])
+configFile.write("\n" "k0 = %.2f" % popt[3])
+configFile.write("\n" "k1 = %.2f" % popt[4])
+configFile.write("\n" "Norm = %.2f" % popt[5])
+
+configFile.close()
+
 #Plot the lineshape and the cruijff
 fig, (ax1, ax2) = plt.subplots(2, figsize = (15,9), height_ratios=[2, 1] , layout = 'tight')
 ax1.grid()
 ax1.set_title("Cruijff fit to LineShape", fontsize = 18, color = 'blue')
 ax1.set_ylabel("Counts", fontsize = '12')
 ax1.set_xlim(100,320)
-ax1.errorbar(freq,Pass, linestyle = '', marker = 's', color = 'black', markersize = 3)
+ax1.errorbar(freq,Pass,yerr, capsize = 3  ,linestyle = '', marker = 's', color = 'blue', markersize = 3)
 ax1.step(freq,Pass, linestyle = '-', color = 'black', where='mid')
 xx = np.linspace(100, 320,1000)
-ax1.plot(xx,Cruijff(xx,*popt), linestyle = '--', color = 'red', label = r"$\sigma_{0} = %.1f \pm %.2f$" "\n" r"$\sigma_{1} = %.1f \pm %.2f$" "\n" r"$x_{0} = %.1f \pm %.2f$" "\n" r"$k_{0} = %.2f \pm %.2f$" "\n" r"$k_{1} = %.2f \pm %.2f$" "\n" r"$N = %.1f \pm %.2f$" "\n" r"$ \frac{\chi^{2}}{ndof} = \frac{%.1f}{%d} \pm %.1f$" % (popt[1], errors[1] ,popt[2], errors[2], popt[0], errors[0], popt[3], errors[3], popt[4], errors[4], popt[5],errors[5], chisq, len(Pass[mask]), np.sqrt(2*len(Pass[mask]))))
+ax1.plot(xx,Cruijff(xx,*popt), linestyle = '--', color = 'red', label = r"$\sigma_{0} = %.1f \pm %.2f$" "\n" r"$\sigma_{1} = %.1f \pm %.2f$" "\n" r"$x_{0} = %.1f \pm %.2f$" "\n" r"$k_{0} = %.2f \pm %.2f$" "\n" r"$k_{1} = %.2f \pm %.2f$" "\n" r"$N = %.1f \pm %.2f$" "\n" r"baseline $= %.1f \pm %.1f$" "\n" r"$ \frac{\chi^{2}}{ndof} = \frac{%.1f}{%d} \pm %.1f$" % (popt[1], errors[1] ,popt[2], errors[2], popt[0], errors[0], popt[3], errors[3], popt[4], errors[4], popt[5],errors[5],popt[6], errors[6], chisq, len(Pass[mask]), np.sqrt(2*len(Pass[mask]))))
 ax1.legend( fontsize = '13')
 # residual
 ax2.grid()
@@ -103,8 +118,8 @@ ax2.set_xlim(100,320)
 ax2.set_title("Residuals", fontsize = '12')
 ax2.set_xlabel("frequency [kHz]", fontsize = '12')
 ax2.set_ylabel("Normalized Residual", fontsize = '12')
-Residui = (Pass[mask] - Cruijff(freq[mask],*popt))/(np.sqrt(Pass[mask]))
-ax2.errorbar(freq[mask], Residui,marker = '.', linestyle = 'dotted', color = 'green')
-#fig.savefig("Plot/FitToLineShape.pdf", format = 'pdf' , bbox_inches = 'tight')
+Residui = (Pass[mask1] - Cruijff(freq[mask1],*popt))/(yerr[mask1])
+ax2.errorbar(freq[mask1], Residui,marker = '.', linestyle = 'dotted', color = 'green')
+fig.savefig("Plot/TruncatedLineShape.pdf", format = 'pdf' , bbox_inches = 'tight')
 plt.show()
 

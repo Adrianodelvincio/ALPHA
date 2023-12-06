@@ -10,12 +10,15 @@ double firstOverThreshold(ROOT::RDF::RResultPtr<TH1D> histpdf, double threshold)
 double firstWithVeto(ROOT::RDF::RResultPtr<TH1D> histpdf, double threshold);
 double algorithm_2017(ROOT::RDF::RResultPtr<TH1D> histpdf);
 double reverse_2017(ROOT::RDF::RResultPtr<TH1D> histpdf);
+double constFrac(ROOT::RDF::RResultPtr<TH1D> histpdf, double fraction);
 
 void LineShapeAnalysis(TString directory = "linear/",
 					int start = 0,
 					int stop = 999,
-					TString ConfFile = "ToyConfiguration.txt",
-					double mu = 3){
+					double mu = 3,
+					double fraction = 0.1,
+					TString ConfFile = "ToyConfiguration.txt"
+					){
 	
 	gInterpreter->GenerateDictionary("ToyParser","../Headers/ConfigurationParser.h");
 	gInterpreter->GenerateDictionary("ReadFiles", "../Headers/AnalysisLineShape.h");
@@ -30,13 +33,12 @@ void LineShapeAnalysis(TString directory = "linear/",
 	
 	std::vector<std::string> FileList;
 	FileList = getFiles(start,stop, directory);
-	//std::cout << FileList[0] << std::endl;
 	ROOT::RDataFrame rdf("myTree", FileList);
-	auto histF3 = rdf.Filter("runNumber == 1").Filter("frequence <= 1000").Histo1D({"Counts"," c to b",static_cast<int>(SweepStep),startPdf1, startPdf1 + SweepStep*FrequencyStep }, "frequence");
-	auto histF4 = rdf.Filter("runNumber == 1").Filter("frequence >= 1000").Histo1D({"Counts"," d to a",static_cast<int>(SweepStep), startPdf2, startPdf2 + SweepStep*FrequencyStep}, "frequence");
+	auto histF3 = rdf.Filter("runNumber == 1").Filter("frequence <= 1000").Filter("type != 2").Histo1D({"Counts"," c to b",static_cast<int>(SweepStep),startPdf1, startPdf1 + SweepStep*FrequencyStep }, "frequence");
+	auto histF4 = rdf.Filter("runNumber == 1").Filter("frequence >= 1000").Filter("type != 2").Histo1D({"Counts"," d to a",static_cast<int>(SweepStep), startPdf2, startPdf2 + SweepStep*FrequencyStep}, "frequence");
 
 
-	double threshold = mu*CosmicBackground;	// threshold considering the cosmic background
+	double threshold = mu; //*CosmicBackground;	// threshold considering the cosmic background
 	vector<double> onset1v,onset2v;
 	vector<double> deltaOnset;
 	
@@ -46,12 +48,12 @@ void LineShapeAnalysis(TString directory = "linear/",
 		ROOT::RDataFrame frame("myTree", {FileList[i], FileList[i+1]});		// Load i-th dataset
 		auto Spectra1 = frame.Filter("runNumber == 1")
 							 .Filter("frequence <= 1000")
-							 .Filter("type != 2")
+							 //.Filter("type != 2")
 							 .Histo1D({"Counts","Frequence", static_cast<int>(SweepStep),startPdf1, startPdf1 + SweepStep*FrequencyStep }, "frequence");
 		
 		auto Spectra2 = frame.Filter("runNumber == 1")
 							 .Filter("frequence >= 1000")
-							 .Filter("type != 2")
+							 //.Filter("type != 2")
 							 .Histo1D({"Counts","Frequence", static_cast<int>(SweepStep), startPdf2, startPdf2 + SweepStep*FrequencyStep}, "frequence");
 		
 		//auto d = frame.Display({"frequence","random", "type", "radius", "delay"},1); d->Print();
@@ -63,10 +65,14 @@ void LineShapeAnalysis(TString directory = "linear/",
 		std::cout << "delay1: " << delay1 << " delay2: " << delay2 << std::endl;
 		double onset1;			// Reconstructed onset and bin of the onset
 		double onset2;
-		onset1 = algorithm_2017(Spectra1);
-		onset2 = algorithm_2017(Spectra2);
+		//onset1 = firstOverThreshold(Spectra1, threshold);
+		//onset2 = firstOverThreshold(Spectra2, threshold);
+		//onset1 = algorithm_2017(Spectra1);
+		//onset2 = algorithm_2017(Spectra2);
 		//onset1 = reverse_2017(Spectra1);
 		//onset2 = reverse_2017(Spectra2);
+		onset1 = constFrac(Spectra1, fraction);
+		onset2 = constFrac(Spectra2, fraction);
 		onset1v.push_back(onset1 - (Params.x_cb_start));
 		onset2v.push_back(onset2 - (Params.x_da_start));
 		deltaOnset.push_back(onset2 - onset1 - (Params.x_da_start - Params.x_cb_start));
@@ -74,8 +80,8 @@ void LineShapeAnalysis(TString directory = "linear/",
 
 	//histF3->Scale(1./histF3->Integral(), "width");
 	//histF4->Scale(1./histF4->Integral(), "width");
-	histF3->Scale(1./(stop));
-	histF4->Scale(1./(stop));
+	//histF3->Scale(1./(stop));
+	//histF4->Scale(1./(stop));
 
 	auto b = new TCanvas("b1", "Spectral lines");
 	auto pad = new TPad("pad1", "pad",0,0,1,1);
@@ -90,7 +96,6 @@ void LineShapeAnalysis(TString directory = "linear/",
 	histF4->SetMarkerColor(2);
 	histF4->SetLineColor(4);
 	histF4->DrawClone();
-	
 	
 	// Create the histograms
 	std::vector<double> w(onset1v.size(),1); // weights vector
@@ -126,12 +131,13 @@ void LineShapeAnalysis(TString directory = "linear/",
 	h3->SetLineColor(38);
 	h3->Draw();
 	//legend->Draw();
-	TString name = "onsetResult"; TString endname = ".pdf"; 
+	TString name = TString::Format("constFract_%d", static_cast<int>(100*fraction)); TString endname = ".pdf"; 
 	int numero = 0;
 	TString folder = "Plot/";
 	while(!gSystem->AccessPathName(folder + name + endname)){
 		numero += 1;
-		name = TString::Format("onsetResult%d", numero);
+		TString add = TString::Format("_%d", numero);
+		name = name + add;
 	}
 	canvas->SaveAs(folder + name + endname);
 	
@@ -149,7 +155,7 @@ double firstOverThreshold(ROOT::RDF::RResultPtr<TH1D> histpdf, double threshold)
 	double bin = 1;		// bin onset
 	for(int i = 1; i < histpdf->GetNbinsX(); i++){
 		bin = i;
-		if(histpdf->GetBinContent(i) >= threshold){
+		if(histpdf->GetBinContent(i) > threshold){
 			onset = histpdf->GetBinCenter(i);
 			bin = i;
 			break;
@@ -175,6 +181,8 @@ double firstWithVeto(ROOT::RDF::RResultPtr<TH1D> histpdf, double threshold){
 	std::cout << "		i: " << bin  << " bin content: " << histpdf->GetBinContent(bin) << std::endl;
 	return onset;
 }
+
+
 
 double algorithm_2017(ROOT::RDF::RResultPtr<TH1D> histpdf){
 	// bin 0 is underflow
@@ -209,4 +217,25 @@ double reverse_2017(ROOT::RDF::RResultPtr<TH1D> histpdf){
 	std::cout << "		i: " << bin  << " bin content: " << histpdf->GetBinContent(bin) << std::endl;
 	return onset;
 }
+
+double constFrac(ROOT::RDF::RResultPtr<TH1D> histpdf, double fraction){
+// bin 0 is underflow
+	double onset = 0;	// onset value 
+	double bin = 1;		// bin onset
+	double threshold = fraction*histpdf->GetMaximum();
+	for(int i = 1; i < histpdf->GetNbinsX(); i++){
+		bin = i;
+		if(histpdf->GetBinContent(i) > threshold){
+			onset = histpdf->GetBinCenter(i);
+			bin = i;
+			break;
+		}
+	}
+	std::cout << "Threshold: " << threshold << " frequency: " << histpdf->GetBinCenter(bin) << " bin content: " << histpdf->GetBinContent(bin) << std::endl;
+	return onset;
+
+}
+
+
+
 

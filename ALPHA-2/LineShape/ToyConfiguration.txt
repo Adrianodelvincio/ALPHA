@@ -25,9 +25,9 @@ x_da_start = 1420175
 x_da_peak = 1420220
 x_da_end = 1420320
 # Parameters of the Cruijff function
-x0 = 220.42
-sigma0 = 8.86
-sigma1 = 40.66
-k0 = 0.21
-k1 = -0.03
-Norm = 270.81
+x0 = 220.65
+sigma0 = 8.76
+sigma1 = 38.55
+k0 = 0.23
+k1 = 0.02
+Norm = 274.22

@@ -21,7 +21,6 @@ gInterpreter->GenerateDictionary("ToyLine","../Headers/toyLineShape.h");
 gInterpreter->GenerateDictionary("Parser","../Headers/ConfigurationParser.h");
 gInterpreter->GenerateDictionary("LineShape","../Headers/LineShape.h");
 
-ROOT::EnableImplicitMT(20);
 // ReadConfigurationFiles;
 ReadConfFile Params(ConfFile);
 Params.Print();
@@ -82,8 +81,8 @@ RooAddPdf genMix("model","model", RooArgList{gauss_Mix}, RooArgList{Nwall});
 RooAddPdf genGas("model1","model1", RooArgList{Rayleigh}, RooArgList{Ngas});
 RooAddPdf genCosmic("model2", "model2", RooArgList{linearFit}, RooArgList{Nbk});
 
-TH1F *genLineShape1 = new TH1F("hist1", "pdf1", Nbin1, freqScanStart1, freqScanStart1 + Nbin1*(FrequencyStep));
-TH1F *genLineShape2 = new TH1F("hist2", "pdf2", Nbin2, freqScanStart2, freqScanStart2 + Nbin2*(FrequencyStep));
+TH1F *genLineShape1 = new TH1F("hist1", "lineshape c to b", Nbin1, freqScanStart1, freqScanStart1 + Nbin1*(FrequencyStep));
+TH1F *genLineShape2 = new TH1F("hist2", "lineshape d to a", Nbin2, freqScanStart2, freqScanStart2 + Nbin2*(FrequencyStep));
 
 //External Toy Loop
 TRandom3 *r = new TRandom3();
@@ -150,7 +149,7 @@ TRandom3 *r = new TRandom3();
 				}else{ CosmicCount = 0;}
 				// STORE SOME USEFUL QUANTITIES
 				v1Tot.push_back(mixCount + gasCount + CosmicCount);
-				
+				//std::cout << "line1 " << "Bin: " << bin << " frequence: " << frequence << " " << mixCount << " " << CosmicCount << std::endl;
 				// PDF 2
 				mixCount = 0; gasCount = 0; CosmicCount = 0;
 				prob = ComputeProb(genLineShape2,bin);	// Probability of the bin
@@ -187,6 +186,7 @@ TRandom3 *r = new TRandom3();
 				}else{ CosmicCount = 0;}
 				// STORE USEFUL QUANTITIES
 				v2Tot.push_back(mixCount + gasCount + CosmicCount);
+				//std::cout << "line2 " << "Bin: " << bin << " frequence: " << frequence - 1420000 << " " << mixCount << " " << CosmicCount << std::endl;
 			} // Loop on Bin
 			
 			if(l != Ntrial-1 && run != Repetition -1){

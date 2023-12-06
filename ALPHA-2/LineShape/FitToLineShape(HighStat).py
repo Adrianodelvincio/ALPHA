@@ -8,7 +8,7 @@ window,freq,power,unixtimestart,runtimestart,stop,duration,Trig,Read,Pass,MVA = 
 freq = freq * 1e6 - 28.2353e6 # Eliminate the offset and convert to kHz
 
 background = 0.051028571*8
-Pass = Pass - background
+Pass = Pass - background # correct for the background data
 
 def linearRise(f,f0,m):
 	tmp = (f-f0)*m

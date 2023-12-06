@@ -8,6 +8,8 @@
 \usepackage{xcolor}
 \author{Adriano Del Vincio}
 \usepackage[output-decimal-marker={.}]{siunitx}
+%\sisetup{detect-all}
+
 \title[Alpha 2]{Toy Model For Hyperfine Measurement}
 
 \setbeamercolor{block title}{fg=white, bg = cyan }
@@ -199,12 +201,81 @@ The lineShape is fitted using a Cruijff function, which takes into account the a
 \end{frame}
 
 \begin{frame}
+
+The Cruijff function is used in the simulation to generate the data. The Cruijff is truncated at $f_{0} = \SI{175}{\kilo \hertz}$. In this way the onset of the lineshape is unambiguously determined. The new model is:
+
+\begin{equation}
+{\small
+model =
+\begin{cases}
+baseline 	& f \leqslant \SI{175}{\kilo \hertz} \\
+N \cdot exp(  \frac{-(x - x_{0})^2}{2\sigma_{0} + k_{0}(x - x_{0})^{2}}) & \SI{175}{\kilo \hertz} < f \leqslant x_{0} \\
+N \cdot exp(  \frac{-(x - x_{0})^2}{2\sigma_{1} + k_{1}(x - x_{0})^{2}}) &  f >  x_{0}
+\end{cases}
+}
+\end{equation}
+
+\begin{figure}[hbtp]
+\centering
+\includegraphics[width = 0.8\textwidth]{../Plot/TruncatedLineShape.pdf}
+%\caption{ Fit with a truncated Cruijff function at $ f = \SI{175}{\kilo \hertz}$}
+\end{figure}
+\end{frame}
+
+{\nologo
+\begin{frame}{Discretization of the lineshape}
+
+Here we plot the discretizede lineshape, obtained sampling the Cruijff function with the optimal parameters given by the fit of the previous slide. The lineshape is discretized into a series of 50 points, with a increment step of $\SI{5}{\kilo \hertz}$. The starting frequence is $f = \SI{160}{\kilo \hertz}$ 
+
+\begin{figure}[hbtp]
+\centering
+\includegraphics[width = \textwidth]{../Plot/CruijffLineShapes.pdf}
+\end{figure}
+\end{frame}
+
+
+\begin{frame}
+
+For illustration purposes, in this plot we show the distribution for a single run with an artificially high number of antihydrogen (50000 in the following plot, and omne single stack):
+
 \begin{figure}[hbtp]
 \centering
 \includegraphics[width = \textwidth]{../Plot/LineshapeSampled.pdf}
-\caption{ Histogram of the generated lineshape for 20 run. The Lineshape is scaled by a\newline factor of 20.}
+%\caption{ Histogram of the generated lineshape.}
 \end{figure}
 \end{frame}
+}
+
+\begin{frame}{Parameters of the Simulation}
+
+We have studies the case of the series of run 4b. The parameters of the simulation are:
+\begin{itemize}
+\item $N_{stack} = 20$.
+\item $N_{\overline{H}} = 14$.
+\item $SweepSteps = 24$.
+\item $Repetition = 5$.
+\item $TimeStep = \SI{8}{\second}$
+\item $FrequencyStep = \SI{5}{\kilo \hertz}$.
+\item $\mu_{cosmic} = \SI{0.051}{\second \tothe{-1}}$.
+\item $delay = \pm \SI{2.5}{\kilo \hertz}$.
+\end{itemize}
+
+The percentage of events of annihilation to residual gas is set to zero. The amount of anti-hydrogen is divided equally for the two transition c-b and d-a. \newline
+
+The first algorithm that we test is the one applied to the data taking of 2017. The onset is exstimated taking the frequence which fulfills the criteria
+
+\begin{equation}
+f_{i} : bin(i) > 0; bin(i + 1) > 1
+\end{equation}
+
+a second version of the same algorithm is implemented, analyzing the frequencies in decreasing order (reversed algorithm):
+
+\begin{equation}
+f_{i} : bin(i) < 2; bin(i - 1) < 1
+\end{equation}
+
+\end{frame}
+
 
 \nologo{
 \begin{frame}{test 2017 algorithm}
@@ -253,5 +324,53 @@ The algorithm is tested for $N_{trial} = 1000$. The cosmic background is fixed t
 \end{figure}
 \end{frame}
 }
+
+\begin{frame}{Other stategies}
+
+We have tested other ... different algorithms, that can be useful to identify the onset. The first algorithm indetifies the onset ad the first frequency with counts over threshold:
+
+\begin{equation}
+f_{i} : bin_{i} > Threshold
+\end{equation}
+
+The second algorithms is a constant fraction discriminator. It works similarly to the previous algorithm, except for the fact that the threshold is computed each time as:
+
+\begin{equation}
+threshold = p \cdot max\{bin_{i}  \}
+\end{equation}
+
+where $p$ is a parameter of the algorithm, in the range (0,1).
+
+\end{frame}
+
+
+\begin{frame}{Results}
+
+\begin{table}
+\center
+\begin{tabular}{l|l l l l l}
+\hline 
+algorithms & $\mu$ $\small[\SI{}{\kilo \hertz}]$  & $\sigma$  $\small[\SI{}{\kilo \hertz}]$& $\mu$ $\small[\SI{}{\kilo \hertz}]$ & $\sigma$ $\small[\SI{}{\kilo \hertz}]$ \\ 
+\hline
+2017 ($ > 0 ; > 1$ )          & $-0.18$  & $9.7$   & $-0.445$ & $14.1$ \\ 
+
+2017 reversed ($ < 2; < 1$)   & $-0.285$ & $10.1$  & $-0.34$  & $12.8$ \\ 
+
+threshold ($ > 1$)            & $+0.025$ & $11.5$  & $+0.005$ & $16.72$ \\ 
+
+threshold ($ > 2$)            & $-0.06$  & $9.56$  & $+0.67$  & $14.08$ \\ 
+
+threshold ($ > 3$)            & $-0.1$   & $7.48$  & $-0.07$  & $9.96$\\
+
+const. fraction ($ p = 10 \% $) & $-0.02$  & $11.56$ & $0.19$   & $16.66$ \\ 
+ 
+const. fraction ($ p = 20 \% $) & $-0.215$ & $9.05$  & $0.55$   & $13.06$ \\ 
+
+const. fraction ($ p = 30 \% $) & $+0.08$  & $7.43$  & $0.05$   & $8.84$ \\ 
+\hline
+\end{tabular}
+\caption{ Result of the simulation for $N_{trials} = 1000$. In the first two column the cosmic background is removed from the data. The last two columns contains the result of the simulation adding the cosmic background. The $\mu$ and $\sigma$ are the quantities computed from the distribution of $(onset_{2} - onset_{1}) - MC_{truth}$.}
+\end{table}
+\end{frame}
 
 \end{document}
