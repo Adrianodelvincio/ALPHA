@@ -137,10 +137,18 @@ We have tested the algorithm with a dataset without cosmic background. The delay
 
 \begin{frame}{Consistency Check 2}
 
-With the delay, two bins ( $frequency = \SI{0}{\kilo \hertz}$ and $frequency = \SI{5}{\kilo \hertz}$) are populated.  
+With the delay, two bins ( $frequency = \SI{0}{\kilo \hertz}$ and $frequency = \SI{5}{\kilo \hertz}$) are populated.
+
 \begin{figure}
-\includegraphics[width = 0.9\textwidth]{ExplainingAlgorithm2.pdf}
+\includegraphics[width = 0.8\textwidth]{ExplainingAlgorithm2.pdf}
 \end{figure}
+
+The frequency step are fixed, and the lineshape is shifted accordingly to the extracted value of the delay. In few words:
+\begin{itemize}
+\item step 1): fix the frequency steps (the frequency effectively used in the experiment)
+\item step 2): define the new value of the onset adding a uniform distributed delay  
+\item step 3): shift the lineshape accordingly to the new value of the onset,\newline discretize the lineshape and proceed with the generation of the data.
+\end{itemize}
 \end{frame}
 
 \begin{frame}{algorithm test: threshold $ > 3 \mu_{cosmic}$}
@@ -257,8 +265,9 @@ We have studies the case of the series of run 4b. The parameters of the simulati
 \item $Repetition = 5$.
 \item $TimeStep = \SI{8}{\second}$
 \item $FrequencyStep = \SI{5}{\kilo \hertz}$.
-\item {\color{red}{$\mu_{cosmic} = \SI{0.051}{\second \tothe{-1}}$}}.
 \item $delay = \pm \SI{2.5}{\kilo \hertz}$.
+\item {\color{red}{$\mu_{cosmic} = \SI{0.051}{\second \tothe{-1}}$
+\item $onset_{1, true} = \SI{0}{\kilo \hertz}$ ; $onset_{2, true} = \SI{1420000}{\kilo \hertz}$}}
 \end{itemize}
 
 The percentage of events of annihilation to residual gas is set to zero. The amount of anti-hydrogen is divided equally for the two transition c-b and d-a.
@@ -273,9 +282,9 @@ f_{i} : bin(i) > 0; bin(i + 1) > 1
 
 a second version of the same algorithm is implemented, analyzing the frequencies in decreasing order (reversed algorithm):
 
-\begin{equation}
-f_{i} : bin(i) < 2; bin(i - 1) < 1
-\end{equation}
+\begin{equation*}
+f_{i} : bin(i) < 3; bin(i - 1) < 2
+\end{equation*}
 
 \end{frame}
 

@@ -211,8 +211,8 @@ double reverse_2017(ROOT::RDF::RResultPtr<TH1D> histpdf){
 	double onset = 0;			// onset value 
 	double bin = histpdf->GetNbinsX();	// bin onset
 	for(int i = histpdf->GetNbinsX(); i > 1; --i){
-		if(histpdf->GetBinContent(i) < 2){
-			if(histpdf->GetBinContent(i-1) < 1){
+		if(histpdf->GetBinContent(i) < 3){
+			if(histpdf->GetBinContent(i-1) < 2){
 				onset = histpdf->GetBinCenter(i);
 				bin = i;
 				break;
