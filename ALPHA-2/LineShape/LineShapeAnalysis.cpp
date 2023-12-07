@@ -70,12 +70,12 @@ void LineShapeAnalysis(TString directory = "linear/",
 		//onset2 = firstOverThreshold(Spectra2, mu);
 		//onset1 = algorithm_2017(Spectra1);
 		//onset2 = algorithm_2017(Spectra2);
-		//onset1 = reverse_2017(Spectra1);
-		//onset2 = reverse_2017(Spectra2);
+		onset1 = reverse_2017(Spectra1);
+		onset2 = reverse_2017(Spectra2);
 		//onset1 = constFrac(Spectra1, fraction);
 		//onset2 = constFrac(Spectra2, fraction);
-		onset1 = sumNeighbors(Spectra1, threshold);
-		onset2 = sumNeighbors(Spectra2, threshold);
+		//onset1 = sumNeighbors(Spectra1, threshold);
+		//onset2 = sumNeighbors(Spectra2, threshold);
 		onset1v.push_back(onset1 - (Params.x_cb_start));
 		onset2v.push_back(onset2 - (Params.x_da_start));
 		deltaOnset.push_back(onset2 - onset1 - (Params.x_da_start - Params.x_cb_start));
@@ -134,8 +134,9 @@ void LineShapeAnalysis(TString directory = "linear/",
 	h3->SetLineColor(38);
 	h3->Draw();
 	//legend->Draw();
+	TString name = "2017_reversed"; TString endname = ".pdf"; 
 	//TString name = TString::Format("constFract_%d", static_cast<int>(100*fraction)); TString endname = ".pdf"; 
-	TString name = TString::Format("sumNeighbours_sigma%d(cosmic=0)", static_cast<int>(mu)); TString endname = ".pdf"; 
+	//TString name = TString::Format("sumNeighbours_sigma%d(cosmic=0)", static_cast<int>(mu)); TString endname = ".pdf"; 
 	int numero = 0;
 	TString folder = "Plot/";
 	while(!gSystem->AccessPathName(folder + name + endname)){
