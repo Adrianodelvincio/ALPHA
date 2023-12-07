@@ -107,8 +107,8 @@ TRandom3 *r = new TRandom3();
 			double end2 =  x_da_end + delay;
 			// SetContent(genLineShape1,Nbin1,parabola, start1, peak1, end1);
 			// SetContent(genLineShape2,Nbin2,parabola, start2, peak2 , end2);
-			SetContent(genLineShape1,Nbin1,Cruijff, start1, x_cb_peak, sigma0, sigma1, k0, k1, Norm);
-			SetContent(genLineShape2,Nbin2,Cruijff, start2, x_da_peak, sigma0, sigma1, k0, k1, Norm);
+			SetContent(genLineShape1,Nbin1,Cruijff, start1, peak1, sigma0, sigma1, k0, k1, Norm);
+			SetContent(genLineShape2,Nbin2,Cruijff, start2, peak2, sigma0, sigma1, k0, k1, Norm);
 			
 			double sumProb1 = 0;
 			double sumProb2 = 0; 
@@ -188,11 +188,8 @@ TRandom3 *r = new TRandom3();
 				v2Tot.push_back(mixCount + gasCount + CosmicCount);
 				//std::cout << "line2 " << "Bin: " << bin << " frequence: " << frequence - 1420000 << " " << mixCount << " " << CosmicCount << std::endl;
 			} // Loop on Bin
-			
-			if(l != Ntrial-1 && run != Repetition -1){
-				genLineShape1->Reset("ICESM");
-				genLineShape2->Reset("ICESM");
-			}
+			genLineShape1->Reset("ICESM");
+			genLineShape2->Reset("ICESM");
 			std::cout << "sumProb1: " << sumProb1 << std::endl;
 			std::cout << "sumProb2: " << sumProb2 << std::endl;
 		} // Loop on Repetition
@@ -241,6 +238,12 @@ TRandom3 *r = new TRandom3();
 		dataPdf1.Delete(); dataPdf2.Delete();
 	} // Loop Trials
 	
+	SetContent(genLineShape1,Nbin1,Cruijff, x_cb_start -2.5, x_cb_peak - 2.5, sigma0, sigma1, k0, k1, Norm);
+	SetContent(genLineShape2,Nbin2,Cruijff, x_da_start -2.5, x_da_peak - 2.5, sigma0, sigma1, k0, k1, Norm);
+	TH1F *genLineShape3 = new TH1F("hist3", "lineshape c to b", Nbin1, freqScanStart1, freqScanStart1 + Nbin1*(FrequencyStep));
+	TH1F *genLineShape4 = new TH1F("hist4", "lineshape d to a", Nbin2, freqScanStart2, freqScanStart2 + Nbin2*(FrequencyStep));
+	SetContent(genLineShape3,Nbin1,Cruijff, x_cb_start + 2.5, x_cb_peak + 2.5, sigma0, sigma1, k0, k1, Norm);
+	SetContent(genLineShape4,Nbin2,Cruijff, x_da_start + 2.5, x_da_peak + 2.5, sigma0, sigma1, k0, k1, Norm);
 	auto b = new TCanvas("b1", "Spectral lines");
 	auto pad = new TPad("pad1", "pad",0,0,1,1);
 	pad->Divide(2,1,0.001,0.001); pad->Draw();
@@ -249,13 +252,26 @@ TRandom3 *r = new TRandom3();
 	genLineShape1->GetXaxis()->SetTitle("frequency [kHz]");
 	genLineShape1->SetMarkerStyle(21);
 	genLineShape1->SetMarkerColor(2);
-	genLineShape1->SetLineColor(4);
+	genLineShape1->SetMarkerSize(0.5);
+	genLineShape1->SetLineColor(2);
 	genLineShape1->Draw();
+	
+	genLineShape3->SetMarkerStyle(21);
+	genLineShape3->SetMarkerColor(kViolet);
+	genLineShape3->SetLineColor(kViolet);
+	genLineShape3->SetMarkerSize(0.5);
+	genLineShape3->Draw("samehist");
 	pad->cd(2);
 	genLineShape2->GetXaxis()->SetTitle("frequency [kHz]");
 	genLineShape2->SetMarkerStyle(21);
 	genLineShape2->SetMarkerColor(2);
-	genLineShape2->SetLineColor(4);
+	genLineShape2->SetMarkerSize(0.5);
+	genLineShape2->SetLineColor(2);
 	genLineShape2->Draw();
+	genLineShape4->SetMarkerStyle(21);
+	genLineShape4->SetMarkerColor(kViolet);
+	genLineShape4->SetMarkerSize(0.5);
+	genLineShape4->SetLineColor(kViolet);
+	genLineShape4->Draw("samehist");
 } // End program
 
