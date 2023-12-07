@@ -238,12 +238,13 @@ TRandom3 *r = new TRandom3();
 		dataPdf1.Delete(); dataPdf2.Delete();
 	} // Loop Trials
 	
-	SetContent(genLineShape1,Nbin1,Cruijff, x_cb_start -2.5, x_cb_peak - 2.5, sigma0, sigma1, k0, k1, Norm);
-	SetContent(genLineShape2,Nbin2,Cruijff, x_da_start -2.5, x_da_peak - 2.5, sigma0, sigma1, k0, k1, Norm);
-	TH1F *genLineShape3 = new TH1F("hist3", "lineshape c to b", Nbin1, freqScanStart1, freqScanStart1 + Nbin1*(FrequencyStep));
-	TH1F *genLineShape4 = new TH1F("hist4", "lineshape d to a", Nbin2, freqScanStart2, freqScanStart2 + Nbin2*(FrequencyStep));
-	SetContent(genLineShape3,Nbin1,Cruijff, x_cb_start + 2.5, x_cb_peak + 2.5, sigma0, sigma1, k0, k1, Norm);
-	SetContent(genLineShape4,Nbin2,Cruijff, x_da_start + 2.5, x_da_peak + 2.5, sigma0, sigma1, k0, k1, Norm);
+	// Show the lineshape
+	SetContent(genLineShape1,Nbin1,Cruijff, x_cb_start, x_cb_peak, sigma0, sigma1, k0, k1, Norm);
+	SetContent(genLineShape2,Nbin2,Cruijff, x_da_start, x_da_peak, sigma0, sigma1, k0, k1, Norm);
+	TH1F *genLineShape3 = new TH1F("hist3", "lineshape", 500,0,400);
+	TH1F *genLineShape4 = new TH1F("hist4", "lineshape", 500,0,400);
+	SetContent(genLineShape3,500,Cruijff, 0, 220, sigma0, sigma1, k0, k1, Norm);
+	SetContent(genLineShape4,500,Cruijff, 10, 220+10 , sigma0, sigma1, k0, k1, Norm);
 	auto b = new TCanvas("b1", "Spectral lines");
 	auto pad = new TPad("pad1", "pad",0,0,1,1);
 	pad->Divide(2,1,0.001,0.001); pad->Draw();
@@ -251,27 +252,34 @@ TRandom3 *r = new TRandom3();
 	gStyle->SetOptStat(0);
 	genLineShape1->GetXaxis()->SetTitle("frequency [kHz]");
 	genLineShape1->SetMarkerStyle(21);
-	genLineShape1->SetMarkerColor(2);
+	genLineShape1->SetMarkerColor(1);
 	genLineShape1->SetMarkerSize(0.5);
-	genLineShape1->SetLineColor(2);
+	genLineShape1->SetLineColor(1);
 	genLineShape1->Draw();
-	
+	/*
 	genLineShape3->SetMarkerStyle(21);
 	genLineShape3->SetMarkerColor(kViolet);
 	genLineShape3->SetLineColor(kViolet);
 	genLineShape3->SetMarkerSize(0.5);
 	genLineShape3->Draw("samehist");
+	*/
 	pad->cd(2);
 	genLineShape2->GetXaxis()->SetTitle("frequency [kHz]");
 	genLineShape2->SetMarkerStyle(21);
-	genLineShape2->SetMarkerColor(2);
+	genLineShape2->SetMarkerColor(1);
 	genLineShape2->SetMarkerSize(0.5);
-	genLineShape2->SetLineColor(2);
+	genLineShape2->SetLineColor(1);
 	genLineShape2->Draw();
+	/*
 	genLineShape4->SetMarkerStyle(21);
 	genLineShape4->SetMarkerColor(kViolet);
 	genLineShape4->SetMarkerSize(0.5);
 	genLineShape4->SetLineColor(kViolet);
 	genLineShape4->Draw("samehist");
+	*/
+	
+	auto c = new TCanvas("c1","simone is runnuning me out of patience");
+	genLineShape3->Draw("histl");
+	genLineShape4->Draw("samehistl");
 } // End program
 

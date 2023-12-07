@@ -225,16 +225,29 @@ N \cdot exp(  \frac{-(x - x_{0})^2}{2\sigma_{1} + k_{1}(x - x_{0})^{2}}) &  f > 
 \end{frame}
 
 {\nologo
+\begin{frame}{shift of the lineshape}
+
+To generate the data, the lineshape is shifted with a uniform distributed random value.
+
+\begin{figure}[hbtp]
+\centering
+\includegraphics[width = 0.75\textwidth]{ShiftedLineshape.pdf}
+\end{figure}
+
+\end{frame}
+}
+
+{\nologo
 \begin{frame}{Discretization of the lineshape}
 
-Here we plot the discretized lineshape, obtained sampling the Cruijff function with the optimal parameters by the fit of the previous slide. The lineshape is discretized into a series of 50 points, with a increment step of $\SI{5}{\kilo \hertz}$. The starting frequence is $f = \SI{160}{\kilo \hertz}$ 
+Here we plot the discretized lineshape, obtained sampling the Cruijff function with the optimal parameters by the fit of the previous slide. The lineshape is discretized into a series of 50 points, with a increment step of $\SI{5}{\kilo \hertz}$.
 
 \begin{figure}[hbtp]
 \centering
 \includegraphics[width = 0.7\textwidth]{../Plot/CruijffLineShapes.pdf}
 \end{figure}
 
-The discretized lineshapes here represents the model which the simulation programs uses to generate the data. In blue the lineshape with a $+\SI{2.5}{\kilo \hertz}$ shift, in red the lineshape with a $+\SI{-2.5}{\kilo \hertz}$  with respect to the onset value ( $\SI{0}{\kilo \hertz}$ for c-b and $\SI{1462000}{\kilo \hertz}$ for d-a).
+The discretized lineshapes here represents the model which the simulation programs uses to generate the data. 
 \end{frame}
 
 \begin{frame}{Generate Counts for each frequency}
@@ -260,7 +273,7 @@ We have studies the case of the series of run 4b. The parameters of the simulati
 \item $TimeStep = \SI{8}{\second}$
 \item $FrequencyStep = \SI{5}{\kilo \hertz}$.
 \item {\color{red}{$\mu_{cosmic} = \SI{0.051}{\second \tothe{-1}}$
-\item $onset_{1, true} = \SI{0}{\kilo \hertz}$ ; $onset_{2, true} = \SI{1420000}{\kilo \hertz}$}}
+\item $onset_{1, true} = \SI{175}{\kilo \hertz}$ ; $onset_{2, true} = \SI{1420175}{\kilo \hertz}$}}
 \item $shift = \pm \SI{2.5}{\kilo \hertz}$.
 \end{itemize}
 
