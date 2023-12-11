@@ -41,15 +41,18 @@ double x_cb_peak = Params.x_cb_peak;
 double x_da_start = Params.x_da_start;
 double x_da_end = Params.x_da_end;
 double x_da_peak = Params.x_da_peak;
-double range = Params.delay;					// Set range delay
+double range = Params.delay;						// Set range delay
 //	Cruijff Parameters
-double x0 = Params.x0;
-double k0 = Params.k0;
-double k1 = Params.k1;
-double sigma0 = Params.sigma0;
-double sigma1 = Params.sigma1;
-double Norm = Params.Norm;
-
+double k0_cb = Params.k0_cb;
+double k1_cb = Params.k1_cb;
+double sigma0_cb = Params.sigma0_cb;
+double sigma1_cb = Params.sigma1_cb;
+double Norm_cb = Params.Norm_cb;
+double k0_da = Params.k0_da;
+double k1_da = Params.k1_da;
+double sigma0_da = Params.sigma0_da;
+double sigma1_da = Params.sigma1_da;
+double Norm_da = Params.Norm_da;
 
 double freqScanStart1 = Params.x_cb_start - (FrequencyStep)*(BeforeOnset + 0.5);	// Start of frequency sweep c-b
 double freqScanStart2 = Params.x_da_start - (FrequencyStep)*(BeforeOnset + 0.5);	// Start of frequency sweep d-a
@@ -107,8 +110,8 @@ TRandom3 *r = new TRandom3();
 			double end2 =  x_da_end + delay;
 			// SetContent(genLineShape1,Nbin1,parabola, start1, peak1, end1);
 			// SetContent(genLineShape2,Nbin2,parabola, start2, peak2 , end2);
-			SetContent(genLineShape1,Nbin1,Cruijff, start1, peak1, sigma0, sigma1, k0, k1, Norm);
-			SetContent(genLineShape2,Nbin2,Cruijff, start2, peak2, sigma0, sigma1, k0, k1, Norm);
+			SetContent(genLineShape1,Nbin1,Cruijff, start1, peak1, sigma0_cb, sigma1_cb, k0_cb, k1_cb, Norm_cb);
+			SetContent(genLineShape2,Nbin2,Cruijff, start2, peak2, sigma0_da, sigma1_da, k0_da, k1_da, Norm_da);
 			
 			double sumProb1 = 0;
 			double sumProb2 = 0; 
@@ -239,12 +242,12 @@ TRandom3 *r = new TRandom3();
 	} // Loop Trials
 	
 	// Show the lineshape
-	SetContent(genLineShape1,Nbin1,Cruijff, x_cb_start, x_cb_peak, sigma0, sigma1, k0, k1, Norm);
-	SetContent(genLineShape2,Nbin2,Cruijff, x_da_start, x_da_peak, sigma0, sigma1, k0, k1, Norm);
+	SetContent(genLineShape1,Nbin1,Cruijff, x_cb_start, x_cb_peak, sigma0_cb, sigma1_cb, k0_cb, k1_cb, Norm_cb);
+	SetContent(genLineShape2,Nbin2,Cruijff, x_da_start, x_da_peak, sigma0_da, sigma1_da, k0_da, k1_da, Norm_da);
 	TH1F *genLineShape3 = new TH1F("hist3", "lineshape", 500,0,400);
 	TH1F *genLineShape4 = new TH1F("hist4", "lineshape", 500,0,400);
-	SetContent(genLineShape3,500,Cruijff, 0, 220, sigma0, sigma1, k0, k1, Norm);
-	SetContent(genLineShape4,500,Cruijff, 10, 220+10 , sigma0, sigma1, k0, k1, Norm);
+	SetContent(genLineShape3,500,Cruijff, 0, 220, sigma0_cb, sigma1_cb, k0_cb, k1_cb, Norm_cb);
+	SetContent(genLineShape4,500,Cruijff, 10, 220+10 , sigma0_da, sigma1_da, k0_da, k1_da, Norm_da);
 	auto b = new TCanvas("b1", "Spectral lines");
 	auto pad = new TPad("pad1", "pad",0,0,1,1);
 	pad->Divide(2,1,0.001,0.001); pad->Draw();

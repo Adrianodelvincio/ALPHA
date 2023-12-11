@@ -31,12 +31,17 @@ class ReadConfFile{
 						if (strcmp(sBuffer, "Efficiency") == 0) 	{ Efficiency = buffer;}
 						if (strcmp(sBuffer, "delay") == 0) 		{ delay = buffer;}
 						if (strcmp(sBuffer, "FrequencyStep") == 0) 	{ FrequencyStep = buffer;}
-						if (strcmp(sBuffer, "Norm") == 0)		{ Norm = buffer;}
-						if (strcmp(sBuffer, "x0") == 0)			{ x0 = buffer;}
-						if (strcmp(sBuffer, "sigma0") == 0)		{ sigma0 = buffer;}
-						if (strcmp(sBuffer, "sigma1") == 0)		{ sigma1 = buffer;}
-						if (strcmp(sBuffer, "k0") == 0)			{ k0 = buffer;}
-						if (strcmp(sBuffer, "k1") == 0)			{ k1 = buffer;}
+						if (strcmp(sBuffer, "Norm_cb") == 0)		{ Norm_cb = buffer;}
+						if (strcmp(sBuffer, "x0_cb") == 0)		{ x0_cb = buffer;}
+						if (strcmp(sBuffer, "sigma0_cb") == 0)		{ sigma0_cb = buffer;}
+						if (strcmp(sBuffer, "sigma1_cb") == 0)		{ sigma1_cb = buffer;}
+						if (strcmp(sBuffer, "k0_cb") == 0)		{ k0_cb = buffer;}
+						if (strcmp(sBuffer, "k1_cb") == 0)		{ k1_cb = buffer;}
+						if (strcmp(sBuffer, "x0_da") == 0)		{ x0_da = buffer;}
+						if (strcmp(sBuffer, "sigma0_da") == 0)		{ sigma0_da = buffer;}
+						if (strcmp(sBuffer, "sigma1_da") == 0)		{ sigma1_da = buffer;}
+						if (strcmp(sBuffer, "k0_da") == 0)		{ k0_da = buffer;}
+						if (strcmp(sBuffer, "k1_da") == 0)		{ k1_da = buffer;}
 					} // fill the parameters
 					int IntBuffer;
 					if (sscanf(line.c_str(), "%s = %d", sBuffer, &IntBuffer) == 2) {
@@ -74,12 +79,12 @@ class ReadConfFile{
 			std::cout << "pwall_cb      " <<  pwall_cb << std::endl;
 			std::cout << "delay         " <<  delay << std::endl;
 			std::cout << "Cruijff Paramters" << std::endl;
-			std::cout << "x0	" << x0 << std::endl;
-			std::cout << "sigma0	" << sigma0 << std::endl;
-			std::cout << "sigma1	" << sigma1 << std::endl;
-			std::cout << "k0	" << k0 << std::endl;
-			std::cout << "k1	" << k1 << std::endl;
-			std::cout << "Norm	" << Norm << std::endl;
+			std::cout << "x0_cb	" << x0_cb << std::endl;
+			std::cout << "sigma0_cb	" << sigma0_cb << std::endl;
+			std::cout << "sigma1_cb	" << sigma1_cb << std::endl;
+			std::cout << "k0_cb	" << k0_cb << std::endl;
+			std::cout << "k1_cb	" << k1_cb << std::endl;
+			std::cout << "Norm_cb	" << Norm_cb << std::endl;
 			std::cout << "\n" << std::endl;
 		}
 	int Nstack;
@@ -103,11 +108,17 @@ class ReadConfFile{
 	double C;
 	double delay;
 	// Parameters of the Cruijff Function
-	double x0;
-	double sigma0;
-	double sigma1;
-	double k0;
-	double k1;
-	double Norm;
+	double x0_cb;
+	double sigma0_cb;
+	double sigma1_cb;
+	double k0_cb;
+	double k1_cb;
+	double Norm_cb;
+	double x0_da;
+	double sigma0_da;
+	double sigma1_da;
+	double k0_da;
+	double k1_da;
+	double Norm_da;
 };
 #endif
