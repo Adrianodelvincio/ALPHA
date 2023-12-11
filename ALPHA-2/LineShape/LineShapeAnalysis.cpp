@@ -76,7 +76,6 @@ void LineShapeAnalysis(TString directory = "linear/",
 		v1_thr.push_back(onset1 - (Params.x_cb_start));
 		v2_thr.push_back(onset2 - (Params.x_da_start));
 		diff_thr.push_back(onset2 - onset1 - (Params.x_da_start - Params.x_cb_start));
-		
 		// 2017 FOWARD
 		onset1 = algorithm_2017(Spectra1);
 		onset2 = algorithm_2017(Spectra2);

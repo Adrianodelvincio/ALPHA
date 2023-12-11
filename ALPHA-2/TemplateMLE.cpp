@@ -133,7 +133,7 @@ leg1->Draw();
 
 // DATA FOR THE FIT f
 TString formato = TString::Format(".csv");
-auto f4_rdf = ROOT::RDF::MakeCsvDataFrame(cartella + filename + formato);
+auto f4_rdf = ROOT::RDF::FromCSV(cartella + filename + formato);
 auto displ = f4_rdf.Display({"CutsType0","CutsType1","CutsType2", "X", "Y", "Z"}, 5);
     displ->Print();
 
