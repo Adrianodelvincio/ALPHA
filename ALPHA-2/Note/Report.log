@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.141592653-2.6-1.40.22 (TeX Live 2022/dev/Debian) (preloaded format=pdflatex 2023.12.1)  11 DEC 2023 17:03
+This is pdfTeX, Version 3.141592653-2.6-1.40.22 (TeX Live 2022/dev/Debian) (preloaded format=pdflatex 2023.12.1)  12 DEC 2023 17:01
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -290,43 +290,67 @@ Package: lipsum 2021-09-20 v2.7 150 paragraphs of Lorem Ipsum dummy text
 \l__lipsum_b_int=\count295
 
 (/usr/share/texlive/texmf-dist/tex/latex/lipsum/lipsum.ltd.tex))
+(/usr/share/texlive/texmf-dist/tex/latex/appendix/appendix.sty
+Package: appendix 2020/02/08 v1.2c extra appendix facilities
+\c@@pps=\count296
+\c@@ppsavesec=\count297
+\c@@ppsaveapp=\count298
+)
 Package translations Info: No language package found. I am going to use `englis
-h' as default language. on input line 15.
+h' as default language. on input line 22.
  (./Report.aux)
 \openout1 = `Report.aux'.
 
-LaTeX Font Info:    Checking defaults for OML/cmm/m/it on input line 15.
-LaTeX Font Info:    ... okay on input line 15.
-LaTeX Font Info:    Checking defaults for OMS/cmsy/m/n on input line 15.
-LaTeX Font Info:    ... okay on input line 15.
-LaTeX Font Info:    Checking defaults for OT1/cmr/m/n on input line 15.
-LaTeX Font Info:    ... okay on input line 15.
-LaTeX Font Info:    Checking defaults for T1/cmr/m/n on input line 15.
-LaTeX Font Info:    ... okay on input line 15.
-LaTeX Font Info:    Checking defaults for TS1/cmr/m/n on input line 15.
-LaTeX Font Info:    ... okay on input line 15.
-LaTeX Font Info:    Checking defaults for OMX/cmex/m/n on input line 15.
-LaTeX Font Info:    ... okay on input line 15.
-LaTeX Font Info:    Checking defaults for U/cmr/m/n on input line 15.
-LaTeX Font Info:    ... okay on input line 15.
-Package ragged2e Info: ABD: executing \RaggedRight on input line 15.
+LaTeX Font Info:    Checking defaults for OML/cmm/m/it on input line 22.
+LaTeX Font Info:    ... okay on input line 22.
+LaTeX Font Info:    Checking defaults for OMS/cmsy/m/n on input line 22.
+LaTeX Font Info:    ... okay on input line 22.
+LaTeX Font Info:    Checking defaults for OT1/cmr/m/n on input line 22.
+LaTeX Font Info:    ... okay on input line 22.
+LaTeX Font Info:    Checking defaults for T1/cmr/m/n on input line 22.
+LaTeX Font Info:    ... okay on input line 22.
+LaTeX Font Info:    Checking defaults for TS1/cmr/m/n on input line 22.
+LaTeX Font Info:    ... okay on input line 22.
+LaTeX Font Info:    Checking defaults for OMX/cmex/m/n on input line 22.
+LaTeX Font Info:    ... okay on input line 22.
+LaTeX Font Info:    Checking defaults for U/cmr/m/n on input line 22.
+LaTeX Font Info:    ... okay on input line 22.
+Package ragged2e Info: ABD: executing \RaggedRight on input line 22.
+
 (/usr/share/texlive/texmf-dist/tex/context/base/mkii/supp-pdf.mkii
 [Loading MPS to PDF converter (version 2006.09.02).]
-\scratchcounter=\count296
+\scratchcounter=\count299
 \scratchdimen=\dimen168
 \scratchbox=\box63
-\nofMPsegments=\count297
-\nofMParguments=\count298
+\nofMPsegments=\count300
+\nofMParguments=\count301
 \everyMPshowfont=\toks27
-\MPscratchCnt=\count299
+\MPscratchCnt=\count302
 \MPscratchDim=\dimen169
-\MPnumerator=\count300
-\makeMPintoPDFobject=\count301
+\MPnumerator=\count303
+\makeMPintoPDFobject=\count304
 \everyMPtoPDFconversion=\toks28
 ) (/usr/share/texlive/texmf-dist/tex/latex/epstopdf-pkg/epstopdf-base.sty
 Package: epstopdf-base 2020-01-24 v2.11 Base part for package epstopdf
+
+(/usr/share/texlive/texmf-dist/tex/latex/grfext/grfext.sty
+Package: grfext 2019/12/03 v1.3 Manage graphics extensions (HO)
+
+(/usr/share/texlive/texmf-dist/tex/generic/kvdefinekeys/kvdefinekeys.sty
+Package: kvdefinekeys 2019-12-19 v1.6 Define keys (HO)
+))
+(/usr/share/texlive/texmf-dist/tex/latex/kvoptions/kvoptions.sty
+Package: kvoptions 2020-10-07 v3.14 Key value format for package options (HO)
+
+(/usr/share/texlive/texmf-dist/tex/generic/kvsetkeys/kvsetkeys.sty
+Package: kvsetkeys 2019/12/15 v1.18 Key value parser (HO)
+))
 Package epstopdf-base Info: Redefining graphics rule for `.eps' on input line 4
 85.
+Package grfext Info: Graphics extension search list:
+(grfext)             [.pdf,.png,.jpg,.mps,.jpeg,.jbig2,.jb2,.PDF,.PNG,.JPG,.JPE
+G,.JBIG2,.JB2,.eps]
+(grfext)             \AppendGraphicsExtensions on input line 504.
 
 (/usr/share/texlive/texmf-dist/tex/latex/latexconfig/epstopdf-sys.cfg
 File: epstopdf-sys.cfg 2010/07/13 v1.3 Configuration of (r)epstopdf for TeX Liv
@@ -343,13 +367,18 @@ File: translations-basic-dictionary-english.trsl (english translation file `tra
 nslations-basic-dictionary')
 )
 Package translations Info: loading dictionary `translations-basic-dictionary' f
-or `english'. on input line 15.
-LaTeX Font Info:    Trying to load font information for U+msa on input line 26.
+or `english'. on input line 22.
+<../../logo/ALPHA_Logo.jpg, id=1, 1771.36781pt x 1154.06157pt>
+File: ../../logo/ALPHA_Logo.jpg Graphic file (type jpg)
+<use ../../logo/ALPHA_Logo.jpg>
+Package pdftex.def Info: ../../logo/ALPHA_Logo.jpg  used on input line 33.
+(pdftex.def)             Requested size: 67.79724pt x 44.16472pt.
+LaTeX Font Info:    Trying to load font information for U+msa on input line 33.
 
  (/usr/share/texlive/texmf-dist/tex/latex/amsfonts/umsa.fd
 File: umsa.fd 2013/01/14 v3.01 AMS symbols A
 )
-LaTeX Font Info:    Trying to load font information for U+msb on input line 26.
+LaTeX Font Info:    Trying to load font information for U+msb on input line 33.
 
 
 (/usr/share/texlive/texmf-dist/tex/latex/amsfonts/umsb.fd
@@ -357,38 +386,109 @@ File: umsb.fd 2013/01/14 v3.01 AMS symbols B
 ) [1{/var/lib/texmf/fonts/map/pdftex/updmap/pdftex.map}
 
 
-]
-<../PlotMLEfit/SingleModel/GaussianFitMixing.pdf, id=15, 614.44559pt x 616.9016
+ <../../logo/ALPHA_Logo.jpg>]
+<../PlotMLEfit/SingleModel/GaussianFitMixing.pdf, id=16, 614.44559pt x 616.9016
 pt>
 File: ../PlotMLEfit/SingleModel/GaussianFitMixing.pdf Graphic file (type pdf)
 <use ../PlotMLEfit/SingleModel/GaussianFitMixing.pdf>
 Package pdftex.def Info: ../PlotMLEfit/SingleModel/GaussianFitMixing.pdf  used 
-on input line 53.
+on input line 60.
 (pdftex.def)             Requested size: 203.39862pt x 204.20883pt.
- [2 <../PlotMLEfit/SingleModel/GaussianFitMixing.pdf>] (./Report.aux) ) 
+<../PlotMLEfit/SingleModel/FitToUw.pdf, id=17, 569.12625pt x 484.81125pt>
+File: ../PlotMLEfit/SingleModel/FitToUw.pdf Graphic file (type pdf)
+<use ../PlotMLEfit/SingleModel/FitToUw.pdf>
+Package pdftex.def Info: ../PlotMLEfit/SingleModel/FitToUw.pdf  used on input l
+ine 77.
+(pdftex.def)             Requested size: 226.0pt x 192.5229pt.
+
+Overfull \hbox (5.0pt too wide) in paragraph at lines 77--78
+ [][] 
+ []
+
+[2 <../PlotMLEfit/SingleModel/GaussianFitMixing.pdf> <../PlotMLEfit/SingleModel
+/FitToUw.pdf, page is rotated 90 degrees>]
+<../PlotMLEfit/SingleModel/Cosmici_fit.pdf, id=125, 569.12625pt x 484.81125pt>
+File: ../PlotMLEfit/SingleModel/Cosmici_fit.pdf Graphic file (type pdf)
+<use ../PlotMLEfit/SingleModel/Cosmici_fit.pdf>
+Package pdftex.def Info: ../PlotMLEfit/SingleModel/Cosmici_fit.pdf  used on inp
+ut line 88.
+(pdftex.def)             Requested size: 226.0pt x 192.5229pt.
+
+Overfull \hbox (5.0pt too wide) in paragraph at lines 88--89
+ [][] 
+ []
+
+<../PlotMLEfit/PdfTogether.pdf, id=126, 569.12625pt x 452.69125pt>
+File: ../PlotMLEfit/PdfTogether.pdf Graphic file (type pdf)
+<use ../PlotMLEfit/PdfTogether.pdf>
+Package pdftex.def Info: ../PlotMLEfit/PdfTogether.pdf  used on input line 104.
+
+(pdftex.def)             Requested size: 226.0pt x 179.76776pt.
+
+Overfull \hbox (5.0pt too wide) in paragraph at lines 104--105
+ [][] 
+ []
+
+<../PlotMLEfit/RadialDensity.pdf, id=127, 416.0117pt x 327.53253pt>
+File: ../PlotMLEfit/RadialDensity.pdf Graphic file (type pdf)
+<use ../PlotMLEfit/RadialDensity.pdf>
+Package pdftex.def Info: ../PlotMLEfit/RadialDensity.pdf  used on input line 11
+3.
+(pdftex.def)             Requested size: 226.0pt x 177.93443pt.
+
+Overfull \hbox (5.0pt too wide) in paragraph at lines 113--114
+ [][] 
+ []
+
+
+Underfull \vbox (badness 10000) has occurred while \output is active []
+
+ [3 <../PlotMLEfit/SingleModel/Cosmici_fit.pdf, page is rotated 90 degrees> <..
+/PlotMLEfit/PdfTogether.pdf, page is rotated 90 degrees> <../PlotMLEfit/RadialD
+ensity.pdf>]
+
+pdfTeX warning: /usr/bin/pdflatex (file ../PlotMLEfit/ListofRun-cropped.pdf): P
+DF inclusion: found PDF version <1.7>, but at most version <1.5> allowed
+<../PlotMLEfit/ListofRun-cropped.pdf, id=263, 780.66656pt x 253.75804pt>
+File: ../PlotMLEfit/ListofRun-cropped.pdf Graphic file (type pdf)
+<use ../PlotMLEfit/ListofRun-cropped.pdf>
+Package pdftex.def Info: ../PlotMLEfit/ListofRun-cropped.pdf  used on input lin
+e 170.
+(pdftex.def)             Requested size: 452.0pt x 146.92421pt.
+
+Overfull \hbox (231.0pt too wide) in paragraph at lines 170--171
+ [][] 
+ []
+
+[4 <../PlotMLEfit/ListofRun-cropped.pdf>] (./Report.aux) ) 
 Here is how much of TeX's memory you used:
- 9156 strings out of 480129
- 198864 string characters out of 5893409
- 542014 words of memory out of 5000000
- 27031 multiletter control sequences out of 15000+600000
+ 9611 strings out of 480129
+ 208621 string characters out of 5893409
+ 550856 words of memory out of 5000000
+ 27458 multiletter control sequences out of 15000+600000
  479665 words of font info for 68 fonts, out of 8000000 for 9000
  81 hyphenation exceptions out of 8191
- 71i,8n,79p,647b,551s stack positions out of 5000i,500n,10000p,200000b,80000s
- </home/
-adriano/.texlive2021/texmf-var/fonts/pk/ljfour/jknappen/ec/tcrm1095.600pk></usr
-/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmbx10.pfb></usr/share
-/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmbx12.pfb></usr/share/texli
-ve/texmf-dist/fonts/type1/public/amsfonts/cm/cmmi10.pfb></usr/share/texlive/tex
-mf-dist/fonts/type1/public/amsfonts/cm/cmmi8.pfb></usr/share/texlive/texmf-dist
-/fonts/type1/public/amsfonts/cm/cmr10.pfb></usr/share/texlive/texmf-dist/fonts/
-type1/public/amsfonts/cm/cmr12.pfb></usr/share/texlive/texmf-dist/fonts/type1/p
-ublic/amsfonts/cm/cmr17.pfb></usr/share/texlive/texmf-dist/fonts/type1/public/a
-msfonts/cm/cmsy10.pfb></usr/share/texlive/texmf-dist/fonts/type1/public/amsfont
-s/cm/cmti10.pfb>
-Output written on Report.pdf (2 pages, 132880 bytes).
+ 71i,15n,79p,647b,551s stack positions out of 5000i,500n,10000p,200000b,80000s
+ </home/adriano/.texl
+ive2021/texmf-var/fonts/pk/ljfour/jknappen/ec/tcrm1095.600pk></usr/share/texliv
+e/texmf-dist/fonts/type1/public/amsfonts/cm/cmbx10.pfb></usr/share/texlive/texm
+f-dist/fonts/type1/public/amsfonts/cm/cmbx12.pfb></usr/share/texlive/texmf-dist
+/fonts/type1/public/amsfonts/cm/cmex10.pfb></usr/share/texlive/texmf-dist/fonts
+/type1/public/amsfonts/cm/cmmi10.pfb></usr/share/texlive/texmf-dist/fonts/type1
+/public/amsfonts/cm/cmmi6.pfb></usr/share/texlive/texmf-dist/fonts/type1/public
+/amsfonts/cm/cmmi8.pfb></usr/share/texlive/texmf-dist/fonts/type1/public/amsfon
+ts/cm/cmr10.pfb></usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/c
+mr12.pfb></usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmr17.pf
+b></usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmr6.pfb></usr/
+share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmr8.pfb></usr/share/te
+xlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmsy10.pfb></usr/share/texlive/
+texmf-dist/fonts/type1/public/amsfonts/cm/cmsy6.pfb></usr/share/texlive/texmf-d
+ist/fonts/type1/public/amsfonts/cm/cmsy8.pfb></usr/share/texlive/texmf-dist/fon
+ts/type1/public/amsfonts/cm/cmti10.pfb>
+Output written on Report.pdf (4 pages, 573414 bytes).
 PDF statistics:
- 121 PDF objects out of 1000 (max. 8388607)
- 46 compressed objects within 1 object stream
+ 349 PDF objects out of 1000 (max. 8388607)
+ 140 compressed objects within 2 object streams
  0 named destinations out of 1000 (max. 500000)
- 6 words of extra memory for PDF output out of 10000 (max. 10000000)
+ 36 words of extra memory for PDF output out of 10000 (max. 10000000)
 
