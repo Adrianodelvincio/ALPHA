@@ -25,9 +25,9 @@ SetProb(&a, &b, &c, N, Nfix);
 gInterpreter->GenerateDictionary("Functions", "Headers/MontecarloForFit.h");
 
 //CREATE AN ISTOGRAM TO SAVE THE QUANTITIES OF THE MONTECARLO
-TH1* hmix = new TH1I("h1", "MIX : (N_{fit} - N_{gen})/#sigma",30, -6,6);
-TH1* huw =  new TH1I("h2", "Residual gas : (N_{fit} - N_{gen})/#sigma",30,-6,6);
-TH1* hbk =  new TH1I("h3", "Cosmic : (N_{fit} - N_{gen})/#sigma",30,-6,6);
+TH1* hmix = new TH1I("h1", "Annihilation on trap walls : (N_{fit} - N_{gen})/#sigma",30, -6,6);
+TH1* huw =  new TH1I("h2", "Residual Gas : (N_{fit} - N_{gen})/#sigma",30,-6,6);
+TH1* hbk =  new TH1I("h3", "Cosmic Events : (N_{fit} - N_{gen})/#sigma",30,-6,6);
 TH1* hchisq = new TH1I("hchisq", "chiquadro", 30, 0, 50);
 
 RooRealVar x("x","r [cm]",0.,4.);
