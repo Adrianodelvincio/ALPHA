@@ -1,0 +1,9 @@
+# Parameters of the simulation program MontecarloForFit.cpp
+N = 1000
+Nloop = 1000
+a = 0.5
+b = 0.5
+Ncosmic = 10.2
+mu = 2.38
+sigWall = 0.85
+sigRay =  1.722

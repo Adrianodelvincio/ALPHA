@@ -1,5 +1,4 @@
 ALPHA-2/Control
-ALPHA-2/DataSetROOT
 ALPHA-2/Dataset
 PlotMLEfit/MLE_TOY.aux
 PlotMLEfit/MLE_TOY.log
@@ -43,6 +42,14 @@ ALPHA-2/LineShape/AutoDict_ReadFiles.cxx
 ALPHA-2/LineShape/AutoDict_ReadFiles_cxx.d
 ALPHA-2/LineShape/AutoDict_ReadFiles_cxx.so
 ALPHA-2/LineShape/AutoDict_ReadFiles_cxx_ACLiC_dict_rdict.pcm
+ALPHA-2/LineShape/Beamer/hyperfine2.aux
+ALPHA-2/LineShape/Beamer/hyperfine2.log
+ALPHA-2/LineShape/Beamer/hyperfine2.nav
+ALPHA-2/LineShape/Beamer/hyperfine2.out
+ALPHA-2/LineShape/Beamer/hyperfine2.pdf
+ALPHA-2/LineShape/Beamer/hyperfine2.snm
+ALPHA-2/LineShape/Beamer/hyperfine2.synctex.gz
+ALPHA-2/LineShape/Beamer/hyperfine2.toc
 ALPHA-2/LineShape/ToyShape1f0.root
 ALPHA-2/LineShape/ToyShape1f100.root
 ALPHA-2/LineShape/ToyShape1f50.root
@@ -58,6 +65,10 @@ ALPHA-2/LineShape/AutoDict_ReadFiles.cxx
 ALPHA-2/LineShape/AutoDict_ReadFiles_cxx.d
 ALPHA-2/LineShape/AutoDict_ReadFiles_cxx.so
 ALPHA-2/LineShape/AutoDict_ReadFiles_cxx_ACLiC_dict_rdict.pcm
+ALPHA-2/AutoDict_Functions.cxx
+ALPHA-2/AutoDict_Functions_cxx.d
+ALPHA-2/AutoDict_Functions_cxx.so
+ALPHA-2/AutoDict_Functions_cxx_ACLiC_dict_rdict.pcm
 ALPHA-2/LineShape/cosmic_0_delay_0/
 ALPHA-2/LineShape/cosmic_0_delay_15/
 ALPHA-2/LineShape/cosmic_0_delay_2.5/
