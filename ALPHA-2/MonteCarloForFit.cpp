@@ -15,11 +15,11 @@ conf.Print();
 
 //Generate dictionary
 gInterpreter->GenerateDictionary("Functions", "Headers/MontecarloForFit.h");
-
+gRandom->SetSeed(5);
 //CREATE AN ISTOGRAM TO SAVE THE QUANTITIES OF THE MONTECARLO
 TH1* hmix = new TH1I("h1", "Annihilation on trap walls : (N_{fit} - N_{gen})/#sigma",30, -6,6);
 TH1* huw =  new TH1I("h2", "Residual Gas : (N_{fit} - N_{gen})/#sigma",30,-6,6);
-TH1* hbk =  new TH1I("h3", "Cosmic Events : (N_{fit} - N_{gen})/#sigma",30,-6,6);
+TH1* hbk =  new TH1I("h3", "Cosmic Background : (N_{fit} - N_{gen})/#sigma",30,-6,6);
 TH1* hchisq = new TH1I("hchisq", "chiquadro", 30, 0, 50);
 
 RooRealVar x("x","r [cm]",0.,4.);
@@ -94,54 +94,52 @@ hbk->Fit("gaus");
 
 auto legend = new TLegend(0.1,0.7,0.48,0.9);
 legend->SetHeader("PDF Composition","C"); // option "C" allows to center the header
-TString coeffMix = TString::Format("annihi. events on walls: %.1f", conf.a*conf.N);
-TString coeffUw = TString::Format("annihi. residual gas: = %.1f", conf.b*conf.N);
-TString coeffbk = TString::Format("cosmic events = %.1f", conf.Ncosmic);
+TString coeffMix = TString::Format("events on walls: %d", static_cast<int>(conf.a*conf.N));
+TString coeffUw = TString::Format("events res. gas: = %d", static_cast<int>(conf.b*conf.N));
+TString coeffbk = TString::Format("cosmics = %.1f", conf.Ncosmic);
 legend->AddEntry(hmix,coeffMix);
 legend->AddEntry(hmix,coeffUw);
 legend->AddEntry(hmix,coeffbk);
-auto legend1 = new TLegend(0.1,0.7,0.48,0.9);
-legend1->SetHeader("PDF Composition","C"); // option "C" allows to center the header
-legend1->AddEntry(huw,coeffMix);
-legend1->AddEntry(huw,coeffUw);
-legend1->AddEntry(huw,coeffbk);
-auto legend2 = new TLegend(0.1,0.7,0.48,0.9);
-legend2->SetHeader("PDF Composition","C"); // option "C" allows to center the header
-legend2->AddEntry(hbk,coeffMix);
-legend2->AddEntry(hbk,coeffUw);
-legend2->AddEntry(hbk,coeffbk);
+legend->SetTextSize(.028);
 
-gStyle->SetTitleSize(0.1,"t");
+// LAYOUT OF THE PLOTS
 gStyle->SetOptStat(0);
 gStyle->SetOptFit(1);
-
-auto canvas4 = new TCanvas("d4", "Toy Result", 1000,550);
-auto pad = new TPad("pad", "pad",0,0,1,1);
-pad->Divide(3,1,0.,0.);
-pad->Draw();
-pad->cd(1);
+gStyle->SetFitFormat("2.3g");
+// hmix layout
+hmix->SetTitleSize(0.1,"t");
 hmix->SetLineColor(1);
 hmix->SetLineWidth(2);
-hmix->SetAxisRange(0.,hmix->GetMaximum() + 20,"Y");
+hmix->SetAxisRange(0.,hmix->GetMaximum() + 40,"Y");
 auto function0 = hmix->GetFunction("gaus");
 function0->SetLineStyle(9);
-//hmix->SetLineStyle(9);
+// huw layout
+huw->SetTitleSize(0.1,"t");
+huw->SetLineColor(1);
+huw->SetLineWidth(2);
+huw->SetAxisRange(0., huw->GetMaximum() + 40,"Y");
+auto function1 = huw->GetFunction("gaus");
+function1->SetLineStyle(9);
+// hbk layout
+hbk->SetTitleSize(0.1,"t");
+hbk->SetLineColor(1);
+hbk->SetLineWidth(2);
+hbk->SetAxisRange(0., hbk->GetMaximum() + 40,"Y");
+auto function2 = hbk->GetFunction("gaus");
+function2->SetLineStyle(9);
+
+// Plot the Result
+auto canvas4 = new TCanvas("d4", "Toy Result", 1500,800);
+auto pad = new TPad("pad", "pad",0,0,1,1);
+
+pad->Divide(3,1,0.01,0.01);
+pad->Draw();
+pad->cd(1);
 hmix->Draw();
 legend->Draw();
 pad->cd(2);
-huw->SetLineColor(1);
-huw->SetLineWidth(2);
-huw->SetAxisRange(0., huw->GetMaximum() + 20,"Y");
-auto function1 = huw->GetFunction("gaus");
-function1->SetLineStyle(9);
 huw->Draw();
-//legend->Draw();
 pad->cd(3);
-hbk->SetLineColor(1);
-hbk->SetLineWidth(2);
-hbk->SetAxisRange(0., hbk->GetMaximum() + 20,"Y");
-auto function2 = hbk->GetFunction("gaus");
-function2->SetLineStyle(9);
 hbk->Draw();
 
 TString percorso = TString::Format("PlotMLEfit/N%d/", conf.N);
@@ -152,12 +150,12 @@ auto canvas5 = new TCanvas("d5","Chi square distribution",800,800);
 hchisq->SetLineWidth(2);
 hchisq->Draw();
 
-/*
+
 auto canvas6 = new TCanvas("d6", "Toy Result", 1000,700);
 auto pad1 = new TPad("pad", "pad",0,0,1,1);
 gStyle->SetOptStat(1);
 gStyle->SetOptFit(1);
-pad1->Divide(2,1,0.,0.);
+pad1->Divide(2,1,0.01,0.01);
 pad1->Draw();
 pad1->cd(1);
 hmix->SetLineColor(1);
@@ -169,9 +167,9 @@ hbk->SetLineColor(1);
 hbk->SetLineWidth(2);
 hbk->Draw();
 
-TString nameFile1 = TString::Format("ToyNmixNbk_with_bkFixed(%d,%d,%d).pdf",static_cast<int>(a*100),static_cast<int>(b*100),static_cast<int>(c*100));
+TString nameFile1 = TString::Format("Reconstruced_(%d,%d).pdf",static_cast<int>(conf.a*conf.N),static_cast<int>(conf.b*conf.N));
 canvas6->SaveAs(percorso + nameFile1);
-*/
+
 }
 
 

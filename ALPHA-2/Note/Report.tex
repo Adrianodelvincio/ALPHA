@@ -105,11 +105,9 @@ The Normalized Pdfs are plotted together in figure \ref{fig:PdfsNormalized}
 \begin{figure}[!hbtp]
 \centering
 \subfloat[][\emph{Normalized radius distributions.}\label{fig:PdfsNormalized}]{
-	\includegraphics[width = .49\textwidth]{../PlotMLEfit/PdfTogether.pdf}
-}
+	\includegraphics[width = .45\textwidth]{../PlotMLEfit/PdfTogether.pdf}}
 \subfloat[][\emph{Radial density Pdfs.}\label{fig:RadialDensity}]{
-	\includegraphics[width = .49\textwidth]{../PlotMLEfit/RadialDensity.pdf}
-}
+	\includegraphics[width = .45\textwidth]{../PlotMLEfit/RadialDensity.pdf}}
 \end{figure}
 
 To correct for the different area corresponding to each bin, the values of each bin are divided by $ 2 \pi r$. The result are shown in figure :(\ref{fig:RadialDensity}). As we can see in this picture the annihilation due to residual gas shows a peak at $r \simeq 0$, while the annihilations on trap walls (that are indicated with the label \textit{mixing}) are distributed around $\simeq \SI{2}{ \centi \meter} - \SI{2.5}{\centi \meter}$. In the end the cosmic background seems to be uniform distributed in the range $\SI{0}{\centi \meter} - \SI{4}{\centi \meter}$.
@@ -127,7 +125,23 @@ Model \quad = \quad &N_{wall} \cdot PDF_{wall} \\
 
 where $N_{wall}$, $N_ {res \; gas}$ and $N_{cosmic}$ are the number of annihilation on traps walls, due to residual gas and cosmic events, respectively.
 The free parameters of this global model are only $N_{wall}$ and $N_{res \; gas}$. When using this model, $N_{cosmic}$ is a constant parameter, adjusted to the expected number of cosmic events of the particular run which is analysed.
-We have tested this model with an ad-hoc Monte Carlo simulation. The objective of the simulation is to asses whether a maximum likelihood fit with the model in equation \ref{eq:GlobalModel} is able to recover the values of $N_{wall}$ and $N_{res \; gas}$ from the simulated data and the accuracy of this method.
+We have tested this model with an ad-hoc Monte Carlo simulation. The objective of the simulation is to asses whether a maximum likelihood fit with the model in equation \ref{eq:GlobalModel} is able to recover the values of $N_{wall}$ and $N_{res \; gas}$ from the simulated data, and also determine the accuracy of this method. 
+We have generated data following the model in eq. \ref{eq:GlobalModel}, with the total number of events sampled by a poisson distribution with mean $N_{tot \, exp} = 1000$ (to account for the statistical fluctuation in the number of event). The expected number of annihilations on walls and residual gas is $N_{wall} , N_{res \, gas} = (500,500)$ . The expected value of $N_{cosmic}$ is fixed to $10.2$ events. \footnote{ This value is chosen as the expected number of cosmic events for the run ...}.
+The data are fitted with the same model used for the generation, with the only free parameters $N_{wall} , N_{res \, gas}$. This procedure is repeated for $N_{trial} = 1000$ times. For each individual trial we compute the quantity:
+\begin{equation} \label{eq:ParmasReco}
+\dfrac{N_{fit} - N_{gen}}{\sigma}
+\end{equation}
+
+That is the difference between the expected number of event used in the generation and the value retrieved from the fit, weighted with the error on the parameter given by the fit.  These quantities are shown in figure \ref{fig:ReconstructedParameters}
+
+\begin{figure}[hbtp]
+\centering
+\includegraphics[width = \textwidth]{../PlotMLEfit/N1000/Reconstruced_(500,500).pdf}
+\caption{Weighted difference between the reconstructed parameters and the values used in the data generation as defined in equation \ref{eq:ParmasReco}.}
+\label{fig:ReconstructedParameters}
+\end{figure}
+
+
 
 \appendix
 \section{Derivation of the Rayleigh Distribution}
