@@ -5,12 +5,10 @@
 #include "RooHistPdf.h"
 using namespace RooFit;
 
-void AnalysisMLE(){
-
+void TemplateMLE(){
 // DATA TO FIT
-TString cartella = TString::Format("Dataset/");
-TString filename = TString::Format("r68465_uw_exp_freq5.vertex");
-
+TString cartella = TString::Format("DataSetROOT/");
+TString filename = TString::Format("r68465_f4");
 //MIXING
 ROOT::RDataFrame mix_rdf("myTree", {"DataSetROOT/r68814_mixing.vertex.root",
 		"DataSetROOT/r68839_mixing.vertex.root",
@@ -32,11 +30,6 @@ x.setBins(30);
 RooDataHist mix_h("dh0", "dh0", x, Import(*histMix));
 RooPlot *frame1 = x.frame(Title("Mixing PDF"));
 RooHistPdf PdfMixing("mixingpdf", "mixingpdf", x, mix_h, 0);
-mix_h.plotOn(frame1);
-PdfMixing.plotOn(frame1);
-
-auto canvas0 = new TCanvas("d0", "d0", 800,800);
-frame1->Draw();
 
 // UWLOSSES
 ROOT::RDataFrame uw_rdf("myTree",{"DataSetROOT/r68814_uwlosses_160.vertex.root",
@@ -62,12 +55,11 @@ Uw_h.plotOn(frame2);
 PdfUwlosses.plotOn(frame2);
 
 // FIT THE DATA WITH A RAYLEIGH
-
 RooRealVar sigRay("sigRay", "sigma", 1.722);
 RooRealVar sigRay2("sigRay", "sigma", 1.722,0,100);
 RooGenericPdf Rayleigh("line", "linear model", " TMath::Abs(x/(sigRay*sigRay) * TMath::Exp(-(x*x)/(2*sigRay*sigRay)))", RooArgSet(x,sigRay));
-//RUN THE FIRST TIME FOR THE PARAMETERS OF THE RAYLEIGH
 
+//RUN THE FIRST TIME FOR THE PARAMETERS OF THE RAYLEIGH
 RooGenericPdf Rayleigh2("line", "linear model", " TMath::Abs(x/(sigRay*sigRay) * TMath::Exp(-(x*x)/(2*sigRay*sigRay)))", RooArgSet(x,sigRay2));
 Rayleigh2.fitTo(Uw_h); // FIT
 Rayleigh2.plotOn(frame2, LineColor(kRed));
@@ -75,12 +67,10 @@ Double_t chi2ray = frame2->chiSquare();
 std::cout << "chi square rayleigh: " << frame2->chiSquare() << std::endl; 
 TString chis2ray = TString::Format("#chi^{2} = %.1f ndof %d", chi2ray*27,27);
 Rayleigh2.paramOn(frame2,Label(chis2ray));
-
 auto canvas1 = new TCanvas("d1", "d1",800,800);
 frame2->Draw();
 
 //COSMIC
-
 ROOT::RDataFrame cosmic_rdf("myTree",{"DataSetROOT/r68949_cosmics.vertex.root",
 	"DataSetROOT/r69177_cosmics.vertex.root",
 	"DataSetROOT/r69207_cosmics.vertex.root",
@@ -111,11 +101,8 @@ line_pdf.plotOn(frame3, LineColor(kRed));
 auto canvas3 = new TCanvas("d2","d2",800,800);
 frame3->Draw();
 
-
-// PRINT ALL THE PDF TOGHETHER IN THE SAME CANVAS
-
-auto canvasPdf = new TCanvas("p0", "PDF normalized", 800, 800);
-RooPlot *allpdf = x.frame(Title("All Pdf"));
+// PRINT ALL THE NORMALIZED DISTRIBUTIONS TOGHETHER IN THE SAME CANVAS
+RooPlot *allpdf = x.frame(Title("Normalized Distributions"));
 
 PdfBk.plotOn(allpdf, LineColor(kBlue), Name("Cosmic"));
 PdfMixing.plotOn(allpdf, LineColor(kRed), Name("Mixing"));
@@ -125,16 +112,46 @@ PdfUwlosses.plotOn(allpdf, LineColor(kGreen), Name("Gas"));
 TLegend *leg1 = new TLegend(0.65,0.73,0.86,0.87);
 leg1->SetFillColor(kWhite);
 leg1->SetLineColor(kWhite);
-leg1->AddEntry(allpdf->findObject("Cosmic"), "Cosmic Template", "LP");
-leg1->AddEntry(allpdf->findObject("Mixing"), "Mixing Template", "LP");
-leg1->AddEntry(allpdf->findObject("Gas"), "Gas Template","LP");
+leg1->AddEntry(allpdf->findObject("Cosmic"), "Cosmic Distribution", "LP");
+leg1->AddEntry(allpdf->findObject("Mixing"), "Annihi. on Walls Distribution", "LP");
+leg1->AddEntry(allpdf->findObject("Gas"), "Residual Gas Annihi. Distribution","LP");
+allpdf->SetYTitle("");
+
+auto canvasPdf = new TCanvas("p0", "PDF normalized", 800, 800);
 allpdf->Draw();
 leg1->Draw();
 
+histCosmic->Scale(1/histCosmic->Integral());
+histUw->Scale(1/histUw->Integral());
+histMix->Scale(1/histMix->Integral());
+auto canvasPdf2 = new TCanvas("p1", "PDF radial density", 800,800);
+
+for(int i = 1; i <= histCosmic->GetNbinsX(); i++){
+	double radius = histCosmic->GetBinCenter(i);
+	histCosmic->SetBinContent(i, histCosmic->GetBinContent(i)/(2*TMath::Pi()*radius));
+	histUw->SetBinContent(i, histUw->GetBinContent(i)/(2*TMath::Pi()*radius));
+	histMix->SetBinContent(i, histMix->GetBinContent(i)/(2*TMath::Pi()*radius));
+}
+
+gStyle->SetOptStat(0);
+histUw->SetTitle("Radial Density Distributions");
+histUw->SetXTitle("Radius r [cm]");
+histUw->SetYTitle("Counts cm^{-1}");
+histUw->SetLineColor(3);
+histUw->SetLineWidth(3);
+histUw->DrawClone("HIST");
+histCosmic->SetLineColor(4);
+histCosmic->SetLineWidth(3);
+histCosmic->DrawClone("HISTsame");
+histMix->SetLineColor(2);
+histMix->SetLineWidth(3);
+histMix->DrawClone("histsame");
+//canvasPdf2->SaveAs("PlotMLEfit/RadialDensity.pdf");
+
 // DATA FOR THE FIT f
-TString formato = TString::Format(".csv");
-auto f4_rdf = ROOT::RDF::FromCSV(cartella + filename + formato);
-auto displ = f4_rdf.Display({"CutsType0","CutsType1","CutsType2", "X", "Y", "Z"}, 5);
+TString formato = TString::Format(".root");
+ROOT::RDataFrame  f4_rdf("myTree",{cartella + filename + formato});
+auto displ = f4_rdf.Display({"CutsType1","CutsType2", "X", "Y", "Z"}, 5);
     displ->Print();
 
 auto f4_2_rdf = f4_rdf.Define("Radius", "TMath::Sqrt(X*X + Y*Y)").Filter("CutsType1 ==  \" 1\"");
@@ -163,42 +180,4 @@ auto canvas4 = new TCanvas("d4","d4", 800, 800);
 std::cout << "chi^2 = " << frame4->chiSquare() << std::endl;
 frame4->Draw();
 
-// FIT WITH COSMIC FIXED
-RooRealVar Nmix_f("Nmix", "Nmix", 0., 200);
-RooRealVar Nuw_f("Ngas", "Ngas", -100, 100);
-RooRealVar Nbk_f("Ncosmic", "Ncosmic", 10,10);
-RooPlot *frame5 = x.frame(Title("Fit, Cosmic Fixed"));
-RooAddPdf model_bkfixed("model","model", RooArgList{PdfMixing,PdfUwlosses,PdfBk}, RooArgList{Nmix_f, Nuw_f, Nbk_f} );
-model_bkfixed.fitTo(f4_h,PrintLevel(-1)); // FIT
-f4_h.plotOn(frame5);
-model_bkfixed.plotOn(frame5, LineColor(kBlue));
-
-// Print the chisquare on the plot
-Double_t chi2_bkfixed = frame5->chiSquare();
-TString chis2Line_fixed = TString::Format("#chi^{2} = %f ", chi2_bkfixed);
-model_bkfixed.paramOn(frame5, Label(chis2Line_fixed));
-
-auto canvas6 = new TCanvas("d6"," Cosmic Fixed", 800, 800);
-// Calculate the Chisquare
-std::cout << "chi^2 bk fixed = " << frame5->chiSquare() << std::endl;
-frame5->Draw();
-
-// FIT WITH ONLY MIXING + COSMIC(FIXED)
-
-RooRealVar Nmix_f2("Nmix", "Nmix", 0., 200);
-RooPlot *frame6 = x.frame(Title("Fit, MIxing only"));
-RooAddPdf model_onlyMix("model","model", RooArgList{PdfMixing,PdfBk}, RooArgList{Nmix_f2, Nbk_f} );
-model_onlyMix.fitTo(f4_h,PrintLevel(-1)); // FIT
-f4_h.plotOn(frame6);
-model_onlyMix.plotOn(frame6, LineColor(kGreen));
-
-// Print the chisquare on the plot
-Double_t chi2_onlyMix = frame6->chiSquare();
-TString chis2Line_onlyMix = TString::Format("#chi^{2} = %f ", chi2_onlyMix);
-model_onlyMix.paramOn(frame6, Label(chis2Line_onlyMix));
-
-auto canvas7 = new TCanvas("d7"," Only Mix", 800, 800);
-// Calculate the Chisquare
-std::cout << "chi^2 only mix = " << frame6->chiSquare() << std::endl;
-frame6->Draw();
 }

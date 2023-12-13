@@ -101,13 +101,13 @@ rate = \frac{1786}{\SI{35000}{\second}} = \SI{0.051}{\second \tothe{-1}}
 
 \subsection{Normalized Pdfs}
 
-The Normalized Pdfs are plotted together in figure \ref{fig:PdfsNormalized}
+The Normalized Pdfs are plotted together in figure \ref{fig:PdfsNormalized}:
 \begin{figure}[!hbtp]
 \centering
 \subfloat[][\emph{Normalized radius distributions.}\label{fig:PdfsNormalized}]{
 	\includegraphics[width = .45\textwidth]{../PlotMLEfit/PdfTogether.pdf}}
 \subfloat[][\emph{Radial density Pdfs.}\label{fig:RadialDensity}]{
-	\includegraphics[width = .45\textwidth]{../PlotMLEfit/RadialDensity.pdf}}
+	\includegraphics[width = .44\textwidth]{../PlotMLEfit/RadialDensity.pdf}}
 \end{figure}
 
 To correct for the different area corresponding to each bin, the values of each bin are divided by $ 2 \pi r$. The result are shown in figure :(\ref{fig:RadialDensity}). As we can see in this picture the annihilation due to residual gas shows a peak at $r \simeq 0$, while the annihilations on trap walls (that are indicated with the label \textit{mixing}) are distributed around $\simeq \SI{2}{ \centi \meter} - \SI{2.5}{\centi \meter}$. In the end the cosmic background seems to be uniform distributed in the range $\SI{0}{\centi \meter} - \SI{4}{\centi \meter}$.
@@ -132,16 +132,16 @@ The data are fitted with the same model used for the generation, with the only f
 \dfrac{N_{fit} - N_{gen}}{\sigma}
 \end{equation}
 
-That is the difference between the expected number of event used in the generation and the value retrieved from the fit, weighted with the error on the parameter given by the fit.  These quantities are shown in figure \ref{fig:ReconstructedParameters}
+That is the difference between the expected number of event used in the generation and the value retrieved from the fit, weighted with the error on the parameter given by the fit. In figure \ref{fig:ReconstructedParameters} we report the result obtained for $1000$ trials: 
 
 \begin{figure}[hbtp]
 \centering
 \includegraphics[width = \textwidth]{../PlotMLEfit/N1000/Reconstruced_(500,500).pdf}
-\caption{Weighted difference between the reconstructed parameters and the values used in the data generation as defined in equation \ref{eq:ParmasReco}.}
+\caption{Weighted difference between the reconstructed parameters and the values used in the data generation as defined in equation \ref{eq:ParmasReco}. The red dotted line is a Gaussian fit to the histogram.}
 \label{fig:ReconstructedParameters}
 \end{figure}
 
-
+The outcome reveals no discernible evidence of bias in the fitting procedure employed (the distribution mean is compatible with $0$, and a $\sigma = 1$).
 
 \appendix
 \section{Derivation of the Rayleigh Distribution}

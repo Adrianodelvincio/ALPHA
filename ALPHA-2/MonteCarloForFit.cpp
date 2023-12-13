@@ -10,12 +10,10 @@ using namespace RooFit;
 
 void MonteCarloForFit( TString ConfFile = "configToyModel.txt"){
 
-ReadConfFile conf(ConfFile);
-conf.Print();
+ReadConfFile conf(ConfFile);	// Rad the configuartion file of the program
+conf.Print();					// Print the Parameters of the Simulation
+gRandom->SetSeed(6); 			// Define a seed
 
-//Generate dictionary
-gInterpreter->GenerateDictionary("Functions", "Headers/MontecarloForFit.h");
-gRandom->SetSeed(5);
 //CREATE AN ISTOGRAM TO SAVE THE QUANTITIES OF THE MONTECARLO
 TH1* hmix = new TH1I("h1", "Annihilation on trap walls : (N_{fit} - N_{gen})/#sigma",30, -6,6);
 TH1* huw =  new TH1I("h2", "Residual Gas : (N_{fit} - N_{gen})/#sigma",30,-6,6);
@@ -25,7 +23,7 @@ TH1* hchisq = new TH1I("hchisq", "chiquadro", 30, 0, 50);
 RooRealVar x("x","r [cm]",0.,4.);
 x.setBins(30);
 
-//MIXING analytic model
+// ANNIHILATION ON WALL PDF
 RooRealVar mu("mu", "mu", conf.mu);
 RooRealVar sigMix("sigMix", "sigMix", conf.sigWall);
 RooGaussian gauss_Mix("gauss", "gauss", x, mu, sigMix);
@@ -100,7 +98,7 @@ TString coeffbk = TString::Format("cosmics = %.1f", conf.Ncosmic);
 legend->AddEntry(hmix,coeffMix);
 legend->AddEntry(hmix,coeffUw);
 legend->AddEntry(hmix,coeffbk);
-legend->SetTextSize(.028);
+legend->SetTextSize(.026);
 
 // LAYOUT OF THE PLOTS
 gStyle->SetOptStat(0);
@@ -121,7 +119,7 @@ huw->SetAxisRange(0., huw->GetMaximum() + 40,"Y");
 auto function1 = huw->GetFunction("gaus");
 function1->SetLineStyle(9);
 // hbk layout
-hbk->SetTitleSize(0.1,"t");
+hbk->SetTitleSize(0.95,"t");
 hbk->SetLineColor(1);
 hbk->SetLineWidth(2);
 hbk->SetAxisRange(0., hbk->GetMaximum() + 40,"Y");
@@ -140,6 +138,7 @@ legend->Draw();
 pad->cd(2);
 huw->Draw();
 pad->cd(3);
+hbk->SetTitleSize(0.1,"t");
 hbk->Draw();
 
 TString percorso = TString::Format("PlotMLEfit/N%d/", conf.N);
