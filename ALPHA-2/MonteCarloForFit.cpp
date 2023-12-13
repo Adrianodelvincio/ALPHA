@@ -162,9 +162,9 @@ hmix->SetLineWidth(2);
 hmix->Draw();
 legend->Draw();
 pad1->cd(2);
-hbk->SetLineColor(1);
-hbk->SetLineWidth(2);
-hbk->Draw();
+huw->SetLineColor(1);
+huw->SetLineWidth(2);
+huw->Draw();
 
 TString nameFile1 = TString::Format("Reconstruced_(%d,%d).pdf",static_cast<int>(conf.a*conf.N),static_cast<int>(conf.b*conf.N));
 canvas6->SaveAs(percorso + nameFile1);
