@@ -283,7 +283,7 @@ sumNeighbors ($ N = 3 $) & $-0.47$  & $7.85$  & $+0.115$   & $11.66$ \\
 \end{table}
 \end{frame}
 
-\begin{frame}{Results for $\mu_{cosmic} = 0.046$, $\epsilon = 0.775$ simulated data}
+\begin{frame}{Results for point 1 :$\mu_{cosmic} = 0.046$, $\epsilon = 0.775$}
 
 \begin{table}
 \center
@@ -295,7 +295,7 @@ algorithms & $\mu$ $[\SI{}{\kilo \hertz}]$
 		   & $\mu$ $[\SI{}{\kilo \hertz}]$
 		   & $\sigma$ $[\SI{}{\kilo \hertz}]$ \\ 
 \hline
-\textit{PassCut} data 						 	  &  \multicolumn{2}{c}{\color{blue}{without cosmic background}}     & \multicolumn{3}{c}{\color{blue}{with cosmic background}}  \\
+\textit{Point 1} data 						 	  &  \multicolumn{2}{c}{\color{blue}{without cosmic background}}     & \multicolumn{3}{c}{\color{blue}{with cosmic background}}  \\
 \hline
 2017 ($ > 0 ; > 1$ )          & $-0.045$  & $9.97$   & $-0.03$ & $13.68$\\ 
 
@@ -325,8 +325,87 @@ sumNeighbors ($ N = 3 $) & $+0.37$  & $8.177$  & $+0.175$   & $10.86$ \\
 \end{frame}
 
 
+\begin{frame}{Results for point 2 :$\mu_{cosmic} = 0.01$, $\epsilon = 0.638$}
 
+\begin{table}
+\center
+\resizebox{\textwidth}{!}{
+\begin{tabular}{l|l l l l l}
+\hline 
+algorithms & $\mu$ $[\SI{}{\kilo \hertz}]$  
+		   & $\sigma$  $[\SI{}{\kilo \hertz}]$
+		   & $\mu$ $[\SI{}{\kilo \hertz}]$
+		   & $\sigma$ $[\SI{}{\kilo \hertz}]$ \\ 
+\hline
+\textit{Point 2} data 						 	  &  \multicolumn{2}{c}{\color{blue}{without cosmic background}}     & \multicolumn{3}{c}{\color{blue}{with cosmic background}}  \\
+\hline
+2017 ($ > 0 ; > 1$ )          & $-0.35$  & $11.21$   & $-0.35$ & $11.21$\\ 
 
+2017 reversed ($ < 3; < 2$)   & $+0.03$ & $8.19$   & $+0.03$  & $8.196$\\ 
+
+threshold ($ > 1$)            & $-0.26$ & $12.69$  & $-0.26$ & $12.69$\\ 
+
+threshold ($ > 2$)            & $-0.05$  & $10.28$  & $-0.05$  & $10.28$\\ 
+
+threshold ($ > 3$)            & $+0.155$   & $7.93$  & $+0.155$  & $7.93$ \\
+
+const. fraction ($ p = 10 \% $) & $-0.365$  & $12.75$ & $-0.365$   & $12.75$\\ 
+ 
+const. fraction ($ p = 20 \% $) & $-0.005$ & $9.74$  & $-0.005$   & $9.74$\\ 
+
+const. fraction ($ p = 30 \% $) & $+0.075$  & $7.725$  & $+0.075$   & $7.725$ \\
+
+sumNeighbors ($ N = 1 $) & $-0.04$  & $10.67$  & $-0.04$   & $10.67$ \\
+
+sumNeighbors ($ N = 2 $) & $-0.015$  & $11.06$  & $-0.015$   & $11.06$ \\
+
+sumNeighbors ($ N = 3 $) & $$  & $$  & $$   & $$ \\
+\hline
+\end{tabular}}
+\caption{ Result of the simulation for $N_{trials} = 1000$. In the first two column the cosmic background is removed from the data. The last two columns contains the result of the simulation adding the cosmic background. The $\mu$ and $\sigma$ are the quantities computed from the distribution of $(onset_{2} - onset_{1}) - MC_{truth}$.}
+\end{table}
+\end{frame}
+
+\begin{frame}{Results for point 2 :$\mu_{cosmic} = 0.23$, $\epsilon = 0.86$}
+
+\begin{table}
+\center
+\resizebox{\textwidth}{!}{
+\begin{tabular}{l|l l l l l}
+\hline 
+algorithms & $\mu$ $[\SI{}{\kilo \hertz}]$  
+		   & $\sigma$  $[\SI{}{\kilo \hertz}]$
+		   & $\mu$ $[\SI{}{\kilo \hertz}]$
+		   & $\sigma$ $[\SI{}{\kilo \hertz}]$ \\ 
+\hline
+\textit{Point 3} data 						 	  &  \multicolumn{2}{c}{\color{blue}{without cosmic background}}     & \multicolumn{3}{c}{\color{blue}{with cosmic background}}  \\
+\hline
+2017 ($ > 0 ; > 1$ )          & $-0.04$  & \textcolor{red}{$10.47$}   & $+0.31$ & \textcolor{red}{$10.2$}\\ 
+
+2017 reversed ($ < 3; < 2$)   & $+0.15$ & $8.51$   & $-0.7731$  & $13.45$\\ 
+
+threshold ($ > 1$)            & $+0.295$ & \textcolor{red}{$11.18$}  & $-0.24$ & \textcolor{red}{$8.06$}\\ 
+
+threshold ($ > 2$)            & $+0.42$  & $10.08$  & $+0.16$  & $13.92$\\ 
+
+threshold ($ > 3$)            & $+0.455$   & $8.026$  & $+0.165$  & $18.73$ \\
+
+const. fraction ($ p = 10 \% $) & $+0.18$  & $11.81$ & $+0.125$   & $13.19$\\ 
+ 
+const. fraction ($ p = 20 \% $) & $+0.08$ & $8.23$  & $-1.12$   & $20.4$\\ 
+
+const. fraction ($ p = 30 \% $) & $-0.185$  & $6.26$  & $-0.125$   & $14.59$ \\
+
+sumNeighbors ($ N = 1 $) & $+0.005$  & $6.00$  & $+0.19$   & $14.75$ \\
+
+sumNeighbors ($ N = 2 $) & $-0.115$  & $4.77$  & $+0.265$   & $13.39$ \\
+
+sumNeighbors ($ N = 3 $) & $-0.1$  & $4.43$  & $-0.31$   & $10.16$ \\
+\hline
+\end{tabular}}
+\caption{ Result of the simulation for $N_{trials} = 1000$. In the first two column the cosmic background is removed from the data. The last two columns contains the result of the simulation adding the cosmic background. The $\mu$ and $\sigma$ are the quantities computed from the distribution of $(onset_{2} - onset_{1}) - MC_{truth}$.}
+\end{table}
+\end{frame}
 
 \begin{frame}{ \textit{PassCut} plots}
 

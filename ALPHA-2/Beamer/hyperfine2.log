@@ -1,4 +1,4 @@
-This is LuaHBTeX, Version 1.14.0 (TeX Live 2022/dev/Debian)  (format=lualatex 2023.5.31)  14 DEC 2023 17:33
+This is LuaHBTeX, Version 1.14.0 (TeX Live 2022/dev/Debian)  (format=lualatex 2023.5.31)  14 DEC 2023 21:04
  restricted system commands enabled.
 **hyperfine2.tex
 (./hyperfine2.tex
@@ -1180,67 +1180,71 @@ LaTeX Font Info:    Font shape `TU/lmss/m/it' in size <7> not available
 
 ] [17
 
+] [18
+
+] [19
+
 ]
-<../LineShape/Plot/delta_2017_foward.pdf, id=709, 569.12625pt x 388.45125pt>
+<../LineShape/Plot/delta_2017_foward.pdf, id=724, 569.12625pt x 388.45125pt>
 File: ../LineShape/Plot/delta_2017_foward.pdf Graphic file (type pdf)
 <use ../LineShape/Plot/delta_2017_foward.pdf>
 Package luatex.def Info: ../LineShape/Plot/delta_2017_foward.pdf  used on input
- line 348.
+ line 427.
 (luatex.def)             Requested size: 104.45966pt x 71.29333pt.
-<../LineShape/Plot/delta_2017_reversed.pdf, id=710, 569.12625pt x 388.45125pt>
+<../LineShape/Plot/delta_2017_reversed.pdf, id=725, 569.12625pt x 388.45125pt>
 File: ../LineShape/Plot/delta_2017_reversed.pdf Graphic file (type pdf)
 <use ../LineShape/Plot/delta_2017_reversed.pdf>
 Package luatex.def Info: ../LineShape/Plot/delta_2017_reversed.pdf  used on inp
-ut line 348.
+ut line 427.
 (luatex.def)             Requested size: 104.45966pt x 71.29333pt.
-<../LineShape/Plot/delta_Threshold_2.pdf, id=711, 569.12625pt x 388.45125pt>
+<../LineShape/Plot/delta_Threshold_2.pdf, id=726, 569.12625pt x 388.45125pt>
 File: ../LineShape/Plot/delta_Threshold_2.pdf Graphic file (type pdf)
 <use ../LineShape/Plot/delta_Threshold_2.pdf>
 Package luatex.def Info: ../LineShape/Plot/delta_Threshold_2.pdf  used on input
- line 348.
+ line 427.
 (luatex.def)             Requested size: 104.45966pt x 71.29333pt.
-<../LineShape/Plot/delta_Threshold_3.pdf, id=712, 569.12625pt x 388.45125pt>
+<../LineShape/Plot/delta_Threshold_3.pdf, id=727, 569.12625pt x 388.45125pt>
 File: ../LineShape/Plot/delta_Threshold_3.pdf Graphic file (type pdf)
 <use ../LineShape/Plot/delta_Threshold_3.pdf>
 Package luatex.def Info: ../LineShape/Plot/delta_Threshold_3.pdf  used on input
- line 348.
+ line 427.
 (luatex.def)             Requested size: 104.45966pt x 71.29333pt.
-<../LineShape/Plot/delta_constFract_20.pdf, id=713, 569.12625pt x 388.45125pt>
+<../LineShape/Plot/delta_constFract_20.pdf, id=728, 569.12625pt x 388.45125pt>
 File: ../LineShape/Plot/delta_constFract_20.pdf Graphic file (type pdf)
 <use ../LineShape/Plot/delta_constFract_20.pdf>
 Package luatex.def Info: ../LineShape/Plot/delta_constFract_20.pdf  used on inp
-ut line 348.
+ut line 427.
 (luatex.def)             Requested size: 104.45966pt x 71.29333pt.
-<../LineShape/Plot/delta_constFract_30.pdf, id=714, 569.12625pt x 388.45125pt>
+<../LineShape/Plot/delta_constFract_30.pdf, id=729, 569.12625pt x 388.45125pt>
 File: ../LineShape/Plot/delta_constFract_30.pdf Graphic file (type pdf)
 <use ../LineShape/Plot/delta_constFract_30.pdf>
 Package luatex.def Info: ../LineShape/Plot/delta_constFract_30.pdf  used on inp
-ut line 348.
+ut line 427.
 (luatex.def)             Requested size: 104.45966pt x 71.29333pt.
- [18
+ [20
 
 <../LineShape/Plot/delta_2017_foward.pdf><../LineShape/Plot/delta_2017_reversed.
 pdf><../LineShape/Plot/delta_Threshold_2.pdf><../LineShape/Plot/delta_Threshold_
 3.pdf><../LineShape/Plot/delta_constFract_20.pdf><../LineShape/Plot/delta_constF
 ract_30.pdf>]
-<../LineShape/Plot/delta_sumNeighbors_sigma20.pdf, id=988, 569.12625pt x 388.45
-125pt>
+<../LineShape/Plot/delta_sumNeighbors_sigma20.pdf, id=1002, 569.12625pt x 388.4
+5125pt>
 File: ../LineShape/Plot/delta_sumNeighbors_sigma20.pdf Graphic file (type pdf)
 <use ../LineShape/Plot/delta_sumNeighbors_sigma20.pdf>
 Package luatex.def Info: ../LineShape/Plot/delta_sumNeighbors_sigma20.pdf  used
- on input line 359.
+ on input line 438.
 (luatex.def)             Requested size: 156.68684pt x 106.94592pt.
-<../LineShape/Plot/delta_sumNeighbors_sigma30.pdf, id=989, 569.12625pt x 388.45
-125pt>
+<../LineShape/Plot/delta_sumNeighbors_sigma30.pdf, id=1003, 569.12625pt x 388.4
+5125pt>
 File: ../LineShape/Plot/delta_sumNeighbors_sigma30.pdf Graphic file (type pdf)
 <use ../LineShape/Plot/delta_sumNeighbors_sigma30.pdf>
 Package luatex.def Info: ../LineShape/Plot/delta_sumNeighbors_sigma30.pdf  used
- on input line 359.
+ on input line 438.
 (luatex.def)             Requested size: 156.68684pt x 106.94592pt.
- [19
+ [21
 
 <../LineShape/Plot/delta_sumNeighbors_sigma20.pdf><../LineShape/Plot/delta_sumNe
-ighbors_sigma30.pdf>] [20
+ighbors_sigma30.pdf>] [22
 
 ]
 \tf@nav=\write6
@@ -1258,14 +1262,14 @@ Package rerunfilecheck Info: File `hyperfine2.out' has not changed.
 )
 
 Here is how much of LuaTeX's memory you used:
- 28011 strings out of 477805
+ 28021 strings out of 477805
  100000,953878 words of node,token memory allocated
  3291 words of node memory still in use:
    30 hlist, 9 vlist, 6 rule, 19 disc, 4 local_par, 80 glue, 11 kern, 17 penalty
 , 172 glyph, 75 attribute, 65 glue_spec, 75 attribute_list, 4 write, 20 pdf_colo
 rstack nodes
-   avail lists: 2:1107,3:215,4:265,5:193,6:62,7:4506,8:41,9:618,10:22,11:168
- 47264 multiletter control sequences out of 65536+600000
+   avail lists: 2:1127,3:215,4:265,5:193,6:62,7:4479,8:41,9:618,10:22,11:168
+ 47270 multiletter control sequences out of 65536+600000
  60 fonts using 4555351 bytes
  128i,15n,115p,408b,815s stack positions out of 5000i,500n,10000p,200000b,80000s
 </usr/share/texmf/fonts/opentype/public/lm/lmsans10-oblique.otf></usr/share/texm
@@ -1284,10 +1288,10 @@ ss10.pfb></usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmss8.pfb
 hare/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmsy7.pfb></usr/share/tex
 live/texmf-dist/fonts/type1/public/amsfonts/cm/cmsy8.pfb></usr/share/texlive/tex
 mf-dist/fonts/type1/public/amsfonts/symbols/msam10.pfb>
-Output written on hyperfine2.pdf (20 pages, 1682527 bytes).
+Output written on hyperfine2.pdf (22 pages, 1688887 bytes).
 
-PDF statistics: 1171 PDF objects out of 1200 (max. 8388607)
- 538 compressed objects within 6 object streams
- 41 named destinations out of 1000 (max. 131072)
+PDF statistics: 1186 PDF objects out of 1200 (max. 8388607)
+ 551 compressed objects within 6 object streams
+ 45 named destinations out of 1000 (max. 131072)
  26 words of extra memory for PDF output out of 10000 (max. 100000000)
 
