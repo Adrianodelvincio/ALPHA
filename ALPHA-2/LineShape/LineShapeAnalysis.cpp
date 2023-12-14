@@ -10,11 +10,12 @@ using namespace RooFit;
 void LineShapeAnalysis(TString directory = "linear/",
 					int start = 0,
 					int stop = 999,
-					double mu = 3,
-					double fraction = 0.1,
-					TString ConfFile = "ToyConfiguration.txt"
+					double mu = 3, 		// Threshold coefficient
+					double fraction = 0.1, 	// constant fraction discrimination
+					TString folder = "Plot/"
 					){
-	
+	TString ConfFile = directory + "ToyConfiguration.txt";
+	std::cout << ConfFile << std::endl;
 	gInterpreter->GenerateDictionary("ToyParser","../Headers/ConfigurationParser.h");
 	gInterpreter->GenerateDictionary("ReadFiles", "../Headers/AnalysisLineShape.h");
 	
@@ -28,10 +29,14 @@ void LineShapeAnalysis(TString directory = "linear/",
 	
 	std::vector<std::string> FileList;
 	FileList = getFiles(start,stop, directory);
-	ROOT::RDataFrame rdf("myTree", FileList);
-	auto histF3 = 	rdf.Filter("runNumber == 1")
+	ROOT::RDataFrame rdf("myTree", {FileList[0], FileList[1]});
+	auto hist_ctob = rdf.Filter("runNumber == 1")
 			.Filter("frequence <= 1000")
 			.Filter("type != 2")
+			.Histo1D({"Counts"," c to b",static_cast<int>(SweepStep),startPdf1, startPdf1 + SweepStep*FrequencyStep }, "frequence");
+	auto ctob_withCosmic = rdf.Filter("runNumber == 1")
+			.Filter("frequence <= 1000")
+			//.Filter("type != 2")
 			.Histo1D({"Counts"," c to b",static_cast<int>(SweepStep),startPdf1, startPdf1 + SweepStep*FrequencyStep }, "frequence");
 	auto histF4 = 	rdf.Filter("runNumber == 1")
 			.Filter("frequence >= 1000")
@@ -51,12 +56,12 @@ void LineShapeAnalysis(TString directory = "linear/",
 		ROOT::RDataFrame frame("myTree", {FileList[i], FileList[i+1]});		// Load i-th dataset
 		auto Spectra1 = frame.Filter("runNumber == 1")
 							 .Filter("frequence <= 1000")
-							 //.Filter("type != 2")
+							 .Filter("type != 2")
 							 .Histo1D({"Counts","Frequence", static_cast<int>(SweepStep),startPdf1, startPdf1 + SweepStep*FrequencyStep }, "frequence");
 		
 		auto Spectra2 = frame.Filter("runNumber == 1")
 							 .Filter("frequence >= 1000")
-							 //.Filter("type != 2")
+							 .Filter("type != 2")
 							 .Histo1D({"Counts","Frequence", static_cast<int>(SweepStep), startPdf2, startPdf2 + SweepStep*FrequencyStep}, "frequence");
 		
 		//auto d = frame.Display({"frequence","random", "type", "radius", "delay"},1); d->Print();
@@ -107,24 +112,28 @@ void LineShapeAnalysis(TString directory = "linear/",
 		
 	}
 
-	//histF3->Scale(1./histF3->Integral(), "width");
-	//histF4->Scale(1./histF4->Integral(), "width");
-	//histF3->Scale(1./(stop));
-	//histF4->Scale(1./(stop));
+	//hist_ctob->Scale(1./hist_ctob->Integral(), "width");
+	//ctob_withCosmic->Scale(1./ctob_withCosmic->Integral(), "width");
+	//hist_ctob->Scale(1./(stop));
+	//ctob_withCosmic->Scale(1./(stop));
 
 	auto b = new TCanvas("b1", "Spectral lines");
 	auto pad = new TPad("pad1", "pad",0,0,1,1);
 	pad->Divide(2,1,0.001,0.001); pad->Draw();
 	pad->cd(1);
-	histF3->SetMarkerStyle(21);
-	histF3->SetMarkerColor(2);
-	histF3->SetLineColor(4);
-	histF3->Draw();
+	hist_ctob->SetTitle("c to b without cosmic events");
+	hist_ctob->SetMarkerStyle(21);
+	hist_ctob->SetMarkerColor(2);
+	hist_ctob->SetLineColor(4);
+	hist_ctob->DrawClone();
+	hist_ctob->DrawClone("SAME P");
 	pad->cd(2);
-	histF4->SetMarkerStyle(21);
-	histF4->SetMarkerColor(2);
-	histF4->SetLineColor(4);
-	histF4->Draw();
+	ctob_withCosmic->SetTitle("c to b with cosmic events");
+	ctob_withCosmic->SetMarkerStyle(21);
+	ctob_withCosmic->SetMarkerColor(2);
+	ctob_withCosmic->SetLineColor(4);
+	ctob_withCosmic->DrawClone();
+	ctob_withCosmic->DrawClone("SAME P");
 	
 	auto h1 = new TH1D("h1","onset_{algorithm} - onset_{true}", 101, -50.5, 50.5);
 	auto h2 = new TH1D("h2","onset_{algorithm} - onset_{true}", 101, -50.5 , 50.5);
@@ -161,7 +170,6 @@ void LineShapeAnalysis(TString directory = "linear/",
 	h3->Draw();
 	TString name = "2017_foward"; TString endname = ".pdf"; 
 	int numero = 0;
-	TString folder = "Plot/";
 	while(!gSystem->AccessPathName(folder + name + endname)){
 		numero += 1;
 		TString add = TString::Format("_%d", numero);

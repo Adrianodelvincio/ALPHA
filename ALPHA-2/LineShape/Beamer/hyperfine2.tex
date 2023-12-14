@@ -114,6 +114,17 @@ For illustration purposes, in this plot we show the simulated distribution (24 s
 \end{frame}
 }
 
+\begin{frame}{Sampled LineShape \textit{c to b} transition}
+
+\begin{figure}[hbtp]
+\centering
+\includegraphics[width = \textwidth]{ExampleOfGeneration.pdf}
+\caption{Plot of the sampled line Shapes, on the right the samples lineshape with cosmic events, on the left the lineshape without cosmic events}
+\end{figure}
+
+
+\end{frame}
+
 \begin{frame}{Parameters of the Simulation}
 
 We have studies the case of the series of run 4b. The parameters of the simulation are:
@@ -221,7 +232,7 @@ Where $N$ is a parameter of the algorithm. This algorithm is directly derived fr
 
 \end{frame}
 
-\begin{frame}{Results}
+\begin{frame}{Results for \textit{Pass Cut} simulated data}
 
 \begin{table}
 \center
@@ -233,11 +244,11 @@ algorithms & $\mu$ $[\SI{}{\kilo \hertz}]$
 		   & $\mu$ $[\SI{}{\kilo \hertz}]$
 		   & $\sigma$ $[\SI{}{\kilo \hertz}]$ \\ 
 \hline
- 						 	  &  \multicolumn{2}{c}{\color{blue}{without cosmic background}}     & \multicolumn{3}{c}{\color{blue}{with cosmic background}}  \\
+\textit{PassCut} data 						 	  &  \multicolumn{2}{c}{\color{blue}{without cosmic background}}     & \multicolumn{3}{c}{\color{blue}{with cosmic background}}  \\
 \hline
 2017 ($ > 0 ; > 1$ )          & $-0.18$  & $9.7$   & $-0.445$ & $14.1$\\ 
 
-2017 reversed ($ < 2; < 1$)   & $+0.13$ & $7.89$   & $+0.25$  & $9.73$\\ 
+2017 reversed ($ < 3; < 2$)   & $+0.13$ & $7.89$   & $+0.25$  & $9.73$\\ 
 
 threshold ($ > 1$)            & $+0.025$ & $11.5$  & $+0.005$ & $16.72$\\ 
 
@@ -262,7 +273,52 @@ sumNeighbors ($ N = 3 $) & $-0.47$  & $7.85$  & $+0.115$   & $11.66$ \\
 \end{table}
 \end{frame}
 
-\begin{frame}
+\begin{frame}{Results for $\mu_{cosmic} = 0.046$, $\epsilon = 0.775$ simulated data}
+
+\begin{table}
+\center
+\resizebox{\textwidth}{!}{
+\begin{tabular}{l|l l l l l}
+\hline 
+algorithms & $\mu$ $[\SI{}{\kilo \hertz}]$  
+		   & $\sigma$  $[\SI{}{\kilo \hertz}]$
+		   & $\mu$ $[\SI{}{\kilo \hertz}]$
+		   & $\sigma$ $[\SI{}{\kilo \hertz}]$ \\ 
+\hline
+\textit{PassCut} data 						 	  &  \multicolumn{2}{c}{\color{blue}{without cosmic background}}     & \multicolumn{3}{c}{\color{blue}{with cosmic background}}  \\
+\hline
+2017 ($ > 0 ; > 1$ )          & $-0.045$  & $9.97$   & $-0.03$ & $13.68$\\ 
+
+2017 reversed ($ < 3; < 2$)   & $-0.01$ & $8.15$   & $-0.3$  & $9.905$\\ 
+
+threshold ($ > 1$)            & $+0.44$ & $11.37$  & $+0.54$ & $14.99$\\ 
+
+threshold ($ > 2$)            & $+0.95$  & $9.96$  & $+0.39$  & $13.00$\\ 
+
+threshold ($ > 3$)            & $+0.23$   & $7.50$  & $-0.17$  & $10.26$ \\
+
+const. fraction ($ p = 10 \% $) & $+0.245$  & $11.71$ & $+0.745$   & $15.57$\\ 
+ 
+const. fraction ($ p = 20 \% $) & $-0.115$ & $8.559$  & $+0.13$   & $11.1$\\ 
+
+const. fraction ($ p = 30 \% $) & $+0.04$  & $6.79$  & $+0.085$   & $7.58$ \\
+
+sumNeighbors ($ N = 1 $) & $+0.535$  & $9.303$  & $+0.25$   & $12.14$ \\
+
+sumNeighbors ($ N = 2 $) & $+0.42$  & $8.915$  & $+0.195$   & $11.89$ \\
+
+sumNeighbors ($ N = 3 $) & $+0.37$  & $8.177$  & $+0.175$   & $10.86$ \\
+\hline
+\end{tabular}}
+\caption{ Result of the simulation for $N_{trials} = 1000$. In the first two column the cosmic background is removed from the data. The last two columns contains the result of the simulation adding the cosmic background. The $\mu$ and $\sigma$ are the quantities computed from the distribution of $(onset_{2} - onset_{1}) - MC_{truth}$.}
+\end{table}
+\end{frame}
+
+
+
+
+
+\begin{frame}{ \textit{PassCut} plots}
 
 \begin{figure}
 \centering
@@ -281,7 +337,8 @@ sumNeighbors ($ N = 3 $) & $-0.47$  & $7.85$  & $+0.115$   & $11.66$ \\
 \end{figure}
 \end{frame}
 
-\begin{frame}
+\begin{frame}{ \textit{PassCut} plots}
+
 \begin{figure}
 \centering
 \subfloat[][\emph{sumNeighbors ($N > 2$)}]

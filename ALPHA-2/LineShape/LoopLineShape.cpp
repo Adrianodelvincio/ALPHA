@@ -26,7 +26,7 @@ ReadConfFile Params(ConfFile);
 Params.Print();
 
 //	Parameters of the Simulation 
-int Ntot = Params.Nstack * Params.NHbar * Params.Efficiency;		// Number of Total Events
+double Ntot = Params.Nstack * Params.NHbar * Params.Efficiency;		// Number of Total Events
 double FrequencyStep = Params.FrequencyStep;				// Kilo hertz
 int SweepStep = Params.SweepStep;					// Number of FrequencyStep
 int BeforeOnset = Params.BinBeforeOnset;

@@ -42,11 +42,12 @@ class ReadConfFile{
 						if (strcmp(sBuffer, "sigma1_da") == 0)		{ sigma1_da = buffer;}
 						if (strcmp(sBuffer, "k0_da") == 0)		{ k0_da = buffer;}
 						if (strcmp(sBuffer, "k1_da") == 0)		{ k1_da = buffer;}
+						if (strcmp(sBuffer, "NHbar") == 0) 		{ NHbar = buffer;}
+						if (strcmp(sBuffer, "Norm_da") == 0)		{ Norm_da = buffer;}
 					} // fill the parameters
 					int IntBuffer;
 					if (sscanf(line.c_str(), "%s = %d", sBuffer, &IntBuffer) == 2) {
 						if (strcmp(sBuffer, "Nstack") == 0) 		{ Nstack = IntBuffer;}
-						if (strcmp(sBuffer, "NHbar") == 0) 		{ NHbar = IntBuffer;}
 						if (strcmp(sBuffer, "Repetition") == 0) 	{ Repetition = IntBuffer;}
 						if (strcmp(sBuffer, "TimeStep") == 0) 		{ TimeStep = IntBuffer;}
 						if (strcmp(sBuffer, "SweepStep") == 0) 		{ SweepStep = IntBuffer;}
@@ -85,15 +86,20 @@ class ReadConfFile{
 			std::cout << "k0_cb	" << k0_cb << std::endl;
 			std::cout << "k1_cb	" << k1_cb << std::endl;
 			std::cout << "Norm_cb	" << Norm_cb << std::endl;
+			std::cout << "sigma0_da	" << sigma0_da << std::endl;
+			std::cout << "sigma1_da	" << sigma1_da << std::endl;
+			std::cout << "k0_da	" << k0_da << std::endl;
+			std::cout << "k1_da	" << k1_da << std::endl;
+			std::cout << "Norm_da	" << Norm_da << std::endl;
 			std::cout << "\n" << std::endl;
 		}
 	int Nstack;
-	int NHbar;
 	int Repetition;
 	int TimeStep;
 	int SweepStep;
 	int BinBeforeOnset;
 	int TotalStep;
+	double NHbar;
 	double FrequencyStep;
 	double x_cb_start;
 	double x_cb_end;

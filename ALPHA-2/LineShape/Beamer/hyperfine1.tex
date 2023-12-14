@@ -75,13 +75,19 @@ We have developed a Monte Carlo Toy that produces two \texttt{.root} dataset fil
 
 \begin{frame}{A brief introduction about the Monte Carlo}
 
-The Annihilation on the walls are generated as function of the frequency, using the two line-shapes of the transitions (c $\rightarrow$ b) and (d $\rightarrow$ a). The Annihilation on the residual gas and the cosmic background are generated uniformly on the frequency spectrum. All the parameters of the simulation are loaded from the \texttt{ToyConfiguration.txt} file. The parameters are chosen to reproduce the runs 4b.
+The Annihilation on the walls are generated as function of the frequency, using the two line-shapes of the transitions (c $\rightarrow$ b) and (d $\rightarrow$ a). The Annihilation on the residual gas and the cosmic background are generated uniformly on the frequency spectrum. The most important parameter of the simulation are listed here:
 
-\begin{figure}[hbtp]
-\centering
-\includegraphics[width = 0.5\textwidth]{MontecarloParams.png}
-\caption{ Parameters of the Toy.}
-\end{figure}
+\begin{itemize}
+\item $N_{stack}$: number of stack for each run.
+\item $NHbar$ : number of $\overline{H}$ per single stack.
+\item $Repetition$: number or time a run is repeated.
+\item $percentage_{\, wall}$: percentage of annihilation on walls ($percentage_{\, res \, gas} = 1 - percentage_{\, wall}$)
+\item $TimeStep$: time interval single frequency step.
+\item $SweepStep$: length of the frequency scan.
+\item $FrequencyStep$: step in frequency during the scan.
+\item $CosmicRate$: expected cosmic rate (in $\SI{}{\second \tothe{-1}}$)
+\end{itemize}
+
 \end{frame}
 
 \begin{frame}{Triangular Line-shape Pdfs}
