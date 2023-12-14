@@ -15,8 +15,8 @@ SweepStep = 24
 TotalStep = 50
 BinBeforeOnset = 3
 # cosmic rate is expressed in event/second, efficiency (point of work of the experiment)
-CosmicRate = 0.23
-Efficiency = 0.86
+CosmicRate = 0.01
+Efficiency = 0.638
 # The following are in kHz units
 x_cb_start = 175
 x_cb_peak = 220

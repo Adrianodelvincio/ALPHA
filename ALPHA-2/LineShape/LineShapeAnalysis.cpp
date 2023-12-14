@@ -56,12 +56,12 @@ void LineShapeAnalysis(TString directory = "linear/",
 		ROOT::RDataFrame frame("myTree", {FileList[i], FileList[i+1]});		// Load i-th dataset
 		auto Spectra1 = frame.Filter("runNumber == 1")
 							 .Filter("frequence <= 1000")
-							 .Filter("type != 2")
+							 //.Filter("type != 2")
 							 .Histo1D({"Counts","Frequence", static_cast<int>(SweepStep),startPdf1, startPdf1 + SweepStep*FrequencyStep }, "frequence");
 		
 		auto Spectra2 = frame.Filter("runNumber == 1")
 							 .Filter("frequence >= 1000")
-							 .Filter("type != 2")
+							 //.Filter("type != 2")
 							 .Histo1D({"Counts","Frequence", static_cast<int>(SweepStep), startPdf2, startPdf2 + SweepStep*FrequencyStep}, "frequence");
 		
 		//auto d = frame.Display({"frequence","random", "type", "radius", "delay"},1); d->Print();

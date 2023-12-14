@@ -17,10 +17,6 @@ void LoopLineShape(	int Nloop = 1,
 			TString folder = "linear/",
 			TString ConfFile = "ToyConfiguration.txt"){
 
-gInterpreter->GenerateDictionary("ToyLine","../Headers/toyLineShape.h");
-gInterpreter->GenerateDictionary("Parser","../Headers/ConfigurationParser.h");
-gInterpreter->GenerateDictionary("LineShape","../Headers/LineShape.h");
-
 // ReadConfigurationFiles;
 ReadConfFile Params(ConfFile);
 Params.Print();
