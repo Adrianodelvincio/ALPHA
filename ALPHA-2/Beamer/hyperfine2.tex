@@ -17,15 +17,15 @@
 \author[Adriano, Germano, Simone]{Adriano Del Vincio, Germano Bonomi,\\ Simone Stracka}
 %\setbeamercovered{transparent} 
 %\setbeamertemplate{navigation symbols}{} 
-\logo{\includegraphics[width = 0.125\textwidth]{../../../logo/ALPHA_Logo.jpg}}
+\logo{\includegraphics[width = 0.125\textwidth]{../../logo/ALPHA_Logo.jpg}}
 \newcommand{\nologo}{\setbeamertemplate{logo}{}}
 \institute[]{University of Brescia, INFN Pisa} 
 \titlegraphic{
 \begin{figure}
 \hspace{1.cm}
-\includegraphics[width = 0.12\textwidth ]{../../../logo/logounibs.png}
+\includegraphics[width = 0.12\textwidth ]{../../logo/logounibs.png}
 %\hspace{1cm}
-\includegraphics[width = 0.25\textwidth ]{../../../logo/1_Pisa_LOGO_SIGLA.pdf}
+\includegraphics[width = 0.25\textwidth ]{../../logo/1_Pisa_LOGO_SIGLA.pdf}
 \end{figure}
 } 
 \beamertemplatenavigationsymbolsempty
@@ -49,7 +49,7 @@ The lineShape is fitted using a Cruijff function, which takes into account the a
 
 \begin{figure}[hbtp]
 \centering
-\includegraphics[width = 0.8\textwidth ]{../Plot/FitToLineShape.pdf}
+\includegraphics[width = 0.8\textwidth ]{../LineShape/Plot/FitToLineShape.pdf}
 \caption{On top plot, the black line represents data and the red line the fit with the\newline Cruijff function.}
 \end{figure}
 \end{frame}
@@ -69,7 +69,7 @@ N \cdot exp(  \frac{-(x - x_{0})^2}{2\sigma_{1} + k_{1}(x - x_{0})^{2}}) &  f > 
 
 \begin{figure}[hbtp]
 \centering
-\includegraphics[width = 0.75\textwidth]{../Plot/TruncatedLineShape.pdf}
+\includegraphics[width = 0.75\textwidth]{../LineShape/Plot/TruncatedLineShape.pdf}
 %\caption{ Fit with a truncated Cruijff function at $ f = \SI{175}{\kilo \hertz}$}
 \end{figure}
 
@@ -96,7 +96,7 @@ Here we plot the discretized lineshape, obtained sampling the Cruijff function w
 
 \begin{figure}[hbtp]
 \centering
-\includegraphics[width = 0.7\textwidth]{../Plot/CruijffLineShapes.pdf}
+\includegraphics[width = 0.7\textwidth]{../LineShape/Plot/CruijffLineShapes.pdf}
 \end{figure}
 
 The discretized lineshapes here represents the model which the simulation programs uses to generate the data. 
@@ -108,7 +108,7 @@ For illustration purposes, in this plot we show the simulated distribution (24 s
 
 \begin{figure}[hbtp]
 \centering
-\includegraphics[width = \textwidth]{../Plot/LineshapeSampled.pdf}
+\includegraphics[width = \textwidth]{../LineShape/Plot/LineshapeSampled.pdf}
 %\caption{ Histogram of the generated lineshape.}
 \end{figure}
 \end{frame}
@@ -166,7 +166,7 @@ The algorithm is tested for $N_{trial} = 1000$.The amount of events per transiti
 
 \begin{figure}[hbtp]
 \centering
-\includegraphics[width = 1\textwidth]{../Plot/2017_foward(cosmic=0).pdf}
+\includegraphics[width = 1\textwidth]{../LineShape/Plot/2017_foward(cosmic=0).pdf}
 \end{figure}
 \end{frame}
 }
@@ -178,7 +178,7 @@ The algorithm is tested for $N_{trial} = 1000$. The amount of events per transit
 
 \begin{figure}[hbtp]
 \centering
-\includegraphics[width = 1\textwidth]{../Plot/2017_foward.pdf}
+\includegraphics[width = 1\textwidth]{../LineShape/Plot/2017_foward.pdf}
 \end{figure}
 \end{frame}
 }
@@ -190,7 +190,7 @@ The algorithm is tested for $N_{trial} = 1000$. The amount of events per transit
 
 \begin{figure}[hbtp]
 \centering
-\includegraphics[width = 1\textwidth]{../Plot/2017_reversed(cosmic=0).pdf}
+\includegraphics[width = 1\textwidth]{../LineShape/Plot/2017_reversed(cosmic=0).pdf}
 \end{figure}
 \end{frame}
 }
@@ -202,7 +202,7 @@ The algorithm is tested for $N_{trial} = 1000$. The amount of events per transit
 
 \begin{figure}[hbtp]
 \centering
-\includegraphics[width = 1\textwidth]{../Plot/2017_reversed.pdf}
+\includegraphics[width = 1\textwidth]{../LineShape/Plot/2017_reversed.pdf}
 \end{figure}
 \end{frame}
 }
@@ -231,6 +231,16 @@ f_{i} : bin_{i} + bin_{i+1} + bin_{i +2} > 3\cdot \mu_{cosmic} + \sqrt{3}   N \c
 Where $N$ is a parameter of the algorithm. This algorithm is directly derived from the t-student test.
 
 \end{frame}
+
+\begin{frame}{MVA}
+\begin{figure}[hbtp]
+\centering
+\includegraphics[width = \textwidth]{MVA.pdf}
+\caption{MVA working curve.}
+\end{figure}
+
+\end{frame}
+
 
 \begin{frame}{Results for \textit{Pass Cut} simulated data}
 
@@ -323,17 +333,17 @@ sumNeighbors ($ N = 3 $) & $+0.37$  & $8.177$  & $+0.175$   & $10.86$ \\
 \begin{figure}
 \centering
 \subfloat[][\emph{algorithm 2017}]
-{\includegraphics[width=.30\textwidth]{../Plot/delta_2017_foward.pdf}} 
+{\includegraphics[width=.30\textwidth]{../LineShape/Plot/delta_2017_foward.pdf}} 
 \subfloat[][\emph{algorithm 2017 reversed}]
-{\includegraphics[width=.30\textwidth]{../Plot/delta_2017_reversed.pdf}} 
+{\includegraphics[width=.30\textwidth]{../LineShape/Plot/delta_2017_reversed.pdf}} 
 \subfloat[][\emph{threshold ($> 2$)}]
-{\includegraphics[width=.30\textwidth]{../Plot/delta_Threshold_2.pdf}} \\
+{\includegraphics[width=.30\textwidth]{../LineShape/Plot/delta_Threshold_2.pdf}} \\
 \subfloat[][\emph{threshold ($> 3$)}]
-{\includegraphics[width=.30\textwidth]{../Plot/delta_Threshold_3.pdf}}
+{\includegraphics[width=.30\textwidth]{../LineShape/Plot/delta_Threshold_3.pdf}}
 \subfloat[][\emph{const fraction ($> 20\%$)}]
-{\includegraphics[width=.30\textwidth]{../Plot/delta_constFract_20.pdf}} 
+{\includegraphics[width=.30\textwidth]{../LineShape/Plot/delta_constFract_20.pdf}} 
 \subfloat[][\emph{const fraction ($> 30\%$)}]
-{\includegraphics[width=.30\textwidth]{../Plot/delta_constFract_30.pdf}}
+{\includegraphics[width=.30\textwidth]{../LineShape/Plot/delta_constFract_30.pdf}}
 \end{figure}
 \end{frame}
 
@@ -342,9 +352,9 @@ sumNeighbors ($ N = 3 $) & $+0.37$  & $8.177$  & $+0.175$   & $10.86$ \\
 \begin{figure}
 \centering
 \subfloat[][\emph{sumNeighbors ($N > 2$)}]
-{\includegraphics[width=.45\textwidth]{../Plot/delta_sumNeighbors_sigma20.pdf}}
+{\includegraphics[width=.45\textwidth]{../LineShape/Plot/delta_sumNeighbors_sigma20.pdf}}
 \subfloat[][\emph{sumNeighbors ($N > 3$)}]
-{\includegraphics[width=.45\textwidth]{../Plot/delta_sumNeighbors_sigma30.pdf}}
+{\includegraphics[width=.45\textwidth]{../LineShape/Plot/delta_sumNeighbors_sigma30.pdf}}
 \end{figure}
 \end{frame}
 
