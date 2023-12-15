@@ -1,6 +1,6 @@
 # Stack, numer of antihydrogen per stack, repetition of the measurement
 Nstack = 20
-NHbar = 14
+NHbar = 20.58
 Repetition = 5
 # Percentage of annihilation on walls/gas
 pwall_cb = 1
@@ -15,8 +15,8 @@ SweepStep = 24
 TotalStep = 50
 BinBeforeOnset = 3
 # cosmic rate is expressed in event/second, efficiency (point of work of the experiment)
-CosmicRate = 0.051028571
-Efficiency = 1
+CosmicRate = 0.046
+Efficiency = 0.55
 # The following are in kHz units
 x_cb_start = 175
 x_cb_peak = 220

@@ -93,19 +93,23 @@ TRandom3 *r = new TRandom3();
 		vector<double>	v1Tot, v2Tot;				// Total Counts
 		vector<int>	v1Type,v2Type;				// Type of Event
 		vector<int>	RunNumber1, RunNumber2;			// Run Number (from 0 to Repetition)
-		vector<double>  freqDelay;
+		vector<double>  cb_shift;
+		vector<double>	da_shift;
+		double LineShift_cb = r->Uniform(-1*Params.FrequencyStep,+1*Params.FrequencyStep);
+		double LineShift_da = r->Uniform(-1*Params.FrequencyStep,+1*Params.FrequencyStep);
+		std::cout << "LineShift c to b " << LineShift_cb << std::endl;
+		std::cout << "LineShift d to a " << LineShift_da << std::endl;
+	
 		for(int run = 0; run < Repetition; run++){		// loop on repetition
 			
-			double delay = r->Uniform(-range, range); 	// set delay of the lineshape
-			freqDelay.push_back(delay);			// Save delay
-			double start1 = x_cb_start + delay;
-			double start2 = x_da_start + delay;
-			double peak1 = x_cb_peak + delay;
-			double peak2 = x_da_peak + delay;
-			double end1 =  x_cb_end + delay;
-			double end2 =  x_da_end + delay;
-			// SetContent(genLineShape1,Nbin1,parabola, start1, peak1, end1);
-			// SetContent(genLineShape2,Nbin2,parabola, start2, peak2 , end2);
+			double smearing = r->Uniform(-range, range); 	// set smearing of the onset inside frequency step			
+			cb_shift.push_back(LineShift_cb);			// Save smearing
+			da_shift.push_back(LineShift_da);			// Save smearing
+			double start1 = x_cb_start + smearing + LineShift_cb;
+			double peak1 = x_cb_peak + smearing + LineShift_cb;
+			double start2 = x_da_start + smearing + LineShift_da;
+			double peak2 = x_da_peak + smearing + LineShift_da;
+
 			SetContent(genLineShape1,Nbin1,Cruijff, start1, peak1, sigma0_cb, sigma1_cb, k0_cb, k1_cb, Norm_cb);
 			SetContent(genLineShape2,Nbin2,Cruijff, start2, peak2, sigma0_da, sigma1_da, k0_da, k1_da, Norm_da);
 			
@@ -216,7 +220,7 @@ TRandom3 *r = new TRandom3();
 						j,
 						rn,
 						RunNumber1,
-						freqDelay); // Fill RDataFrame
+						cb_shift); // Fill RDataFrame
 		std::cout << "Save " <<  folder + nameFile1 << std::endl;
 		FilledFrame1.Snapshot("myTree", folder + nameFile1);
 
@@ -229,7 +233,7 @@ TRandom3 *r = new TRandom3();
 						j,
 						rn2,
 						RunNumber2,
-						freqDelay); // Fill RDataFrame
+						da_shift); // Fill RDataFrame
 		std::cout << "Save " << folder + nameFile2 << std::endl;
 		FilledFrame2.Snapshot("myTree", folder + nameFile2);		
 		std::cout << "Total Event Gen. pdf1: " << Tot1 << std::endl;

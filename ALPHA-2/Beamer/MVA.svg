@@ -75,25 +75,6 @@
     </marker>
     <marker
        style="overflow:visible"
-       id="marker5-7"
-       refX="0"
-       refY="0"
-       orient="auto-start-reverse"
-       inkscape:stockid="Concave triangle arrow"
-       markerWidth="1"
-       markerHeight="1"
-       viewBox="0 0 1 1"
-       inkscape:isstock="true"
-       inkscape:collect="always"
-       preserveAspectRatio="xMidYMid">
-      <path
-         transform="scale(0.7)"
-         d="M -2,-4 9,0 -2,4 c 2,-2.33 2,-5.66 0,-8 z"
-         style="fill:context-stroke;fill-rule:evenodd;stroke:none"
-         id="path5-5" />
-    </marker>
-    <marker
-       style="overflow:visible"
        id="marker5-3"
        refX="0"
        refY="0"
@@ -123,12 +104,12 @@
      inkscape:deskcolor="#d1d1d1"
      showgrid="false"
      inkscape:zoom="0.69947917"
-     inkscape:cx="960"
-     inkscape:cy="539.68727"
-     inkscape:window-width="1920"
-     inkscape:window-height="1043"
-     inkscape:window-x="0"
-     inkscape:window-y="0"
+     inkscape:cx="960.71481"
+     inkscape:cy="540.40208"
+     inkscape:window-width="2490"
+     inkscape:window-height="1376"
+     inkscape:window-x="70"
+     inkscape:window-y="27"
      inkscape:window-maximized="1"
      inkscape:current-layer="g1" />
   <g
@@ -146,11 +127,6 @@
        style="fill:none;fill-opacity:0.97321;stroke:#0600ff;stroke-width:4.91339;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:0.2;stroke-dasharray:none;stroke-opacity:0.674313;marker-start:url(#marker5-3);paint-order:normal"
        d="m 1205.0272,711.07481 35.969,-52.95187"
        id="path4-2"
-       sodipodi:nodetypes="cc" />
-    <path
-       style="fill:none;fill-opacity:0.97321;stroke:#0600ff;stroke-width:4.91339;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:0.2;stroke-dasharray:none;stroke-opacity:0.674313;marker-start:url(#marker5-7);paint-order:normal"
-       d="m 683.9124,473.79297 43.35589,-56.38268"
-       id="path4-6"
        sodipodi:nodetypes="cc" />
     <path
        style="fill:none;fill-opacity:0.97321;stroke:#0600ff;stroke-width:4.91339;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:0.2;stroke-dasharray:none;stroke-opacity:0.674313;marker-start:url(#ConcaveTriangle);paint-order:normal"
@@ -207,15 +183,5 @@
          id="tspan8"
          x="1375.9845"
          y="180.03957">point 3</tspan></text>
-    <text
-       xml:space="preserve"
-       style="font-size:26.6667px;font-family:sans-serif;-inkscape-font-specification:sans-serif;fill:#000000;fill-opacity:1;stroke:none;stroke-width:4.91339;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:0.2;stroke-dasharray:none;stroke-opacity:0.674313;paint-order:normal"
-       x="679.42053"
-       y="396.51807"
-       id="text9"><tspan
-         sodipodi:role="line"
-         id="tspan9"
-         x="679.42053"
-         y="396.51807">point 4</tspan></text>
   </g>
 </svg>

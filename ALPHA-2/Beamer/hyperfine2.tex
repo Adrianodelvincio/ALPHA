@@ -83,8 +83,11 @@ To generate the data, the lineshape is shifted with a uniform distributed random
 
 \begin{figure}[hbtp]
 \centering
-\includegraphics[width = 0.75\textwidth]{ShiftedLineshape.pdf}
+\includegraphics[width = 0.85\textwidth]{ShiftedLineshape.pdf}
 \end{figure}
+\begin{center}
+The value of the shift is between $\SI{-2.5}{\kilo \hertz}$ and $\SI{2.5}{\kilo \hertz}$
+\end{center}
 
 \end{frame}
 }
@@ -96,7 +99,7 @@ Here we plot the discretized lineshape, obtained sampling the Cruijff function w
 
 \begin{figure}[hbtp]
 \centering
-\includegraphics[width = 0.7\textwidth]{../LineShape/Plot/CruijffLineShapes.pdf}
+\includegraphics[width = 0.9\textwidth]{../LineShape/Plot/CruijffLineShapes.pdf}
 \end{figure}
 
 The discretized lineshapes here represents the model which the simulation programs uses to generate the data. 
@@ -129,13 +132,13 @@ For illustration purposes, in this plot we show the simulated distribution (24 s
 
 We have studies the case of the series of run 4b. The parameters of the simulation are:
 \begin{itemize}
-\item $N_{stack} = 20$.
+\item $N_{stack} = 20.58$.
 \item $N_{\overline{H} \; per \; stack} = 14$.
 \item $SweepSteps = 24$.
 \item $Repetition = 5$ (not yet used in the following).
 \item $TimeStep = \SI{8}{\second}$
 \item $FrequencyStep = \SI{5}{\kilo \hertz}$.
-\item {\color{red}{$\mu_{cosmic} = \SI{0.051}{\second \tothe{-1}}$
+\item {\color{red}{$\mu_{cosmic} = \SI{0.046}{\second \tothe{-1}}$
 \item $onset_{1, true} = \SI{175}{\kilo \hertz}$ ; $onset_{2, true} = \SI{1420175}{\kilo \hertz}$}}
 \item $shift = \pm \SI{2.5}{\kilo \hertz}$.
 \end{itemize}
@@ -225,11 +228,12 @@ where $p$ is a parameter of the algorithm, in the range (0,1).
 
 In the end we have tested another algorithm (\textit{sumNeighbors}), defined is this way:
 \begin{equation}
-f_{i} : bin_{i} + bin_{i+1} + bin_{i +2} > 3\cdot \mu_{cosmic} + \sqrt{3}   N \cdot \sqrt{\mu_{cosmic}} 
+f_{i} : bin_{i} + bin_{i+1} + bin_{i +2} > 3\cdot \mu_{cosmic} + N \cdot \sqrt{3 \, \mu_{cosmic}} 
 \end{equation}
 
-Where $N$ is a parameter of the algorithm. This algorithm is directly derived from the t-student test.
-
+Where $N$ is a parameter of the algorithm. This algorithm is directly derived from the t-student test.\\
+\vspace{0.5cm}
+\textbf{Note!}: All the algorithms that we will test do not take into account the cosmic baseline in the data, except for the algorithm \textit{sumNeighbors}. The algorithms can be properly modified to handle the cosmic background.
 \end{frame}
 
 \begin{frame}{MVA}
@@ -283,7 +287,7 @@ sumNeighbors ($ N = 3 $) & $-0.47$  & $7.85$  & $+0.115$   & $11.66$ \\
 \end{table}
 \end{frame}
 
-\begin{frame}{Results for point 1 :$\mu_{cosmic} = 0.046$, $\epsilon = 0.775$}
+\begin{frame}{Results for point 1 :$rate_{cosmic} = \SI{0.046}{\second \tothe{-1}}$, $\epsilon = 0.775$}
 
 \begin{table}
 \center
@@ -325,7 +329,7 @@ sumNeighbors ($ N = 3 $) & $+0.37$  & $8.177$  & $+0.175$   & $10.86$ \\
 \end{frame}
 
 
-\begin{frame}{Results for point 2 :$\mu_{cosmic} = 0.01$, $\epsilon = 0.638$}
+\begin{frame}{Results for point 2 :$rate_{cosmic} = \SI{0.01}{\second \tothe{-1}}$, $\epsilon = 0.638$}
 
 \begin{table}
 \center
@@ -359,14 +363,14 @@ sumNeighbors ($ N = 1 $) & $-0.04$  & $10.67$  & $-0.04$   & $10.67$ \\
 
 sumNeighbors ($ N = 2 $) & $-0.015$  & $11.06$  & $-0.015$   & $11.06$ \\
 
-sumNeighbors ($ N = 3 $) & $$  & $$  & $$   & $$ \\
+sumNeighbors ($ N = 3 $) & $-0.015$  & $11.06$  & $-0.015$   & $11.06$ \\
 \hline
 \end{tabular}}
 \caption{ Result of the simulation for $N_{trials} = 1000$. In the first two column the cosmic background is removed from the data. The last two columns contains the result of the simulation adding the cosmic background. The $\mu$ and $\sigma$ are the quantities computed from the distribution of $(onset_{2} - onset_{1}) - MC_{truth}$.}
 \end{table}
 \end{frame}
 
-\begin{frame}{Results for point 2 :$\mu_{cosmic} = 0.23$, $\epsilon = 0.86$}
+\begin{frame}{Results for point 3 :$rate_{cosmic} = \SI{0.23}{\second \tothe{-1}}$, $\epsilon = 0.86$}
 
 \begin{table}
 \center
@@ -380,11 +384,11 @@ algorithms & $\mu$ $[\SI{}{\kilo \hertz}]$
 \hline
 \textit{Point 3} data 						 	  &  \multicolumn{2}{c}{\color{blue}{without cosmic background}}     & \multicolumn{3}{c}{\color{blue}{with cosmic background}}  \\
 \hline
-2017 ($ > 0 ; > 1$ )          & $-0.04$  & \textcolor{red}{$10.47$}   & $+0.31$ & \textcolor{red}{$10.2$}\\ 
+2017 ($ > 0 ; > 1$ )          & $-0.04$  & \textcolor{red}{$10.47$*}   & $+0.31$ & \textcolor{red}{$10.2$*}\\ 
 
 2017 reversed ($ < 3; < 2$)   & $+0.15$ & $8.51$   & $-0.7731$  & $13.45$\\ 
 
-threshold ($ > 1$)            & $+0.295$ & \textcolor{red}{$11.18$}  & $-0.24$ & \textcolor{red}{$8.06$}\\ 
+threshold ($ > 1$)            & $+0.295$ & \textcolor{red}{$11.18$*}  & $-0.24$ & \textcolor{red}{$8.06$*}\\ 
 
 threshold ($ > 2$)            & $+0.42$  & $10.08$  & $+0.16$  & $13.92$\\ 
 
@@ -405,7 +409,23 @@ sumNeighbors ($ N = 3 $) & $-0.1$  & $4.43$  & $-0.31$   & $10.16$ \\
 \end{tabular}}
 \caption{ Result of the simulation for $N_{trials} = 1000$. In the first two column the cosmic background is removed from the data. The last two columns contains the result of the simulation adding the cosmic background. The $\mu$ and $\sigma$ are the quantities computed from the distribution of $(onset_{2} - onset_{1}) - MC_{truth}$.}
 \end{table}
+
+\textcolor{red}{*} These values shows an unpredicted behaviour: $\sigma$ with cosmic background is lower compared to the $\sigma$ without cosmic background. Looking at figure \ref{fig:HighCosmicError} we observe that the high cosmic rate "triggers" the algorithms, which identifies systematically the initial frequency of the sweep as onset. Consequently, the result are significantly affected by this unwanted behaviour.    
+
 \end{frame}
+
+\begin{frame}
+
+\begin{figure}[hbtp]
+\centering
+\includegraphics[width = \textwidth]{../LineShape/Plot/point3/Threshold_1.pdf}
+\caption{Result for algorithm \textit{Threshold ($> 1$)} with cosmic background. Due to the high cosmic rate, the algorithm identifies sistematically the first bin of the sweep. This reduces artificially the $\sigma$ of the $(onset_{2} - onset_{1}) - MC_{truth}$, however this is an unintended behaviour, and we plan to fix it.}
+\label{fig:HighCosmicError}
+\end{figure}
+
+
+\end{frame}
+
 
 \begin{frame}{ \textit{PassCut} plots}
 

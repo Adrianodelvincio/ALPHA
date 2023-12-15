@@ -17,7 +17,7 @@ void LineShapeAnalysis(TString directory = "linear/",
 	TString ConfFile = directory + "ToyConfiguration.txt";
 	std::cout << ConfFile << std::endl;
 	gInterpreter->GenerateDictionary("ToyParser","../Headers/ConfigurationParser.h");
-	gInterpreter->GenerateDictionary("ReadFiles", "../Headers/AnalysisLineShape.h");
+	//gInterpreter->GenerateDictionary("ReadFiles", "../Headers/AnalysisLineShape.h");
 	
 	ReadConfFile Params(ConfFile);
 	Params.Print();
@@ -30,15 +30,15 @@ void LineShapeAnalysis(TString directory = "linear/",
 	std::vector<std::string> FileList;
 	FileList = getFiles(start,stop, directory);
 	ROOT::RDataFrame rdf("myTree", {FileList[0], FileList[1]});
-	auto hist_ctob = rdf.Filter("runNumber == 1")
+	auto hist_ctob = rdf.Filter("runNumber == 0")
 			.Filter("frequence <= 1000")
 			.Filter("type != 2")
 			.Histo1D({"Counts"," c to b",static_cast<int>(SweepStep),startPdf1, startPdf1 + SweepStep*FrequencyStep }, "frequence");
-	auto ctob_withCosmic = rdf.Filter("runNumber == 1")
+	auto ctob_withCosmic = rdf.Filter("runNumber == 0")
 			.Filter("frequence <= 1000")
 			//.Filter("type != 2")
 			.Histo1D({"Counts"," c to b",static_cast<int>(SweepStep),startPdf1, startPdf1 + SweepStep*FrequencyStep }, "frequence");
-	auto histF4 = 	rdf.Filter("runNumber == 1")
+	auto histF4 = 	rdf.Filter("runNumber == 0")
 			.Filter("frequence >= 1000")
 			.Filter("type != 2")
 			.Histo1D({"Counts"," d to a",static_cast<int>(SweepStep), startPdf2, startPdf2 + SweepStep*FrequencyStep}, "frequence");
@@ -64,9 +64,13 @@ void LineShapeAnalysis(TString directory = "linear/",
 							 //.Filter("type != 2")
 							 .Histo1D({"Counts","Frequence", static_cast<int>(SweepStep), startPdf2, startPdf2 + SweepStep*FrequencyStep}, "frequence");
 		
-		//auto d = frame.Display({"frequence","random", "type", "radius", "delay"},1); d->Print();
-		auto frame1 = frame.Filter("runNumber == 1").Filter("frequence <= 1000").Mean<double>("delay");
-		auto frame2 = frame.Filter("runNumber == 1").Filter("frequence >= 1000").Mean<double>("delay");
+		//auto d = frame.Display({"frequence","random", "type", "radius", "lineShift"},1); d->Print();
+		auto frame1 = frame.Filter("runNumber == 1").Filter("frequence <= 1000").Mean<double>("lineShift");
+		auto frame2 = frame.Filter("runNumber == 1").Filter("frequence >= 1000").Mean<double>("lineShift");
+		auto frame3 = frame.Filter("runNumber == 1").Filter("frequence >= 1000").Take<double>("lineShift");
+		auto frame4 = frame.Filter("runNumber == 1").Filter("frequence <= 1000").Take<double>("lineShift");
+		auto lineShiftda = frame3.GetValue(); std::cout << "LineShift c to b : " << lineShiftda[0] << std::endl;
+		auto lineShiftcb = frame4.GetValue(); std::cout << "LineShift c to b : " << lineShiftcb[0] << std::endl;
 		double delay1 = frame1.GetValue();
 		double delay2 = frame2.GetValue();
 		
@@ -78,37 +82,37 @@ void LineShapeAnalysis(TString directory = "linear/",
 		// THRESHOLD
 		onset1 = firstOverThreshold(Spectra1, mu);
 		onset2 = firstOverThreshold(Spectra2, mu);
-		v1_thr.push_back(onset1 - (Params.x_cb_start));
-		v2_thr.push_back(onset2 - (Params.x_da_start));
-		diff_thr.push_back(onset2 - onset1 - (Params.x_da_start - Params.x_cb_start));
+		v1_thr.push_back(onset1 - (Params.x_cb_start + lineShiftcb[0]));
+		v2_thr.push_back(onset2 - (Params.x_da_start + lineShiftda[0]));
+		diff_thr.push_back(onset2 - onset1 - (Params.x_da_start + lineShiftda[0] - Params.x_cb_start - lineShiftcb[0]));
 		// 2017 FOWARD
 		onset1 = algorithm_2017(Spectra1);
 		onset2 = algorithm_2017(Spectra2);
 		
-		v1_2017.push_back(onset1 - (Params.x_cb_start));
-		v2_2017.push_back(onset2 - (Params.x_da_start)); 
-		diff_2017.push_back(onset2 - onset1 - (Params.x_da_start - Params.x_cb_start));
+		v1_2017.push_back(onset1 - (Params.x_cb_start + lineShiftcb[0]));
+		v2_2017.push_back(onset2 - (Params.x_da_start + lineShiftda[0])); 
+		diff_2017.push_back(onset2 - onset1 - (Params.x_da_start + lineShiftda[0] - Params.x_cb_start - lineShiftcb[0]));
 		// REVERSED 2017 
 		onset1 = reverse_2017(Spectra1);
 		onset2 = reverse_2017(Spectra2);
 		
-		v1_rev.push_back(onset1 - (Params.x_cb_start));
-		v2_rev.push_back(onset2 - (Params.x_da_start));
-		diff_rev.push_back(onset2 - onset1 - (Params.x_da_start - Params.x_cb_start));
+		v1_rev.push_back(onset1 - (Params.x_cb_start + lineShiftcb[0]));
+		v2_rev.push_back(onset2 - (Params.x_da_start + lineShiftda[0]));
+		diff_rev.push_back(onset2 - onset1 - (Params.x_da_start + lineShiftda[0] - Params.x_cb_start - lineShiftcb[0]));
 		// CONSTANT FRACTION
 		onset1 = constFrac(Spectra1, fraction);
 		onset2 = constFrac(Spectra2, fraction);
 		
-		v1_cfrac.push_back(onset1 - (Params.x_cb_start));
-		v2_cfrac.push_back(onset2 - (Params.x_da_start));
-		diff_cfrac.push_back(onset2 - onset1 - (Params.x_da_start - Params.x_cb_start));
+		v1_cfrac.push_back(onset1 - (Params.x_cb_start + lineShiftcb[0]));
+		v2_cfrac.push_back(onset2 - (Params.x_da_start + lineShiftda[0]));
+		diff_cfrac.push_back(onset2 - onset1 - (Params.x_da_start + lineShiftda[0] - Params.x_cb_start - lineShiftcb[0]));
 		// SUM NEIGHBORS
 		onset1 = sumNeighbors(Spectra1, CosmicBackground, mu);
 		onset2 = sumNeighbors(Spectra2, CosmicBackground, mu);
 		
-		v1_neigh.push_back(onset1 - (Params.x_cb_start));
-		v2_neigh.push_back(onset2 - (Params.x_da_start));
-		diff_neigh.push_back(onset2 - onset1 - (Params.x_da_start - Params.x_cb_start));
+		v1_neigh.push_back(onset1 - (Params.x_cb_start + lineShiftcb[0]));
+		v2_neigh.push_back(onset2 - (Params.x_da_start + lineShiftda[0]));
+		diff_neigh.push_back(onset2 - onset1 - (Params.x_da_start + lineShiftda[0] - Params.x_cb_start - lineShiftcb[0]));
 		
 	}
 

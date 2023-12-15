@@ -116,7 +116,7 @@ auto FillDataFrame(ROOT::RDataFrame &d1, RooDataSet &data,
 	[&rn, &j](){			//To subsample and randomize 
 		return rn[j];
 		})
-	.Define("delay", [&freqDelay, &RunNumber, &j](){
+	.Define("lineShift", [&freqDelay, &RunNumber, &j](){
 		return freqDelay[RunNumber[j]];
 	})
 	.Define("frequence",	// Frequence of the event
