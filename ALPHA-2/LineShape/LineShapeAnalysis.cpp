@@ -16,7 +16,7 @@ void LineShapeAnalysis(TString directory = "linear/",
 					){
 	TString ConfFile = directory + "ToyConfiguration.txt";
 	std::cout << ConfFile << std::endl;
-	gInterpreter->GenerateDictionary("ToyParser","../Headers/ConfigurationParser.h");
+	//gInterpreter->GenerateDictionary("ToyParser","../Headers/ConfigurationParser.h");
 	//gInterpreter->GenerateDictionary("ReadFiles", "../Headers/AnalysisLineShape.h");
 	
 	ReadConfFile Params(ConfFile);
@@ -43,6 +43,7 @@ void LineShapeAnalysis(TString directory = "linear/",
 			.Filter("type != 2")
 			.Histo1D({"Counts"," d to a",static_cast<int>(SweepStep), startPdf2, startPdf2 + SweepStep*FrequencyStep}, "frequence");
 
+	vector<double> MCtruth;
 	vector<double> v1_2017, v2_2017;
 	vector<double> v1_rev, v2_rev;
 	vector<double> v1_thr, v2_thr;
@@ -78,6 +79,9 @@ void LineShapeAnalysis(TString directory = "linear/",
 		double onset1;				// Reconstructed onset
 		double onset2;				// Reconstructed onset
 		double threshold = mu*CosmicBackground; // threshold considering the cosmic background
+		
+		// SAVE THE GENERATED MONTECARLO
+		MCtruth.push_back((Params.x_da_start + lineShiftda[0] - Params.x_cb_start - lineShiftcb[0]));
 		
 		// THRESHOLD
 		onset1 = firstOverThreshold(Spectra1, mu);
@@ -143,12 +147,14 @@ void LineShapeAnalysis(TString directory = "linear/",
 	auto h2 = new TH1D("h2","onset_{algorithm} - onset_{true}", 121, -70.5 , 50.5);
 	auto h3 = new TH1D("h2","(onset_{pdf1} - onset_{pdf2}) - MC_{truth}",121, -70.5 , 50.5);
 	
+	
 	//2017 FOWARD
 	std::vector<double> w(v1_2017.size(),1); // weights vector
 	
    	h1->FillN(v1_2017.size(),v1_2017.data(), w.data());
    	h2->FillN(v2_2017.size(),v2_2017.data(), w.data());
    	h3->FillN(diff_2017.size(), diff_2017.data(), w.data());
+   	auto g = new TGraph(MCtruth.size(), MCtruth.data(), diff_2017.data());
    	
    	auto canvas = new TCanvas("d", "2017 algorithm", 1000,550);
 	auto pad2 = new TPad("pad2", "pad2",0,0,0,0);
@@ -172,6 +178,12 @@ void LineShapeAnalysis(TString directory = "linear/",
 	h3->SetLineWidth(2);
 	h3->SetLineColor(38);
 	h3->Draw();
+	pad2->cd(4);
+	g->SetMarkerStyle(7); // Medium Dot
+	g->SetMarkerColor(9);
+	g->SetTitle("Scatter plot; (onset_{pdf1} - onset_{pdf2}) - MC_{truth}; MC_{truth}");
+	g->Draw();
+	
 	TString name = "2017_foward"; TString endname = ".pdf"; 
 	int numero = 0;
 	while(!gSystem->AccessPathName(folder + name + endname)){
