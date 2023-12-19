@@ -139,9 +139,9 @@ void LineShapeAnalysis(TString directory = "linear/",
 	ctob_withCosmic->DrawClone();
 	ctob_withCosmic->DrawClone("SAME P");
 	
-	auto h1 = new TH1D("h1","onset_{algorithm} - onset_{true}", 101, -50.5, 50.5);
-	auto h2 = new TH1D("h2","onset_{algorithm} - onset_{true}", 101, -50.5 , 50.5);
-	auto h3 = new TH1D("h2","(onset_{pdf1} - onset_{pdf2}) - MC_{truth}",101, -50.5 , 50.5);
+	auto h1 = new TH1D("h1","onset_{algorithm} - onset_{true}", 121, -70.5, 50.5);
+	auto h2 = new TH1D("h2","onset_{algorithm} - onset_{true}", 121, -70.5 , 50.5);
+	auto h3 = new TH1D("h2","(onset_{pdf1} - onset_{pdf2}) - MC_{truth}",121, -70.5 , 50.5);
 	
 	//2017 FOWARD
 	std::vector<double> w(v1_2017.size(),1); // weights vector

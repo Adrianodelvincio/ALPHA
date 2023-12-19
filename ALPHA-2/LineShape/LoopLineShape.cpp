@@ -50,8 +50,7 @@ double sigma0_da = Params.sigma0_da;
 double sigma1_da = Params.sigma1_da;
 double Norm_da = Params.Norm_da;
 
-double freqScanStart1 = Params.x_cb_start - (FrequencyStep)*(BeforeOnset + 0.5);	// Start of frequency sweep c-b
-double freqScanStart2 = Params.x_da_start - (FrequencyStep)*(BeforeOnset + 0.5);	// Start of frequency sweep d-a
+
 int Ntrial = Nloop;						// Ntrial
 double Nc = Ntot*Params.C; 					// Expected event for lineshape1
 double Nd = Ntot*(1 - Params.C); 				// Expected event for lineshape2
@@ -80,9 +79,16 @@ RooAddPdf genMix("model","model", RooArgList{gauss_Mix}, RooArgList{Nwall});
 RooAddPdf genGas("model1","model1", RooArgList{Rayleigh}, RooArgList{Ngas});
 RooAddPdf genCosmic("model2", "model2", RooArgList{linearFit}, RooArgList{Nbk});
 
-TH1F *genLineShape1 = new TH1F("hist1", "lineshape c to b", Nbin1, freqScanStart1, freqScanStart1 + Nbin1*(FrequencyStep));
-TH1F *genLineShape2 = new TH1F("hist2", "lineshape d to a", Nbin2, freqScanStart2, freqScanStart2 + Nbin2*(FrequencyStep));
 
+///////////////////
+// DISCRETIZED CONTAINER OF THE LINESHAPE
+double ScanStart1 = Params.x_cb_start - (FrequencyStep)*(BeforeOnset + 0.5);	// Start of frequency sweep c-b
+double ScanStart2 = Params.x_da_start - (FrequencyStep)*(BeforeOnset + 0.5);	// Start of frequency sweep d-a
+TH1F *genLineShape1 = new TH1F("hist1", "lineshape c to b", Nbin1, ScanStart1, ScanStart1 + Nbin1*(FrequencyStep));
+TH1F *genLineShape2 = new TH1F("hist2", "lineshape d to a", Nbin2, ScanStart2, ScanStart2 + Nbin2*(FrequencyStep));
+//////////////////
+
+/////////////////
 //External Toy Loop
 TRandom3 *r = new TRandom3();
 
@@ -93,28 +99,32 @@ TRandom3 *r = new TRandom3();
 		vector<double>	v1Tot, v2Tot;				// Total Counts
 		vector<int>	v1Type,v2Type;				// Type of Event
 		vector<int>	RunNumber1, RunNumber2;			// Run Number (from 0 to Repetition)
-		vector<double>  cb_shift;
-		vector<double>	da_shift;
-		double LineShift_cb = r->Uniform(-1*Params.FrequencyStep,+1*Params.FrequencyStep);
-		double LineShift_da = r->Uniform(-1*Params.FrequencyStep,+1*Params.FrequencyStep);
+		vector<double>  cb_shift;				// shift of c to b onset
+		vector<double>	da_shift;				// shift of d to a onset
+		
+		double shift = r->Uniform(-3*Params.FrequencyStep,+3*Params.FrequencyStep);
+		double LineShift_cb = -shift/2;
+		double LineShift_da = +shift/2;
+		
 		std::cout << "LineShift c to b " << LineShift_cb << std::endl;
 		std::cout << "LineShift d to a " << LineShift_da << std::endl;
-	
-		for(int run = 0; run < Repetition; run++){		// loop on repetition
-			
+		/////////////
+		// LOOP ON REPETITION
+		for(int run = 0; run < Repetition; run++){
 			double smearing = r->Uniform(-range, range); 	// set smearing of the onset inside frequency step			
-			cb_shift.push_back(LineShift_cb);			// Save smearing
-			da_shift.push_back(LineShift_da);			// Save smearing
+			cb_shift.push_back(LineShift_cb);				// Save shift
+			da_shift.push_back(LineShift_da);				// Save shift
 			double start1 = x_cb_start + smearing + LineShift_cb;
-			double peak1 = x_cb_peak + smearing + LineShift_cb;
+			double peak1  = x_cb_peak  + smearing + LineShift_cb;
 			double start2 = x_da_start + smearing + LineShift_da;
-			double peak2 = x_da_peak + smearing + LineShift_da;
-
+			double peak2  = x_da_peak  + smearing + LineShift_da;
+			///////////////
+			// DISCTRETIZATION OF THE LINESHAPE
 			SetContent(genLineShape1,Nbin1,Cruijff, start1, peak1, sigma0_cb, sigma1_cb, k0_cb, k1_cb, Norm_cb);
 			SetContent(genLineShape2,Nbin2,Cruijff, start2, peak2, sigma0_da, sigma1_da, k0_da, k1_da, Norm_da);
 			
 			double sumProb1 = 0;
-			double sumProb2 = 0; 
+			double sumProb2 = 0;
 			for(int bin = 1; bin <= SweepStep; bin++){ 	//LOOP ON BINS
 				// PDF1
 				double prob = ComputeProb(genLineShape1,bin);// Probability of the bin
