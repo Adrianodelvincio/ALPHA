@@ -16,7 +16,7 @@ void LineShapeAnalysis(TString directory = "linear/",
 					){
 	TString ConfFile = directory + "ToyConfiguration.txt";
 	std::cout << ConfFile << std::endl;
-	gInterpreter->GenerateDictionary("ToyParser","../Headers/ConfigurationParser.h");
+	//gInterpreter->GenerateDictionary("ToyParser","../Headers/ConfigurationParser.h");
 	//gInterpreter->GenerateDictionary("ReadFiles", "../Headers/AnalysisLineShape.h");
 	
 	ReadConfFile Params(ConfFile);
