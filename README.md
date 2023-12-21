@@ -9,7 +9,7 @@ Language code: **ROOT**, **Pyroot** and **Python**
 
 Structure of the repository
 ---
-**ALPHA-2** folder contains the data and the analysis code to build and test a new model, developed considering the different contributions of the annihilation on trap walls, annihilation due to residual gas and muons background. 
+**ALPHA-2** folder contains both the data and the analysis code required to build and evaluate a new model for the radius distribution of annihilation events in ALPHA experiment. This new model is designed to account for the distinct contributions of the annihilation on trap walls, annihilation due to residual gas, and background from muons. 
 
 1. The data that are used in the analysis are in **.root** format and are saved in the folder **DataSetROOT**. The datasets analyzed include an almost pure sample of annihilation on walls (*..._mixing.vertex.root*), an almost pure sample of annihilation due to residual gas (*..._uwlosses_160.vertex.root*) and datasets cointaing only cosmic background events (*.._cosmic.vertex.root*) 
 
