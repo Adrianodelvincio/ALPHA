@@ -23,7 +23,7 @@ vector<double> errGas;
 TCanvas *c[8];
 
 //Generate dictionary
-gInterpreter->GenerateDictionary("fitAllFrequency", "Headers/fitAllFrequency.h");
+//gInterpreter->GenerateDictionary("fitAllFrequency", "Headers/fitAllFrequency.h");
 
 //Fit distributions
 RooRealVar x("x", "r [cm]", 0, 4);
@@ -103,7 +103,7 @@ gres->Draw("p");
 void AllDataFit(){
 
 //Generate dictionary
-gInterpreter->GenerateDictionary("fitAllFrequency", "Headers/fitAllFrequency.h");
+//gInterpreter->GenerateDictionary("fitAllFrequency", "Headers/fitAllFrequency.h");
 TString runNumber = "r68498"; // runlist r68465 r68481 r68489 r68498
 std::vector<std::string> FileList;
 FileList = getFiles(runNumber);

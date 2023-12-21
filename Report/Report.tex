@@ -25,7 +25,7 @@
 \begin{document}
 
 \AddToShipoutPicture*
-    {\put(512.5,775){\includegraphics[width = 0.125\textwidth]{../../logo/ALPHA_Logo.jpg}}}
+    {\put(512.5,775){\includegraphics[width = 0.125\textwidth]{../logo/ALPHA_Logo.jpg}}}
 
 \maketitle
 \begin{abstract}
@@ -60,7 +60,7 @@ The dataset are analysed separately, to build up different models for the radius
 The events contained in the \textit{mixing} dataset are supposed to be distributed around the radius of the magnetic trap, with a $\sigma$ given by different contribution, as for example the detector resolution in measuring the vertex coordinates. We have analysed only the events that pass the \textbf{cut 1} selection. The data are fitted assuming a gaussian model, see figure \ref{fig:MixingFit}.
 
 \begin{figure}[hbtp]
-\includegraphics[width = 1\textwidth]{../PlotMLEfit/SingleModel/GaussianFitMixing.pdf}
+\includegraphics[width = 1\textwidth]{../ALPHA-2/PlotMLEfit/SingleModel/AnnihilationOnWalls.pdf}
 \caption{Radius distribution of the annihilation vertices for the \textit{mixing} dataset. The red line is the gaussian model. On the bottom of the figure the residuals, assuming poissonian fluctuation ($\sigma = \sqrt{Counts}$).}
 \label{fig:MixingFit}
 \end{figure}
@@ -77,7 +77,7 @@ We have used this model to fit the \textit{UWlosses} data, considering only the 
 \begin{figure}[hbtp]
 
 \centering
-\includegraphics[width = 1\textwidth]{../PlotMLEfit/SingleModel/FitToUw.pdf}
+\includegraphics[width = 1\textwidth]{../ALPHA-2/PlotMLEfit/SingleModel/FitToUw.pdf}
 \caption{ MLE fit of \textit{UWlosses} data. With SigRay we are indicating the $\sigma$ of the Rayleigh distribution.}
 \end{figure}
 
@@ -88,7 +88,7 @@ The cosmic background is expected to be uniform distributed in the trap volume. 
 \begin{figure}[hbtp]
 
 \centering
-\includegraphics[width = 1\textwidth]{../PlotMLEfit/SingleModel/Cosmici_fit.pdf}
+\includegraphics[width = 1\textwidth]{../ALPHA-2/PlotMLEfit/SingleModel/Cosmici_fit.pdf}
 \caption{ MLE fit of the cosmic background dataset.}
 \label{fig:CosmicBackground}
 \end{figure}
@@ -105,9 +105,9 @@ The Normalized Pdfs are plotted together in figure \ref{fig:PdfsNormalized}:
 \begin{figure}[!hbtp]
 \centering
 \subfloat[][\emph{Normalized radius distributions.}\label{fig:PdfsNormalized}]{
-	\includegraphics[width = .45\textwidth]{../PlotMLEfit/PdfTogether.pdf}}
+	\includegraphics[width = .5\textwidth]{../ALPHA-2/PlotMLEfit/PdfTogether.pdf}}
 \subfloat[][\emph{Radial density Pdfs.}\label{fig:RadialDensity}]{
-	\includegraphics[width = .44\textwidth]{../PlotMLEfit/RadialDensity.pdf}}
+	\includegraphics[width = .49\textwidth]{../ALPHA-2/PlotMLEfit/RadialDensity.pdf}}
 \end{figure}
 
 To correct for the different area corresponding to each bin, the values of each bin are divided by $ 2 \pi r$. The result are shown in figure :(\ref{fig:RadialDensity}). As we can see in this picture the annihilation due to residual gas shows a peak at $r \simeq 0$, while the annihilations on trap walls (that are indicated with the label \textit{mixing}) are distributed around $\simeq \SI{2}{ \centi \meter} - \SI{2.5}{\centi \meter}$. In the end the cosmic background seems to be uniform distributed in the range $\SI{0}{\centi \meter} - \SI{4}{\centi \meter}$.
@@ -136,7 +136,7 @@ That is the difference between the expected number of event used in the generati
 
 \begin{figure}[hbtp]
 \centering
-\includegraphics[width = \textwidth]{../PlotMLEfit/N1000/Reconstruced_(500,500).pdf}
+\includegraphics[width = \textwidth]{../ALPHA-2/PlotMLEfit/N1000/Reconstruced_(500,500).pdf}
 \caption{Weighted difference between the reconstructed parameters and the values used in the data generation as defined in equation \ref{eq:ParmasReco}. The red dotted line is a Gaussian fit to the histogram.}
 \label{fig:ReconstructedParameters}
 \end{figure}
@@ -180,7 +180,7 @@ p(r) = \frac{r}{\sigma^{2}} \cdot  e^{ \dfrac{- r^{2}}{ 2 \sigma^{2}}}
 
 \begin{figure}[hbtp]
 \centering
-\includegraphics[width = 1\textwidth]{../PlotMLEfit/ListofRun-cropped.pdf}
+\includegraphics[width = 1\textwidth]{../ALPHA-2/PlotMLEfit/ListofRun-cropped.pdf}
 \caption{List of runs analysed.}
 \end{figure}
 

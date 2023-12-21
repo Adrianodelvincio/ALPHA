@@ -19,16 +19,18 @@ void LineShapeAnalysis(TString directory = "linear/",
 	//gInterpreter->GenerateDictionary("ToyParser","../Headers/ConfigurationParser.h");
 	//gInterpreter->GenerateDictionary("ReadFiles", "../Headers/AnalysisLineShape.h");
 	
-	ReadConfFile Params(ConfFile);
+	ReadConfFile Params(ConfFile); // Read the values from the configuration file 
 	Params.Print();
 	double CosmicBackground = Params.TimeStep * Params.CosmicRate;	// Number of Cosmic Events
 	double FrequencyStep = Params.FrequencyStep;
 	double startPdf1 = Params.x_cb_start - (FrequencyStep)*(Params.BinBeforeOnset + 0.5);	// Start of frequency sweep c-b
 	double startPdf2 = Params.x_da_start - (FrequencyStep)*(Params.BinBeforeOnset + 0.5);	// Start of frequency sweep d-a
-	double SweepStep = Params.SweepStep;
+	double SweepStep = Params.SweepStep; // number of bin for each lineshape
 	
 	std::vector<std::string> FileList;
-	FileList = getFiles(start,stop, directory);
+	FileList = getFiles(start,stop, directory); // file list to be analyzed
+	
+	// Show the first two files
 	ROOT::RDataFrame rdf("myTree", {FileList[0], FileList[1]});
 	auto hist_ctob = rdf.Filter("runNumber == 0")
 			.Filter("frequence <= 1000")
@@ -43,6 +45,7 @@ void LineShapeAnalysis(TString directory = "linear/",
 			.Filter("type != 2")
 			.Histo1D({"Counts"," d to a",static_cast<int>(SweepStep), startPdf2, startPdf2 + SweepStep*FrequencyStep}, "frequence");
 
+	// Define some vectors to store the results
 	vector<double> MCtruth;
 	vector<double> v1_2017, v2_2017;
 	vector<double> v1_rev, v2_rev;
@@ -54,6 +57,7 @@ void LineShapeAnalysis(TString directory = "linear/",
 	// IMPLEMENTING THE TOY FOR THE ALGORITHM
 	for(int i = 0; i < FileList.size(); i += 2){
 		count  += 1; std::cout << "Analizzo DataFrame " << count << "\n" << std::endl;
+		
 		ROOT::RDataFrame frame("myTree", {FileList[i], FileList[i+1]});		// Load i-th dataset
 		auto Spectra1 = frame.Filter("runNumber == 1")
 							 .Filter("frequence <= 1000")
@@ -65,17 +69,14 @@ void LineShapeAnalysis(TString directory = "linear/",
 							 //.Filter("type != 2")
 							 .Histo1D({"Counts","Frequence", static_cast<int>(SweepStep), startPdf2, startPdf2 + SweepStep*FrequencyStep}, "frequence");
 		
-		//auto d = frame.Display({"frequence","random", "type", "radius", "lineShift"},1); d->Print();
 		auto frame1 = frame.Filter("runNumber == 1").Filter("frequence <= 1000").Mean<double>("lineShift");
 		auto frame2 = frame.Filter("runNumber == 1").Filter("frequence >= 1000").Mean<double>("lineShift");
+		// Load the shifts of the lineshapes
 		auto frame3 = frame.Filter("runNumber == 1").Filter("frequence >= 1000").Take<double>("lineShift");
 		auto frame4 = frame.Filter("runNumber == 1").Filter("frequence <= 1000").Take<double>("lineShift");
 		auto lineShiftda = frame3.GetValue(); std::cout << "LineShift c to b : " << lineShiftda[0] << std::endl;
 		auto lineShiftcb = frame4.GetValue(); std::cout << "LineShift c to b : " << lineShiftcb[0] << std::endl;
-		double delay1 = frame1.GetValue();
-		double delay2 = frame2.GetValue();
 		
-		//std::cout << "delay1: " << delay1 << " delay2: " << delay2 << std::endl;
 		double onset1;				// Reconstructed onset
 		double onset2;				// Reconstructed onset
 		double threshold = mu*CosmicBackground; // threshold considering the cosmic background
@@ -120,10 +121,7 @@ void LineShapeAnalysis(TString directory = "linear/",
 		
 	}
 
-	//hist_ctob->Scale(1./hist_ctob->Integral(), "width");
-	//ctob_withCosmic->Scale(1./ctob_withCosmic->Integral(), "width");
-	//hist_ctob->Scale(1./(stop));
-	//ctob_withCosmic->Scale(1./(stop));
+	// PLOTS 
 
 	auto b = new TCanvas("b1", "Spectral lines");
 	auto pad = new TPad("pad1", "pad",0,0,1,1);
@@ -158,6 +156,7 @@ void LineShapeAnalysis(TString directory = "linear/",
 	auto h13 = new TH1D("h1","onset_{algorithm} - onset_{true}", 121, -70.5, 50.5);
 	auto h14 = new TH1D("h2","onset_{algorithm} - onset_{true}", 121, -70.5 , 50.5);
 	auto h15 = new TH1D("h2","(onset_{pdf1} - onset_{pdf2}) - MC_{truth}",121, -70.5 , 50.5);
+	////////////////////////////////
 	//2017 FOWARD
 	std::vector<double> w(v1_2017.size(),1); // weights vector
 	
@@ -216,9 +215,9 @@ void LineShapeAnalysis(TString directory = "linear/",
 		name = name + add;
 	}
 	delta->SaveAs(folder + name + endname);
-	//h1->Reset("ICESM"); h2->Reset("ICESM"); h3->Reset("ICESM");
-	// END 2017
-	
+
+
+	////////////////////////////////
 	// 2017 REVERSED
    	h4->FillN(v1_rev.size(),v1_rev.data(), w.data());
    	h5->FillN(v2_rev.size(),v2_rev.data(), w.data());
@@ -268,8 +267,8 @@ void LineShapeAnalysis(TString directory = "linear/",
 		name = name + add;
 	}
 	delta1->SaveAs(folder + name + endname);
-	//h1->Reset("ICESM"); h2->Reset("ICESM"); h3->Reset("ICESM");
 	
+	////////////////////////////////
 	// THRESHOLD
 	h7->FillN(v1_thr.size(),v1_thr.data(), w.data());
    	h8->FillN(v2_thr.size(),v2_thr.data(), w.data());
@@ -319,9 +318,8 @@ void LineShapeAnalysis(TString directory = "linear/",
 		name = name + add;
 	}
 	delta2->SaveAs(folder + name + endname);
-	//h1->Reset("ICESM"); h2->Reset("ICESM"); h3->Reset("ICESM");
 	
-	
+	////////////////////////////////
 	//COSTANT FRACTION
 	h10->FillN(v1_cfrac.size(),v1_cfrac.data(), w.data());
    	h11->FillN(v2_cfrac.size(),v2_cfrac.data(), w.data());
@@ -378,8 +376,8 @@ void LineShapeAnalysis(TString directory = "linear/",
 		name = name + add;
 	}
 	delta3->SaveAs(folder + name + endname);
-	//h1->Reset("ICESM"); h2->Reset("ICESM"); h3->Reset("ICESM");
-	
+
+	////////////////////////////////
 	// SUMNEIGHBORS	
 	h13->FillN(v1_neigh.size(),v1_neigh.data(), w.data());
    	h14->FillN(v2_neigh.size(),v2_neigh.data(), w.data());
@@ -429,7 +427,6 @@ void LineShapeAnalysis(TString directory = "linear/",
 		name = name + add;
 	}
 	delta4->SaveAs(folder + name + endname);
-	//h1->Reset("ICESM"); h2->Reset("ICESM"); h3->Reset("ICESM");
 	//TString name = TString::Format("sumNeighbours_sigma%d(cosmic=0)", static_cast<int>(mu)); TString endname = ".pdf"; 
 
 }

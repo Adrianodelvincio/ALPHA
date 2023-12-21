@@ -28,8 +28,49 @@ RooRealVar x("x", "r [cm]", 0, 4);
 x.setBins(30);
 
 RooDataHist mix_h("dh0", "dh0", x, Import(*histMix));
-RooPlot *frame1 = x.frame(Title("Mixing PDF"));
+RooPlot *frame1 = x.frame(Title("Annihilation on Walls Dataset"));
 RooHistPdf PdfMixing("mixingpdf", "mixingpdf", x, mix_h, 0);
+mix_h.plotOn(frame1);
+//PdfMixing.plotOn(frame1);
+
+// FIT
+RooRealVar media("mean", "mean of gaussian", 1, -1000, 1000);
+RooRealVar sigma("sigma", "sigma of gaussian", 1, 0, 1000);
+RooGaussian gauss("gauss", "gaussian PDF", x, media, sigma);
+
+gauss.fitTo(mix_h);								// FIT THE DATA WITH A GAUSSIAN FUNCTION
+gauss.plotOn(frame1, LineColor(kRed));			// Plot the fit
+Double_t AnnOnWallChisq = frame1->chiSquare(); 	// Compute the chisquare
+TString chisqLabel = TString::Format("#chi^{2} = %.1f #pm %1.f ndof %d", AnnOnWallChisq*28, sqrt(2*28), 28); // Print in the legend 
+gauss.paramOn(frame1, Label(chisqLabel), Layout(0.12,0.5,0.9)); // Plot the legend on the Plot
+
+RooHist *hres = frame1->residHist();
+RooPlot *resframe = x.frame();
+resframe->addPlotable(hres,"P");
+
+auto canvas = new TCanvas("Ann. on Walls", "Annihilation on Walls Dataset", 800,800);
+TPad *pad1 = new TPad("pad1", "pad1", 0, 0.33,1,1);
+TPad *pad2 = new TPad("pad2", "pad2", 0, 0,1,0.33);
+pad1->SetBottomMargin(0.1);
+pad1->SetBorderMode(0);
+pad2->SetTopMargin(0.00001);
+pad2->SetBottomMargin(0.1);
+pad2->SetBorderMode(0);
+pad1->Draw();
+pad2->Draw();
+pad1->cd();
+frame1->GetXaxis()->SetTitle("radius r [cm]");
+frame1->GetYaxis()->SetTitle("Counts");
+frame1->getAttText()->SetTextSize(0.03);
+frame1->Draw();
+pad2->cd();
+
+resframe->GetXaxis()->SetTitle("radius r [cm]");
+resframe->GetYaxis()->SetTitle("Residuals");
+resframe->SetTitleSize( 0.06, "X");
+resframe->SetTitleSize( 0.06, "Y");
+resframe->Draw();
+
 
 // UWLOSSES
 ROOT::RDataFrame uw_rdf("myTree",{"DataSetROOT/r68814_uwlosses_160.vertex.root",
@@ -55,19 +96,20 @@ Uw_h.plotOn(frame2);
 PdfUwlosses.plotOn(frame2);
 
 // FIT THE DATA WITH A RAYLEIGH
-RooRealVar sigRay("sigRay", "sigma", 1.722);
-RooRealVar sigRay2("sigRay", "sigma", 1.722,0,100);
-RooGenericPdf Rayleigh("line", "linear model", " TMath::Abs(x/(sigRay*sigRay) * TMath::Exp(-(x*x)/(2*sigRay*sigRay)))", RooArgSet(x,sigRay));
+RooRealVar sigRay("sigma", "sigma", 1.722);
+RooRealVar sigRay2("sigma", "sigma", 1.722,0,100);
+RooGenericPdf Rayleigh("line", "linear model", " TMath::Abs(x/(sigma*sigma) * TMath::Exp(-(x*x)/(2*sigma*sigma)))", RooArgSet(x,sigRay));
 
 //RUN THE FIRST TIME FOR THE PARAMETERS OF THE RAYLEIGH
-RooGenericPdf Rayleigh2("line", "linear model", " TMath::Abs(x/(sigRay*sigRay) * TMath::Exp(-(x*x)/(2*sigRay*sigRay)))", RooArgSet(x,sigRay2));
+RooGenericPdf Rayleigh2("line", "linear model", " TMath::Abs(x/(sigma*sigma) * TMath::Exp(-(x*x)/(2*sigma*sigma)))", RooArgSet(x,sigRay2));
 Rayleigh2.fitTo(Uw_h); // FIT
 Rayleigh2.plotOn(frame2, LineColor(kRed));
 Double_t chi2ray = frame2->chiSquare();
 std::cout << "chi square rayleigh: " << frame2->chiSquare() << std::endl; 
 TString chis2ray = TString::Format("#chi^{2} = %.1f ndof %d", chi2ray*27,27);
-Rayleigh2.paramOn(frame2,Label(chis2ray));
+Rayleigh2.paramOn(frame2,Label(chis2ray),Layout(0.1,0.5,0.9));
 auto canvas1 = new TCanvas("d1", "d1",800,800);
+frame2->getAttText()->SetTextSize(0.03);
 frame2->Draw();
 
 //COSMIC
