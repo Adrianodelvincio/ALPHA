@@ -65,14 +65,19 @@ double algorithm_2017(ROOT::RDF::RResultPtr<TH1D> histpdf){
 double reverse_2017(ROOT::RDF::RResultPtr<TH1D> histpdf){
 	// bin 0 is underflow
 	double onset = 0;			// onset value 
-	double bin;	// bin onset
-	for(int i = histpdf->GetNbinsX() - 1; i >= 1; --i){
-		if(histpdf->GetBinContent(i) < 3){
-			if(histpdf->GetBinContent(i-1) < 2){
-				onset = histpdf->GetBinCenter(i);
-				bin = i;
-				break;
-			}
+	double bin = histpdf->GetNbinsX();	// bin onset
+	//std::cout << "last bin " << bin << " content: " << histpdf->GetBinContent(bin) << std::endl;
+	//std::cout << "Loop" << std::endl;
+	for(int i = histpdf->GetNbinsX(); i >= 1; --i){
+		//std::cout << "current bin: " << i << " content: " << histpdf->GetBinContent(i) << std::endl;
+		//std::cout << "   following bin: " << i -1 << " content: " <<  histpdf->GetBinContent(i -1) << std::endl;
+		if(histpdf->GetBinContent(i) < 3 && histpdf->GetBinContent(i-1) < 2){
+			bin = i;
+			break;
+		}
+		if(i == 1){
+		onset = histpdf->GetBinCenter(i);
+		bin = 1;
 		}
 	}
 	std::cout << "2017 reversed" << " i: " << bin  << " bin content: " << histpdf->GetBinContent(bin) << std::endl;
