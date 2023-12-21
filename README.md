@@ -1,31 +1,36 @@
-#ALPHA
-### Project code for analysis of ALPHA-g experiment
-#### PhD student Adriano Del Vincio
+# ALPHA
+### Software Code of Monte Carlo Simulation for ALPHA-2 Hyperfine measurement
+#### PhD student Adriano Del Vincio (University of Brescia)
 
 
-This repository contains the software for the analysis of the ALPHA-g experiment.
+This repository contains software developed for ALPHA-2 and ALPHA-g experiments. We have developed a model for distinguishig annihilations of Trap Walls from residual gas annihilation.
 
 Language code: **ROOT**, **Pyroot** and **Python**
 
 Structure of the repository
 ---
-**ALPHA-2** folder contains the data and the analysis code for the ALPHA-2 spectroscopy experiment. 
+**ALPHA-2** folder contains the data and the Analysis code to build and test a new model which comprises together annihilation on trap walls, annihilation due to residual gas and cosmic events. 
 
-1. the data are a series of.cvs files. The files that contains X,Y,Z position of the annihilation vertices are the ones that contains the word **vertex**. For instance *r69177_cosmics.vertex.csv* contains the data about the vertices of cosmic background
-2. The data files are saved in **Control** folder and **Dataset** folder, that are not loaded in this repository. In the control folder we have two subfolder: **cosmic** and **intrap**. In **cosmic**, as the word says, the data are used to study the distribution of the cosmic background of the experiment (mainly muons). **intrap** contains the data about the annihilation due to the residual gas (indicated as *..._uwlosses_160.vertex.csv*) and almost pure data of annihilation on the trap walls, indicated as *..._mixing.vertex.csv*
+1. The data that are used in the analysis are in **.root** format and are saved in the folder **DataSetROOT**. The datasets analyzed include an almost pure sample of annihilation on walls (*..._mixing.vertex.root*), an almost pure sample of annihilation due to residual gas (*..._uwlosses_160.vertex.root*) and datasets cointaing only cosmic background events (*.._cosmic.vertex.root*) 
+
+
+
 ---
 
-The software is dived in different scripts, that are
+The software is dived in different scripts, the important ones for building up a model to distinguish the different mechanism of annihilation are
 
 1. *TemplateMLE.cpp*
 2. *AnalyticMLE.cpp*
 2. *MonteCarloForFit.cpp*
 3. *Conversion.cpp*
 4. *fitAllFrequency.cpp*
-5. *GaussianToy.cpp*
-6. *toyLineShape.cpp*
 
-*TemplateMLE.cpp* uses the data **cosmic**, **uwlosses** and **mixing** to build template models of the radius distribution of the anti-hydrogen annihilations. These models are used in combination to fit the data of the annihilation contained in **Dataset** folder.
+1) In *TemplateMLE.cpp* an MLE fit is performed to the *cosmic*, *uwlosses* and *mixing* datasets. Some analytic functions are used to fit the radius distribution of the anti-hydrogen annihilations on walls/residual gas and cosmic events. These models are used in combination to fit the data of the annihilation contained in *DataSetROOt* folder. In the end we extract from the data a template model of the radius distribution. The templates are combined together to build a rough model which can be used to fit the data.
+
+2) In *AnalyticMLE.cpp* the analytic models used to fit the radius distributions in *TemplateMLE.cpp* are combine together to build a global analytic model to fit the data.
+
+3) To study the feasibility of this method, we have developed a simple Monte Carlo simulation where we generates some data which follows the radius distributions analysed in *TemplateMLE.cpp* and we apply our fit procedure. We study the uncertainty and bias associated of the fit model. 
+
 
 ---
 **LineShape** simulation
