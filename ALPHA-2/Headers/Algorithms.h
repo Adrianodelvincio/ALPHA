@@ -65,8 +65,8 @@ double algorithm_2017(ROOT::RDF::RResultPtr<TH1D> histpdf){
 double reverse_2017(ROOT::RDF::RResultPtr<TH1D> histpdf){
 	// bin 0 is underflow
 	double onset = 0;			// onset value 
-	double bin = histpdf->GetNbinsX();	// bin onset
-	for(int i = histpdf->GetNbinsX(); i > 1; --i){
+	double bin;	// bin onset
+	for(int i = histpdf->GetNbinsX() - 1; i >= 1; --i){
 		if(histpdf->GetBinContent(i) < 3){
 			if(histpdf->GetBinContent(i-1) < 2){
 				onset = histpdf->GetBinCenter(i);
