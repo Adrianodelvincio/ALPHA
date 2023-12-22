@@ -36,7 +36,7 @@ The parameters of the simulation are loaded from a separated *txt* files, named 
 1. N: number of annihilation per run
 2. Nloop: number of run which are generated and fitted
 3. a: percentage of annihilation on walls
-4. Ncomsic: number of cosmic events
+4. Ncosmic: number of cosmic events
 5. mu: parameter of the analytic model for the annihilation on walls
 6. sigWall: parameter of the analytic model for the annihilation on walls
 7. sigRay: parameter of the analytic model for the annihilation from res. gas
@@ -46,5 +46,4 @@ The parameters of the simulation are loaded from a separated *txt* files, named 
 ---
 **LineShape** simulation
 
-the folder **LineShape** contains the code for a Monte Carlo toy of the hyperfine measurements. The aim of the simulation is to test different onset finding algorithm, studying the bias and statistical uncertainty. The main structure of the simulation is presented here:
-![alt text](https://github.com/Adrianodelvincio/ALPHA/blob/main/ALPHA-2/LineShape/Beamer/SimulationScheme.pdf)
+the folder **LineShape** contains the code for a Monte Carlo toy of the hyperfine measurements. The aim of the simulation is to test different onset finding algorithm, studying the bias and statistical uncertainty. The structure of the simulation is summarized in the scheme: ![alt text](https://github.com/Adrianodelvincio/ALPHA/blob/main/ALPHA-2/Beamer/SimulationScheme.pdf)
