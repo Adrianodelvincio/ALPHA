@@ -14,7 +14,7 @@ class ReadConfFile{
 		ReadConfFile(TString fileName){
 			std::string file(fileName.Data());
 			std::ifstream myfile (file.c_str());	// Open the file
-			std::string line; 			// Parse each line
+			std::string line; 						// Parse each line
 				
 			while(myfile.is_open() && getline(myfile,line)){
 				// If the line is a comment

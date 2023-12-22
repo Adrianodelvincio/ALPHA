@@ -25,11 +25,26 @@ The software is dived in different scripts, the important ones for building up a
 3. *Conversion.cpp*
 4. *fitAllFrequency.cpp*
 
-1) In *TemplateMLE.cpp* an MLE fit is performed to the *cosmic*, *uwlosses* and *mixing* datasets. Some analytic functions are used to fit the radius distribution of the anti-hydrogen annihilations on walls/residual gas and cosmic events. These models are used in combination to fit the data of the annihilation contained in *DataSetROOt* folder. In the end we extract from the data a template model of the radius distribution. The templates are combined together to build a rough model which can be used to fit the data.
+1) In *TemplateMLE.cpp* an MLE fit is performed to the *cosmic*, *uwlosses* and *mixing* datasets. The data are analyzed with RDataFrame. The radius of each annihilation events is computed from the X and Y vertex coordinates. Analytic models are used to fit the radius distributions obatined for the anti-hydrogen annihilations on walls/residual gas and for the cosmic events.
 
-2) In *AnalyticMLE.cpp* the analytic models used to fit the radius distributions in *TemplateMLE.cpp* are combine together to build a global analytic model to fit the data.
+2) In *AnalyticMLE.cpp* the analytic models defined in *TemplateMLE.cpp* are combined together. This final model can be used to analyze runs which have different percentages of Walls/residual gas annihilations.
 
-3) To study the feasibility of this method, we have developed a simple Monte Carlo simulation where we generates some data which follows the radius distributions analysed in *TemplateMLE.cpp* and we apply our fit procedure. We study the uncertainty and bias associated of the fit model. 
+The program can be run passing as argument the name of the run to be analyzed.
+
+root [0] .x AnalyticMLE.cpp("filename")
+
+3) In *MonteCarloForFit.cpp* we have developed a simulation to study the fit procedure applied in *AnalyticMLE.cpp*. The program generates fake data that can be used to validate the fit procedure. The proportion of simulated data resulting from residual gas/wall annihilation is regulated by a parameter of the program. The analytic model is used to fit the simulated data and retrieve the number of annihilation events belonging to the different process.
+
+The parameters of the simulation are loaded from a separated *txt* files, named *configToyModel.txt*, which contains:
+
+1. N: number of annihilation per run
+2. Nloop: number of run which are generated and fitted
+3. a: percentage of annihilation on walls
+4. Ncomsic: number of cosmic events
+5. mu: parameter of the analytic model for the annihilation on walls
+6. sigWall: parameter of the analytic model for the annihilation on walls
+7. sigRay: parameter of the analytic model for the annihilation from res. gas
+
 
 
 ---

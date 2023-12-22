@@ -10,7 +10,7 @@ using namespace RooFit;
 
 void MonteCarloForFit( TString ConfFile = "configToyModel.txt"){
 
-ReadConfFile conf(ConfFile);	// Rad the configuartion file of the program
+ReadConfFile conf(ConfFile);	// Read the configuartion file of the program
 conf.Print();					// Print the Parameters of the Simulation
 gRandom->SetSeed(6); 			// Define a seed
 
@@ -23,7 +23,7 @@ TH1* hchisq = new TH1I("hchisq", "chiquadro", 30, 0, 50);
 RooRealVar x("x","r [cm]",0.,4.);
 x.setBins(30);
 
-// ANNIHILATION ON WALL PDF
+// ANNIHILATION ON WALL
 RooRealVar mu("mu", "mu", conf.mu);
 RooRealVar sigMix("sigMix", "sigMix", conf.sigWall);
 RooGaussian gauss_Mix("gauss", "gauss", x, mu, sigMix);
@@ -36,7 +36,7 @@ RooGenericPdf Rayleigh("line", "linear model", " TMath::Abs(x)/(sigRay*sigRay) *
 RooGenericPdf linearFit("linearFit", "linear model", "TMath::Abs((0.125)*x)", RooArgSet(x));
 
 RooRealVar Nmix_t("Nmix","Nmix", 	conf.N * conf.a, -3000, +3000);
-RooRealVar Nuw_a ("Ngas", "Ngas",	conf.N * conf.b, -3000, +3000);
+RooRealVar Nuw_a ("Ngas", "Ngas",	conf.N * (1 - conf.a), -3000, +3000);
 RooRealVar Nbk_a ("Ncosmic", "Ncosmic", conf.Ncosmic, -3000, +3000);
 RooPlot *frame1 = x.frame(Title("Sum Of Three Pdfs"));
 //Model to generate the data
@@ -50,7 +50,7 @@ RooDataHist *histXgen = data->binnedClone(); //create a binned histogram
 
 // FIT the toy model
 RooRealVar Nmix_f("Nfit_{mix}","Nmix",	conf.a*conf.N,-3000,+3000);
-RooRealVar Nuw_f("Nfit_{gas}","Ngas",	conf.b*conf.N,-3000,+3000);
+RooRealVar Nuw_f("Nfit_{gas}","Ngas",	(1 - conf.a)*conf.N,-3000,+3000);
 RooRealVar Nbk_f("Nfit_{cosmic}", "Nbk",conf.Ncosmic, -3000,+3000);
 
 RooAddPdf model_forfit("model2", "model", RooArgList{gauss_Mix,Rayleigh,linearFit},RooArgList{Nmix_f,Nuw_f,Nbk_f});
@@ -67,7 +67,7 @@ for(int i = 0; i < conf.Nloop; i++){
 	model_forfit.fitTo(*dataLoop, Save(), PrintLevel(-1));
 	//save and store the fit values
 	fit0 = (Nmix_f.getVal() - conf.N*conf.a)/Nmix_f.errorVar()->getVal();
-	fit1 = (Nuw_f.getVal()  - conf.N*conf.b)/Nuw_f.errorVar()->getVal();
+	fit1 = (Nuw_f.getVal()  - conf.N*(1 - conf.a))/Nuw_f.errorVar()->getVal();
 	fit2 = (Nbk_f.getVal()  - conf.Ncosmic )/Nbk_f.errorVar()->getVal();
 	//Get the ChiSquare
 	RooPlot *frameLoop = x.frame(Title("data"));
@@ -81,7 +81,7 @@ for(int i = 0; i < conf.Nloop; i++){
 	if(i%10 == 0){
 		std::cout << "Event LOOP N°" << i << " Gen Event: " << dataLoop->numEntries() <<std::endl;
 		std::cout << "fit:      " << "Nmix: " << Nmix_f.getVal() << " Nuw: " << Nuw_f.getVal() << " Nbk " << Nbk_f.getVal() << std::endl;
-		std::cout << "Expected: " << "Nmix: " << conf.N*conf.a << " Nuw: " << conf.N*conf.b << " Nbk: " << conf.Ncosmic << std::endl;
+		std::cout << "Expected: " << "Nmix: " << conf.N*conf.a << " Nuw: " << conf.N*(1 - conf.a) << " Nbk: " << conf.Ncosmic << std::endl;
 	}
 }
 
@@ -93,7 +93,7 @@ hbk->Fit("gaus");
 auto legend = new TLegend(0.1,0.7,0.48,0.9);
 legend->SetHeader("PDF Composition","C"); // option "C" allows to center the header
 TString coeffMix = TString::Format("events on walls: %d", static_cast<int>(conf.a*conf.N));
-TString coeffUw = TString::Format("events res. gas: = %d", static_cast<int>(conf.b*conf.N));
+TString coeffUw = TString::Format("events res. gas: = %d", static_cast<int>((1 - conf.a)*conf.N));
 TString coeffbk = TString::Format("cosmics = %.1f", conf.Ncosmic);
 legend->AddEntry(hmix,coeffMix);
 legend->AddEntry(hmix,coeffUw);

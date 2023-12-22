@@ -5,11 +5,11 @@
 #include <TMath.h>
 using namespace RooFit;
 
-void AnalyticMLE(){
+void AnalyticMLE( TString filename = "r68465_f5.root"
+				){
 
 // DATA TO FIT
-TString cartella = TString::Format("Dataset/");
-TString filename = TString::Format("r68465_uw_exp_freq5.vertex");
+TString cartella = TString::Format("DataSetROOT/");
 
 RooRealVar x("x", "r [cm]", 0, 4);
 x.setBins(30);
@@ -32,8 +32,7 @@ RooRealVar Nbk_a("Nfit_{cosmic}", "Nfit_{cosmic}",10.2,10.2);
 RooAddPdf model_analytic("model", "model", RooArgList{gauss_Mix,Rayleigh,linearFit}, RooArgList{Nmix_t,Nuw_a,Nbk_a});
 
 // LOAD the data
-TString formato = TString::Format(".csv");
-auto f4_rdf = ROOT::RDF::MakeCsvDataFrame(cartella + filename + formato);
+ROOT::RDataFrame f4_rdf("myTree" ,{cartella + filename});
 auto displ = f4_rdf.Display({"CutsType0","CutsType1","CutsType2", "X", "Y", "Z"}, 5);
 displ->Print(); // Print on the shell some rows
 
@@ -48,9 +47,9 @@ model_analytic.fitTo(hf, PrintLevel(-1));
 hf.plotOn(analyticframe);
 model_analytic.plotOn(analyticframe, LineColor(28));
 TString chiquadrato = TString::Format("#chi^{2} = %.1f, ndof = %d",analyticframe->chiSquare()*(30), (30-3));
-model_analytic.paramOn(analyticframe, Label(chiquadrato));
+model_analytic.paramOn(analyticframe, Label(chiquadrato),  Layout(0.12,0.5,0.9));
 
 auto canvas = new TCanvas("MLE FIT","MLE FIT",800,800);
+analyticframe->getAttText()->SetTextSize(0.03);
 analyticframe->Draw();
-
 }
