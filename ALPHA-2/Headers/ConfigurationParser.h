@@ -18,8 +18,8 @@ class ReadConfFile{
 					if(line.find("#")!=std::string::npos) continue;
 					char sBuffer[20]; float buffer;
 					if (sscanf(line.c_str(), "%s = %f", sBuffer, &buffer) == 2) {
-						if (strcmp(sBuffer, "pwall_cb") == 0) 		{ pwall_cb = buffer;}
-						if (strcmp(sBuffer, "pwall_ad") == 0) 		{ pwall_ad = buffer;}
+						if (strcmp(sBuffer, "WallComponent_cb") == 0) 		{ WallComponent_cb = buffer;}
+						if (strcmp(sBuffer, "WallComponent_ad") == 0) 		{ WallComponent_ad = buffer;}
 						if (strcmp(sBuffer, "C") == 0) 			{ C = buffer;}
 						if (strcmp(sBuffer, "x_cb_start") == 0) 	{ x_cb_start = buffer;}
 						if (strcmp(sBuffer, "x_cb_end") == 0) 		{ x_cb_end = buffer;}
@@ -76,23 +76,25 @@ class ReadConfFile{
 			std::cout << "x_da_peak     " << x_da_peak << std::endl;
 			std::cout << "x_da_end      " << x_da_end << std::endl;
 			std::cout << "C             " << C << std::endl;
-			std::cout << "pwall_ad      " << pwall_ad << std::endl;
-			std::cout << "pwall_cb      " <<  pwall_cb << std::endl;
-			std::cout << "delay         " <<  delay << std::endl;
-			std::cout << "Cruijff Paramters" << std::endl;
-			std::cout << "x0_cb	" << x0_cb << std::endl;
-			std::cout << "sigma0_cb	" << sigma0_cb << std::endl;
-			std::cout << "sigma1_cb	" << sigma1_cb << std::endl;
-			std::cout << "k0_cb	" << k0_cb << std::endl;
-			std::cout << "k1_cb	" << k1_cb << std::endl;
-			std::cout << "Norm_cb	" << Norm_cb << std::endl;
-			std::cout << "sigma0_da	" << sigma0_da << std::endl;
-			std::cout << "sigma1_da	" << sigma1_da << std::endl;
-			std::cout << "k0_da	" << k0_da << std::endl;
-			std::cout << "k1_da	" << k1_da << std::endl;
-			std::cout << "Norm_da	" << Norm_da << std::endl;
+			std::cout << "pwall_ad      " << WallComponent_ad << std::endl;
+			std::cout << "pwall_cb      " << WallComponent_cb << std::endl;
+			std::cout << "delay         " << delay << std::endl;
+			std::cout << "Cruijff Paramters	" << std::endl;
+			std::cout << "x0_cb				" << x0_cb << std::endl;
+			std::cout << "sigma0_cb			" << sigma0_cb << std::endl;
+			std::cout << "sigma1_cb			" << sigma1_cb << std::endl;
+			std::cout << "k0_cb				" << k0_cb << std::endl;
+			std::cout << "k1_cb				" << k1_cb << std::endl;
+			std::cout << "Norm_cb			" << Norm_cb << std::endl;
+			std::cout << "sigma0_da			" << sigma0_da << std::endl;
+			std::cout << "sigma1_da			" << sigma1_da << std::endl;
+			std::cout << "k0_da				" << k0_da << std::endl;
+			std::cout << "k1_da				" << k1_da << std::endl;
+			std::cout << "Norm_da			" << Norm_da << std::endl;
 			std::cout << "\n" << std::endl;
 		}
+		
+	// LIST OF PARAMETERS OF THE SIMULATIONS	
 	int Nstack;
 	int Repetition;
 	int TimeStep;
@@ -109,8 +111,8 @@ class ReadConfFile{
 	double x_da_end;
 	double CosmicRate;
 	double Efficiency;
-	double pwall_cb;
-	double pwall_ad;
+	double WallComponent_cb;
+	double WallComponent_ad;
 	double C;
 	double delay;
 	// Parameters of the Cruijff Function

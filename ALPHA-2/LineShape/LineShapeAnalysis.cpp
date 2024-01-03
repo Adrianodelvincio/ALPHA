@@ -10,7 +10,7 @@ using namespace RooFit;
 void LineShapeAnalysis(TString directory = "linear/",
 					int start = 0,
 					int stop = 999,
-					double mu = 3, 		// Threshold coefficient
+					double mu = 3, 			// Threshold coefficient
 					double fraction = 0.1, 	// constant fraction discrimination
 					TString folder = "Plot/"
 					){

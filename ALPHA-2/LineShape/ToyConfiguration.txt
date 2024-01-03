@@ -3,8 +3,8 @@ Nstack = 20
 NHbar = 20.58
 Repetition = 5
 # Percentage of annihilation on walls/gas
-pwall_cb = 1
-pwall_ad = 1
+WallComponent_cb = 1
+WallComponent_ad = 1
 # percentage of events in c to b and d to a
 C = 0.5
 # step in frequency and time interval, delay of the onset, number of frequencies

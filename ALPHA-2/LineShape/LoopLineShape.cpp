@@ -14,8 +14,8 @@
 using namespace RooFit;
 
 void LoopLineShape(	int Nloop = 1,
-			TString folder = "linear/",
-			TString ConfFile = "ToyConfiguration.txt"){
+					TString folder = "linear/",
+					TString ConfFile = "ToyConfiguration.txt"){
 
 // ReadConfigurationFiles;
 ReadConfFile Params(ConfFile);
@@ -27,8 +27,8 @@ double FrequencyStep = Params.FrequencyStep;				// Kilo hertz
 int SweepStep = Params.SweepStep;					// Number of FrequencyStep
 int BeforeOnset = Params.BinBeforeOnset;
 int Repetition = Params.Repetition;					// Repetition of the single run
-double pWall_c = Params.pwall_cb;					// Weight annihilation on walls for pdf1 (transition c -> b)
-double pWall_d = Params.pwall_ad;					// Weight annihilation on walls for pdf2 (transition d -> a)
+double pWall_c = Params.WallComponent_cb;					// Weight annihilation on walls for pdf1 (transition c -> b)
+double pWall_d = Params.WallComponent_ad;					// Weight annihilation on walls for pdf2 (transition d -> a)
 double Ncosmic = Params.TimeStep * Params.CosmicRate;			// Number of Cosmic Events
 //	Lineshape Parameters
 double x_cb_start = Params.x_cb_start;
@@ -89,46 +89,44 @@ TH1F *genLineShape2 = new TH1F("hist2", "lineshape d to a", Nbin2, ScanStart2, S
 //////////////////
 
 /////////////////
-//External Toy Loop
+// EXTERNAL TOY LOOP
 TRandom3 *r = new TRandom3();
 
 	for(int l = 0; l < Ntrial; l++){				//LOOP ON TRIALS
 		RooDataSet dataPdf1("data", "data", RooArgSet(x));	// Dataset to store the events
 		RooDataSet dataPdf2("dati", "dati", RooArgSet(x));	// Dataset to store the events
 		vector<double>	f1, f2;					// Frequencies pdf1 , Frequencies pdf2
-		vector<double>	v1Tot, v2Tot;				// Total Counts
+		vector<double>	v1Tot, v2Tot;			// Total Counts
 		vector<int>	v1Type,v2Type;				// Type of Event
-		vector<int>	RunNumber1, RunNumber2;			// Run Number (from 0 to Repetition)
+		vector<int>	RunNumber1, RunNumber2;		// Run Number (from 0 to Repetition)
 		vector<double>  cb_shift;				// shift of c to b onset
 		vector<double>	da_shift;				// shift of d to a onset
 		
-		double shift = r->Uniform(-3*Params.FrequencyStep,+3*Params.FrequencyStep);
-		double LineShift_cb = -shift/2;
-		double LineShift_da = +shift/2;
+		double shift = r->Uniform(-3*Params.FrequencyStep,+3*Params.FrequencyStep); // generate a shift in the hyperfine splitting
+		double LineShift_cb = -(shift/2);	// shift of the c to b lineshape
+		double LineShift_da = +(shift/2);	// shift of the d to a lineshape
 		
 		std::cout << "LineShift c to b " << LineShift_cb << std::endl;
 		std::cout << "LineShift d to a " << LineShift_da << std::endl;
 		/////////////
 		// LOOP ON REPETITION
 		for(int run = 0; run < Repetition; run++){
-			double smearing = r->Uniform(-range, range); 	// set smearing of the onset inside frequency step			
+			//double smearing = r->Uniform(-range, range); 	// set smearing of the onset inside frequency step
 			cb_shift.push_back(LineShift_cb);				// Save shift
 			da_shift.push_back(LineShift_da);				// Save shift
-			double start1 = x_cb_start + smearing + LineShift_cb;
-			double peak1  = x_cb_peak  + smearing + LineShift_cb;
-			double start2 = x_da_start + smearing + LineShift_da;
-			double peak2  = x_da_peak  + smearing + LineShift_da;
+			double start1 = x_cb_start + LineShift_cb;
+			double peak1  = x_cb_peak  + LineShift_cb;
+			double start2 = x_da_start + LineShift_da;
+			double peak2  = x_da_peak  + LineShift_da;
+			
 			///////////////
 			// DISCTRETIZATION OF THE LINESHAPE
 			SetContent(genLineShape1,Nbin1,Cruijff, start1, peak1, sigma0_cb, sigma1_cb, k0_cb, k1_cb, Norm_cb);
 			SetContent(genLineShape2,Nbin2,Cruijff, start2, peak2, sigma0_da, sigma1_da, k0_da, k1_da, Norm_da);
 			
-			double sumProb1 = 0;
-			double sumProb2 = 0;
 			for(int bin = 1; bin <= SweepStep; bin++){ 	//LOOP ON BINS
 				// PDF1
 				double prob = ComputeProb(genLineShape1,bin);// Probability of the bin
-				sumProb1 += prob;
 				SetCoefficients((pWall_c*Nc)*prob,(pGas_c*Nc)/SweepStep, Ncosmic, &Nwall,&Ngas,&Nbk);
 				int gasCount = 0; int mixCount = 0; int CosmicCount = 0;
 				double frequence = genLineShape1->GetBinCenter(bin);
@@ -166,7 +164,6 @@ TRandom3 *r = new TRandom3();
 				// PDF 2
 				mixCount = 0; gasCount = 0; CosmicCount = 0;
 				prob = ComputeProb(genLineShape2,bin);	// Probability of the bin
-				sumProb2 += prob;
 				frequence = genLineShape2->GetBinCenter(bin);
 				SetCoefficients((pWall_d*Nd)*prob,(pGas_d*Nd)/SweepStep,Ncosmic, &Nwall,&Ngas,&Nbk);
 				
@@ -203,8 +200,6 @@ TRandom3 *r = new TRandom3();
 			} // Loop on Bin
 			genLineShape1->Reset("ICESM");
 			genLineShape2->Reset("ICESM");
-			std::cout << "sumProb1: " << sumProb1 << std::endl;
-			std::cout << "sumProb2: " << sumProb2 << std::endl;
 		} // Loop on Repetition
 	
 		int Tot1 = std::accumulate(v1Tot.begin(), v1Tot.end(), 0);
@@ -215,7 +210,6 @@ TRandom3 *r = new TRandom3();
 		
 		TString nameFile1 = TString::Format("LoopDataPdf1_%d.root", l);
 		TString nameFile2 = TString::Format("LoopDataPdf2_%d.root", l);
-		
 		
 		vector<Double_t> rn; vector<Double_t> rn2;
 		for(int i = 0; i < v1Type.size(); i++){ rn.push_back(r->Uniform(1));}
@@ -234,7 +228,7 @@ TRandom3 *r = new TRandom3();
 		std::cout << "Save " <<  folder + nameFile1 << std::endl;
 		FilledFrame1.Snapshot("myTree", folder + nameFile1);
 
-		j = 0; // FROM HERE APPLY THE ALGORITHM TO PDF2
+		j = 0; // FROM HERE FILL DA DATA
 		auto FilledFrame2 = FillDataFrame(d2,
 						dataPdf2,
 						f2,
