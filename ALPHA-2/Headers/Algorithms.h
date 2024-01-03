@@ -73,6 +73,7 @@ double reverse_2017(ROOT::RDF::RResultPtr<TH1D> histpdf){
 		//std::cout << "   following bin: " << i -1 << " content: " <<  histpdf->GetBinContent(i -1) << std::endl;
 		if(histpdf->GetBinContent(i) < 3 && histpdf->GetBinContent(i-1) < 2){
 			bin = i;
+			onset = histpdf->GetBinCenter(i);
 			break;
 		}
 		if(i == 1){
@@ -80,7 +81,7 @@ double reverse_2017(ROOT::RDF::RResultPtr<TH1D> histpdf){
 		bin = 1;
 		}
 	}
-	std::cout << "2017 reversed" << " i: " << bin  << " bin content: " << histpdf->GetBinContent(bin) << std::endl;
+	std::cout << "2017 reversed" << " i: " << bin << " frequency: " << histpdf->GetBinCenter(bin)  << " bin content: " << histpdf->GetBinContent(bin) << std::endl;
 	return onset;
 }
 
