@@ -20,19 +20,21 @@ double stdev(std::vector<double> v){
 	return sqrt(accum/(v.size() - 1));
 }
 
-std::vector<double> ScanAnalysis(TString directory = "linear/",
-					int start = 0,
-					int stop = 999,
-					double N = 1, 			// Threshold coefficient
-					double fraction = 0.1 	// constant fraction discrimination
+std::vector<double> ScanAnalysis(TString directory,
+					TString ConfFile,
+					int start,
+					int stop,
+					double N, 			// Threshold coefficient
+					double fraction, 	// constant fraction discrimination
+					double rate
 					){
-	TString ConfFile = directory + "ToyConfiguration.txt";
+	//ConfFile = directory + "ToyConfiguration.txt";
 	std::cout << ConfFile << std::endl;
-	//gInterpreter->GenerateDictionary("ToyParser","../Headers/ConfigurationParser.h");
-	//gInterpreter->GenerateDictionary("ReadFiles", "../Headers/AnalysisLineShape.h");
+
 	
 	ReadConfFile Params(ConfFile); // Read the values from the configuration file 
 	Params.Print();
+	Params.CosmicRate = rate;
 	double CosmicBackground = Params.TimeStep * Params.CosmicRate;	// Number of Cosmic Events
 	double FrequencyStep = Params.FrequencyStep;
 	double startPdf1 = Params.x_cb_start - (FrequencyStep)*(Params.BinBeforeOnset + 0.5);	// Start of frequency sweep c-b
@@ -71,7 +73,7 @@ std::vector<double> ScanAnalysis(TString directory = "linear/",
 		// Load the shifts of the lineshapes
 		auto frame3 = frame.Filter("runNumber == 1").Filter("frequence >= 1000").Take<double>("lineShift");
 		auto frame4 = frame.Filter("runNumber == 1").Filter("frequence <= 1000").Take<double>("lineShift");
-		auto lineShiftda = frame3.GetValue(); std::cout << "LineShift c to b : " << lineShiftda[0] << std::endl;
+		auto lineShiftda = frame3.GetValue(); std::cout << "LineShift d to a : " << lineShiftda[0] << std::endl;
 		auto lineShiftcb = frame4.GetValue(); std::cout << "LineShift c to b : " << lineShiftcb[0] << std::endl;
 		
 		double onset1;				// Reconstructed onset
@@ -112,11 +114,10 @@ std::vector<double> ScanAnalysis(TString directory = "linear/",
 		diff_neigh.push_back(onset2 - onset1 - (Params.x_da_start + lineShiftda[0] - Params.x_cb_start - lineShiftcb[0]));
 		
 	}
-	// THRESHOLD, FOWARD, REVERSED, CONSTANT FRACTION, SUM NEIGHBORS
-	return {mean(diff_thr), stdev(diff_thr),
-			mean(diff_2017),stdev(diff_2017),
-			mean(diff_rev), stdev(diff_rev),
-			mean(diff_cfrac), stdev(diff_cfrac),
-			mean(diff_neigh), stdev(diff_neigh)};
+	return {mean(diff_thr), stdev(diff_thr),		// THRESHOLD
+			mean(diff_2017),stdev(diff_2017),		// FOWARD
+			mean(diff_rev), stdev(diff_rev),		// REVERSED
+			mean(diff_cfrac), stdev(diff_cfrac),	// CONSTANT FRACTION
+			mean(diff_neigh), stdev(diff_neigh)};	// SUM NEIGHBORS
 }
 

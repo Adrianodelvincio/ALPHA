@@ -13,23 +13,30 @@
 
 using namespace RooFit;
 
-void LoopLineShape(	int Nloop = 1,
-					TString folder = "linear/",
-					TString ConfFile = "ToyConfiguration.txt"){
+void LoopLineShape(	int Nloop,
+					TString folder,
+					TString mvaScan,
+					double CosmicRate,
+					double Efficiency,
+					TString ConfFile){
 
 // ReadConfigurationFiles;
 ReadConfFile Params(ConfFile);
-Params.Print();
+//Params.Print();
+if(mvaScan == TString::Format("true")){
+	Params.Efficiency = Efficiency;
+	Params.CosmicRate = CosmicRate;
+}
 
 //	Parameters of the Simulation 
 double Ntot = Params.Nstack * Params.NHbar * Params.Efficiency;		// Number of Total Events
-double FrequencyStep = Params.FrequencyStep;				// Kilo hertz
+double FrequencyStep = Params.FrequencyStep;		// Kilo hertz
 int SweepStep = Params.SweepStep;					// Number of FrequencyStep
 int BeforeOnset = Params.BinBeforeOnset;
 int Repetition = Params.Repetition;					// Repetition of the single run
-double pWall_c = Params.WallComponent_cb;					// Weight annihilation on walls for pdf1 (transition c -> b)
-double pWall_d = Params.WallComponent_ad;					// Weight annihilation on walls for pdf2 (transition d -> a)
-double Ncosmic = Params.TimeStep * Params.CosmicRate;			// Number of Cosmic Events
+double pWall_c = Params.WallComponent_cb;			// Weight annihilation on walls for pdf1 (transition c -> b)
+double pWall_d = Params.WallComponent_ad;			// Weight annihilation on walls for pdf2 (transition d -> a)
+double Ncosmic = Params.TimeStep * Params.CosmicRate;	// Number of Cosmic Events
 //	Lineshape Parameters
 double x_cb_start = Params.x_cb_start;
 double x_cb_end = Params.x_cb_end;
@@ -52,10 +59,10 @@ double Norm_da = Params.Norm_da;
 
 
 int Ntrial = Nloop;						// Ntrial
-double Nc = Ntot*Params.C; 					// Expected event for lineshape1
-double Nd = Ntot*(1 - Params.C); 				// Expected event for lineshape2
-double pGas_d = 1 - pWall_d; 					// Percentage of annihilation on residual gas
-double pGas_c = 1 - pWall_c; 					// Percentage of annihilation on residual gas
+double Nc = Ntot*Params.C; 				// Expected event for lineshape1
+double Nd = Ntot*(1 - Params.C); 		// Expected event for lineshape2
+double pGas_d = 1 - pWall_d; 			// Percentage of annihilation on residual gas
+double pGas_c = 1 - pWall_c; 			// Percentage of annihilation on residual gas
 
 int Nbin1 = Params.TotalStep;	// FIX NUMBER BIN EQUAL TO SWEEPSTEP
 int Nbin2 = Params.TotalStep;	// FIX NUMBER BIN EQUAL TO SWEEPSTEP
@@ -65,7 +72,7 @@ RooMsgService::instance().setGlobalKillBelow(RooFit::PROGRESS);
 
 RooRealVar x("x","r [cm]",0.,4.);
 RooRealVar mu("mu", "mu", 2.38);
-RooRealVar sigMix("sigMix", "sigMix",0.85);
+RooRealVar sigMix("sigMix", "sigMix",0.85, 0.85, 0.85);
 RooGaussian gauss_Mix("gauss", "gauss", x, mu, sigMix); //Pdf Annihilation on walls
 RooRealVar sigRay("sigRay", "sigma", 1.722);
 RooGenericPdf Rayleigh("line", "linear model", " TMath::Abs(x)/(sigRay*sigRay) * TMath::Exp(-(x*x)/(2*sigRay*sigRay))", RooArgSet(x,sigRay)); //PDF Residual Gas
@@ -106,8 +113,8 @@ TRandom3 *r = new TRandom3();
 		double LineShift_cb = -(shift/2);	// shift of the c to b lineshape
 		double LineShift_da = +(shift/2);	// shift of the d to a lineshape
 		
-		std::cout << "LineShift c to b " << LineShift_cb << std::endl;
-		std::cout << "LineShift d to a " << LineShift_da << std::endl;
+		//std::cout << "LineShift c to b " << LineShift_cb << std::endl;
+		//std::cout << "LineShift d to a " << LineShift_da << std::endl;
 		/////////////
 		// LOOP ON REPETITION
 		for(int run = 0; run < Repetition; run++){
@@ -239,13 +246,15 @@ TRandom3 *r = new TRandom3();
 						RunNumber2,
 						da_shift); // Fill RDataFrame
 		std::cout << "Save " << folder + nameFile2 << std::endl;
-		FilledFrame2.Snapshot("myTree", folder + nameFile2);		
+		FilledFrame2.Snapshot("myTree", folder + nameFile2);
+		std::cout << "Efficiency: " << Params.Efficiency << " Background: " << Params.CosmicRate << std::endl;
 		std::cout << "Total Event Gen. pdf1: " << Tot1 << std::endl;
 		std::cout << "Total Event Gen. pdf2: " << Tot2 << std::endl;
 		dataPdf1.Delete(); dataPdf2.Delete();
 	} // Loop Trials
 	
 	// Show the lineshape
+	/*
 	SetContent(genLineShape1,Nbin1,Cruijff, x_cb_start, x_cb_peak, sigma0_cb, sigma1_cb, k0_cb, k1_cb, Norm_cb);
 	SetContent(genLineShape2,Nbin2,Cruijff, x_da_start, x_da_peak, sigma0_da, sigma1_da, k0_da, k1_da, Norm_da);
 	TH1F *genLineShape3 = new TH1F("hist3", "lineshape", 500,0,400);
@@ -263,13 +272,11 @@ TRandom3 *r = new TRandom3();
 	genLineShape1->SetMarkerSize(0.5);
 	genLineShape1->SetLineColor(1);
 	genLineShape1->Draw();
-	/*
-	genLineShape3->SetMarkerStyle(21);
-	genLineShape3->SetMarkerColor(kViolet);
-	genLineShape3->SetLineColor(kViolet);
-	genLineShape3->SetMarkerSize(0.5);
-	genLineShape3->Draw("samehist");
-	*/
+	//genLineShape3->SetMarkerStyle(21);
+	//genLineShape3->SetMarkerColor(kViolet);
+	//genLineShape3->SetLineColor(kViolet);
+	//genLineShape3->SetMarkerSize(0.5);
+	//genLineShape3->Draw("samehist");
 	pad->cd(2);
 	genLineShape2->GetXaxis()->SetTitle("frequency [kHz]");
 	genLineShape2->SetMarkerStyle(21);
@@ -277,16 +284,15 @@ TRandom3 *r = new TRandom3();
 	genLineShape2->SetMarkerSize(0.5);
 	genLineShape2->SetLineColor(1);
 	genLineShape2->Draw();
-	/*
-	genLineShape4->SetMarkerStyle(21);
-	genLineShape4->SetMarkerColor(kViolet);
-	genLineShape4->SetMarkerSize(0.5);
-	genLineShape4->SetLineColor(kViolet);
-	genLineShape4->Draw("samehist");
-	*/
-	
+	//genLineShape4->SetMarkerStyle(21);
+	//genLineShape4->SetMarkerColor(kViolet);
+	//genLineShape4->SetMarkerSize(0.5);
+	//genLineShape4->SetLineColor(kViolet);
+	//genLineShape4->Draw("samehist");
 	auto c = new TCanvas("c1","simone is runnuning me out of patience");
 	genLineShape3->Draw("histl");
 	genLineShape4->Draw("samehistl");
-} // End program
-
+	*/
+	delete genLineShape1;
+	delete genLineShape2;
+}
