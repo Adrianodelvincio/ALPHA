@@ -109,7 +109,8 @@ TRandom3 *r = new TRandom3();
 		vector<double>  cb_shift;				// shift of c to b onset
 		vector<double>	da_shift;				// shift of d to a onset
 		
-		double shift = r->Uniform(-3*Params.FrequencyStep,+3*Params.FrequencyStep); // generate a shift in the hyperfine splitting
+		//double shift = r->Uniform(-3*Params.FrequencyStep,+3*Params.FrequencyStep); // generate a shift in the hyperfine splitting
+		double shift = r->Uniform(-6*Params.FrequencyStep,+2*Params.FrequencyStep); // generate a shift in the hyperfine splitting
 		double LineShift_cb = -(shift/2);	// shift of the c to b lineshape
 		double LineShift_da = +(shift/2);	// shift of the d to a lineshape
 		
