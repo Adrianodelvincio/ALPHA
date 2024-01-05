@@ -9,10 +9,10 @@ rate, efficiency = np.loadtxt("MVA-points.txt", unpack = True)
 # DATA GENERATION
 simulationCPP = "LoopLineShape"
 mvaScan = "\"true\""
-Nfiles = "10"
+Nfiles = "30"
 ConfFile = "\"ToyConfiguration.txt\""
 
-"""
+
 ROOT.gInterpreter.ProcessLine(".L LoopLineShape.cpp")
 for i, item in enumerate(efficiency):
 	CosmicRate = str(rate[i])
@@ -28,7 +28,7 @@ for i, item in enumerate(efficiency):
 	ROOT.gInterpreter.ProcessLine(code)
 	# copy the configuration file in the folder
 	os.popen("cp ToyConfiguration.txt " + folder + "/"  + ConfFile)
-"""
+
 
 # Constant Fraction
 bias_cf = np.zeros(len(rate))
@@ -51,7 +51,7 @@ variance_thr = np.zeros(len(rate))
 ROOT.gInterpreter.ProcessLine(".L ScanAnalysis.cpp")
 for i, item in enumerate(rate):
 	result = ROOT.std.vector("double")(10)
-	result = ROOT.ScanAnalysis("mva_" + str(i) + "/", "mva_" +  str(i) + "/ToyConfiguration.txt",0,10,3,0.1,item)
+	result = ROOT.ScanAnalysis("mva_" + str(i) + "/", "mva_" +  str(i) + "/ToyConfiguration.txt",0,30,3,0.1,item)
 	print("point %d" % i, " ", type(result), " ", result)
 	npResult = np.asarray(result)
 	
