@@ -33,7 +33,7 @@ std::vector<double> ScanAnalysis(TString directory,
 
 	
 	ReadConfFile Params(ConfFile); // Read the values from the configuration file 
-	Params.Print();
+	//Params.Print();
 	Params.CosmicRate = rate;
 	double CosmicBackground = Params.TimeStep * Params.CosmicRate;	// Number of Cosmic Events
 	double FrequencyStep = Params.FrequencyStep;
