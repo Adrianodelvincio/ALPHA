@@ -21,6 +21,7 @@ double firstOverThreshold(ROOT::RDF::RResultPtr<TH1D> histpdf, double threshold)
 			bin = i;
 			break;
 		}
+		onset = histpdf->GetBinCenter(i);
 	}
 	std::cout << "Threshold: " << threshold << " frequency: " << histpdf->GetBinCenter(bin) << " bin content: " << histpdf->GetBinContent(bin) << std::endl;
 	return onset;
