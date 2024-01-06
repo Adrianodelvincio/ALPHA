@@ -114,10 +114,10 @@ std::vector<double> ScanAnalysis(TString directory,
 		diff_neigh.push_back(onset2 - onset1 - (Params.x_da_start + lineShiftda[0] - Params.x_cb_start - lineShiftcb[0]));
 		
 	}
-	return 		{mean(diff_thr), stdev(diff_thr) + abs(diff_thr),		// THRESHOLD
-			mean(diff_2017),stdev(diff_2017) + abs(diff_2017),		// FOWARD
-			mean(diff_rev), stdev(diff_rev) + abs(diff_rev),		// REVERSED
-			mean(diff_cfrac), stdev(diff_cfrac) + abs(diff_cfrac),		// CONSTANT FRACTION
-			mean(diff_neigh), stdev(diff_neigh) + abs(diff_neigh)};		// SUM NEIGHBORS
+	return 		{mean(diff_thr), stdev(diff_thr),	// THRESHOLD
+			mean(diff_2017),stdev(diff_2017),	// FOWARD
+			mean(diff_rev), stdev(diff_rev),	// REVERSED
+			mean(diff_cfrac), stdev(diff_cfrac),	// CONSTANT FRACTION
+			mean(diff_neigh), stdev(diff_neigh)};	// SUM NEIGHBORS
 }
 
