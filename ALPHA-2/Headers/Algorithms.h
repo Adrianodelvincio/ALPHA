@@ -118,6 +118,7 @@ double sumNeighbors(ROOT::RDF::RResultPtr<TH1D> histpdf, double threshold, int N
 			bin = i;
 			break;
 		}
+		onset = histpdf->GetBinCenter(i);
 	}
 	std::cout << "sumNeighbors: " << threshold << " frequency: " << histpdf->GetBinCenter(bin) << " bin content: " << histpdf->GetBinContent(bin) << std::endl;
 	return onset;

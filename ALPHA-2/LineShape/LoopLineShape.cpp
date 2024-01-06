@@ -248,9 +248,9 @@ TRandom3 *r = new TRandom3();
 						da_shift); // Fill RDataFrame
 		std::cout << "Save " << folder + nameFile2 << std::endl;
 		FilledFrame2.Snapshot("myTree", folder + nameFile2);
-		std::cout << "Efficiency: " << Params.Efficiency << " Background: " << Params.CosmicRate << std::endl;
-		std::cout << "Total Event Gen. pdf1: " << Tot1 << std::endl;
-		std::cout << "Total Event Gen. pdf2: " << Tot2 << std::endl;
+		//std::cout << "Efficiency: " << Params.Efficiency << " Background: " << Params.CosmicRate << std::endl;
+		//std::cout << "Total Event Gen. pdf1: " << Tot1 << std::endl;
+		//std::cout << "Total Event Gen. pdf2: " << Tot2 << std::endl;
 		dataPdf1.Delete(); dataPdf2.Delete();
 	} // Loop Trials
 	

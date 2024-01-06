@@ -26,6 +26,7 @@ std::vector<double> ScanAnalysis(TString directory,
 					int stop,
 					double N, 			// Threshold coefficient
 					double fraction, 	// constant fraction discrimination
+					double Nsum,
 					double rate
 					){
 	//ConfFile = directory + "ToyConfiguration.txt";
@@ -107,8 +108,8 @@ std::vector<double> ScanAnalysis(TString directory,
 		v2_cfrac.push_back(onset2 - (Params.x_da_start + lineShiftda[0]));
 		diff_cfrac.push_back(onset2 - onset1 - (Params.x_da_start + lineShiftda[0] - Params.x_cb_start - lineShiftcb[0]));
 		// SUM NEIGHBORS
-		onset1 = sumNeighbors(Spectra1, CosmicBackground, N);
-		onset2 = sumNeighbors(Spectra2, CosmicBackground, N);
+		onset1 = sumNeighbors(Spectra1, CosmicBackground, Nsum);
+		onset2 = sumNeighbors(Spectra2, CosmicBackground, Nsum);
 		v1_neigh.push_back(onset1 - (Params.x_cb_start + lineShiftcb[0]));
 		v2_neigh.push_back(onset2 - (Params.x_da_start + lineShiftda[0]));
 		diff_neigh.push_back(onset2 - onset1 - (Params.x_da_start + lineShiftda[0] - Params.x_cb_start - lineShiftcb[0]));
