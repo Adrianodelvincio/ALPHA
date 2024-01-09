@@ -4,6 +4,8 @@ from matplotlib import pyplot as plt
 import array
 import os, sys
 from multiprocessing import Pool
+from matplotlib import rcParams
+rcParams['axes.titlepad'] = 20 
 
 rate, efficiency = np.loadtxt("MVA-points.txt", unpack = True)
 
@@ -12,6 +14,13 @@ simulationCPP = "LoopLineShape"
 mvaScan = "\"true\""
 ConfFile = "\"ToyConfiguration.txt\""
 
+def replace_line(file_name, line_num, text):
+    lines = open(file_name, 'r').readlines()
+    lines[line_num] = text
+    out = open(file_name, 'w')
+    out.writelines(lines)
+    out.close()
+
 if "-g" in sys.argv:
 	Nfiles = sys.argv[2]
 	ROOT.gInterpreter.ProcessLine(".L LoopLineShape.cpp")
@@ -19,41 +28,41 @@ if "-g" in sys.argv:
 	def generate(i):
 		CosmicRate = str(rate[i])
 		Efficiency = str(efficiency[i])
-		folder = "mva_" + str(i)
+		folder = "try_" + str(i)
 		if not os.path.exists(folder):	# Check if the folder exist
 			os.makedirs(folder)	# Create the folder
 		code = simulationCPP + "(" + Nfiles + ",\"" + folder + "/\"," + mvaScan + "," + CosmicRate + "," + Efficiency + "," + ConfFile + ")"
 		print("running: ", code)
-		ROOT.gInterpreter.ProcessLine(code)
-		os.popen("cp ToyConfiguration.txt " + folder + "/"  + ConfFile)
-
-	if __name__ == "__main__":
-		#index = [18,19,20,21,22,23,24]
-		index = [25,26,27,28,29,30,31]
-		with Pool(processes = 10, maxtasksperchild = 1) as pool:
-			pool.map(generate, index)
-
-"""
-Sequential Generation
-if "-g" in sys.argv:
-	ROOT.gInterpreter.ProcessLine(".L LoopLineShape.cpp")
-	Nfiles = sys.argv[2]
-	for i, item in enumerate(efficiency):
-		CosmicRate = str(rate[i])
-		Efficiency = str(item)
+		ROOT.LoopLineShape(int(Nfiles),folder + "/","true", rate[i], efficiency[i],"ToyConfiguration.txt")
+		os.popen("cp ToyConfiguration.txt " + folder + "/"  + "ToyConfiguration.txt")	
+	
+	# Paraller generation of the data
+	njob = 7
+	indexes = range(0,len(rate))
+	for i in range(0, int(len(rate)/njob)):
+		#Create list of point to be generated
+		start = i*njob
+		stop = (i+1)*njob
+		index = np.asarray(indexes[start:stop])
+		print("Generating MVA points: ", index)
+		if __name__ == "__main__":
+			# Generate Files
+			with Pool(processes = njob, maxtasksperchild = 1) as pool:
+				pool.map(generate, index)
+		# Create list of last points to be generated
+		if (i == (int(len(rate)/njob) - 1) and (len(rate))%njob != 0):
+			start = (i+1)*njob
+			stop = start + len(rate)%njob
+			index = np.asarray(indexes[start:stop])
+			print("generating last points: " , index)
+			# Generate last points
+			if __name__ == "__main__":
+				with Pool(processes = njob, maxtasksperchild = 1) as pool:
+					pool.map(generate, index)
+	for i in range(0,len(rate)):
 		folder = "mva_" + str(i)
-		# Create folder
-		
-		if not os.path.exists(folder):	# Check if the folder exist
-			os.makedirs(folder)	# Create the folder
-
-		code = simulationCPP + "(" + Nfiles + ",\"" + folder + "/\"," + mvaScan + "," + CosmicRate + "," + Efficiency + "," + ConfFile + ")"
-		print("running: ", code)
-		# Execute simulation code
-		ROOT.gInterpreter.ProcessLine(code)
-		# copy the configuration file in the folder
-		os.popen("cp ToyConfiguration.txt " + folder + "/"  + ConfFile)
-"""
+		replace_line(folder + "/ToyConfiguration.txt", 17, "CosmicRate = %f\n" % (rate[i]))
+		replace_line(folder + "/ToyConfiguration.txt", 18, "Efficiency = %f\n" % (efficiency[i]))
 
 # Constant Fraction
 bias_cf = np.array([])
@@ -101,50 +110,12 @@ if __name__ == "__main__":
 			variance_sum = np.append(variance_sum, results[9])
 
 
-
-"""
-#SEQUENTIAL VERSION
-
-# Constant Fraction
-bias_cf = np.array(len(rate))
-variance_cf = np.zeros(len(rate))
-# Foward 2017
-bias_fw = np.zeros(len(rate))
-variance_fw = np.zeros(len(rate))
-# Reversed 2017
-bias_rev = np.zeros(len(rate))
-variance_rev = np.zeros(len(rate))
-# Sum Neighbors 
-bias_sum = np.zeros(len(rate))
-variance_sum = np.zeros(len(rate))
-# Threshold
-bias_thr = np.zeros(len(rate))
-variance_thr = np.zeros(len(rate))
-
-for i, item in enumerate(rate):
-	result = ROOT.ScanAnalysis(folder + str(i) + "/", folder +  str(i) + "/ToyConfiguration.txt",0,trial,3,0.3,item)
-	print("point %d" % i, " ", type(result), " ", result)
-	npResult = np.asarray(result)
-	bias_thr[i] = npResult[0]
-	variance_thr[i] = npResult[1]
-	bias_cf[i] = npResult[6]
-	variance_cf[i] = npResult[7]
-	bias_fw[i] = npResult[2]
-	variance_fw[i] = npResult[3]
-	bias_rev[i] = npResult[4]
-	variance_rev[i] = npResult[5]
-	bias_sum[i] = npResult[8]
-	variance_sum[i] = npResult[9]
-"""
-
 # define a cost function, function of bias and variance
 cost_cf = (np.abs(bias_cf) + variance_cf)**2/variance_cf	
 cost_fw = (np.abs(bias_fw) + variance_fw)**2/variance_fw
 cost_rev = (np.abs(bias_rev) + variance_rev)**2/variance_rev
 cost_sum = (np.abs(bias_sum) + variance_sum)**2/variance_sum
 cost_thr = (np.abs(bias_thr) + variance_thr)**2/variance_thr
-
-print(len(rate), len(cost_cf))
 
 plt.figure(1, figsize = (12,12))
 plt.title("MVA scan " + r"$N_{trial}$ = " + str(trial + 1) , fontsize = 20)
@@ -156,7 +127,7 @@ plt.errorbar(rate,cost_cf, linestyle = '',marker = "v", color = "red", label = "
 plt.errorbar(rate,cost_fw, linestyle = '',marker = ".", color = "blue", label = "foward")
 plt.errorbar(rate,cost_rev, linestyle = '',marker = "D", color = "green", label = "reversed")
 plt.errorbar(rate,cost_sum, linestyle = '',marker = "s", color = "black", label = "Neighbors sum (N = %d)" % Nsum)
-plt.errorbar(rate,cost_thr, linestyle = '',marker = "D", color = "brown", label = "over Threshold (> 3)")
+plt.errorbar(rate,cost_thr, linestyle = '',marker = "D", color = "orange", label = "over Threshold (> 3)")
 plt.legend(fontsize = 10)
 
 plt.figure(2, figsize = (12,12))
@@ -165,36 +136,35 @@ plt.xlabel("rate [events/second]", fontsize = 15)
 plt.ylabel("Bias", fontsize = 15)
 plt.xscale("log")
 plt.grid()
-plt.errorbar(rate,bias_cf, linestyle = '',marker = "v", color = "red", label = "constant fraction 30%")
-plt.errorbar(rate,bias_fw, linestyle = '',marker = ".", color = "blue", label = "foward")
-plt.errorbar(rate,bias_rev, linestyle = '',marker = "D", color = "green", label = "reversed")
-plt.errorbar(rate,bias_sum, linestyle = '',marker = "s", color = "black", label = "Neighbors sum (N = %d)" % Nsum)
-plt.errorbar(rate,bias_thr, linestyle = '',marker = "D", color = "brown", label = "over Threshold (> 3)")
+plt.errorbar(rate,np.abs(bias_cf), linestyle = '',marker = "v", color = "red", label = "constant fraction 30%")
+plt.errorbar(rate,np.abs(bias_fw), linestyle = '',marker = ".", color = "blue", label = "foward")
+plt.errorbar(rate,np.abs(bias_rev), linestyle = '',marker = "D", color = "green", label = "reversed")
+plt.errorbar(rate,np.abs(bias_sum), linestyle = '',marker = "s", color = "black", label = "Neighbors sum (N = %d)" % Nsum)
+plt.errorbar(rate,np.abs(bias_thr), linestyle = '',marker = "D", color = "orange", label = "over Threshold (> 3)")
 plt.legend(fontsize = 10)
 
 plt.figure(3, figsize = (12,12))
-plt.title("Variance vs Bias " + r"$N_{trial}$ = " + str(trial + 1) , fontsize = 20)
-plt.xlabel("Variance [kHz]", fontsize = 15)
+plt.title(r"$\sigma$ vs Bias " + r"$N_{trial}$ = " + str(trial + 1) , fontsize = 20)
+plt.xlabel(r"$\sigma$ [kHz]", fontsize = 15)
 plt.ylabel("Bias [kHz]", fontsize = 15)
 plt.grid()
 plt.errorbar(variance_cf,bias_cf, linestyle = '',marker = "v", color = "red", label = "constant fraction 30%")
 plt.errorbar(variance_fw,bias_fw, linestyle = '',marker = ".", color = "blue", label = "foward")
-plt.errorbar(variance_rev,bias_rev, linestyle = '',marker = "D", color = "black", label = "reversed")
+plt.errorbar(variance_rev,bias_rev, linestyle = '',marker = "D", color = "green", label = "reversed")
 plt.errorbar(variance_sum,bias_sum, linestyle = '',marker = "s", color = "black", label = "Neighbors sum (N = %d)" % Nsum)
-plt.errorbar(variance_thr,bias_thr, linestyle = '',marker = "D", color = "brown", label = "over Threshold (> 3)")
+plt.errorbar(variance_thr,bias_thr, linestyle = '',marker = "D", color = "orange", label = "over Threshold (> 3)")
 plt.legend(fontsize = 10)
 
 plt.figure(4, figsize = (12,12))
 plt.title("MVA scan " + r"$N_{trial}$ = " + str(trial + 1) , fontsize = 20)
 plt.xlabel("rate [events/second]", fontsize = 15)
-plt.ylabel("variance [kHz]", fontsize = 15)
+plt.ylabel(r"$\sigma$ [kHz]", fontsize = 15)
 plt.xscale("log")
 plt.grid()
 plt.errorbar(rate,variance_cf, linestyle = '',marker = "v", color = "red", label = "constant fraction 30%")
 plt.errorbar(rate,variance_fw, linestyle = '',marker = ".", color = "blue", label = "foward")
-plt.errorbar(rate, variance_rev, linestyle = '',marker = "D", color = "black", label = "reversed")
-plt.errorbar(rate,variance_sum, linestyle = '',marker = "s", color = "green", label = "Neighbors sum (N = %d)" % Nsum)
-plt.errorbar(rate,variance_thr, linestyle = '',marker = "D", color = "brown", label = "over Threshold (> 3)")
+plt.errorbar(rate, variance_rev, linestyle = '',marker = "D", color = "green", label = "reversed")
+plt.errorbar(rate,variance_sum, linestyle = '',marker = "s", color = "black", label = "Neighbors sum (N = %d)" % Nsum)
+plt.errorbar(rate,variance_thr, linestyle = '',marker = "D", color = "orange", label = "over Threshold (> 3)")
 plt.legend(fontsize = 10)
-
 plt.show()
