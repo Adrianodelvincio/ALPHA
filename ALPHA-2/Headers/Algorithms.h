@@ -2,15 +2,24 @@
 #define ALGORITHMS_H
 #include <ROOT/RDataFrame.hxx>
 
+double firstOverThreshold(ROOT::RDF::RResultPtr<TH1D> histpdf, double threshold, double background){ // WITH COSMIC BACKGROUND
+	// bin 0 is underflow
+	double onset = 0;	// onset value 
+	double bin = 1;		// bin onset
+	for(int i = 1; i < histpdf->GetNbinsX(); i++){
+		bin = i;
+		if(histpdf->GetBinContent(i) > round(threshold + background)){
+			onset = histpdf->GetBinCenter(i);
+			bin = i;
+			break;
+		}
+		onset = histpdf->GetBinCenter(i);
+	}
+	//std::cout << "Threshold: " << threshold << " frequency: " << histpdf->GetBinCenter(bin) << " bin content: " << histpdf->GetBinContent(bin) << std::endl;
+	return onset;
+}
 
-double firstOverThreshold(ROOT::RDF::RResultPtr<TH1D> histpdf, double threshold);
-double firstWithVeto(ROOT::RDF::RResultPtr<TH1D> histpdf, double threshold);
-double algorithm_2017(ROOT::RDF::RResultPtr<TH1D> histpdf);
-double reverse_2017(ROOT::RDF::RResultPtr<TH1D> histpdf);
-double constFrac(ROOT::RDF::RResultPtr<TH1D> histpdf, double fraction);
-double sumNeighbors(ROOT::RDF::RResultPtr<TH1D> histpdf, double threshold, int N);
-
-double firstOverThreshold(ROOT::RDF::RResultPtr<TH1D> histpdf, double threshold){
+double firstOverThreshold(ROOT::RDF::RResultPtr<TH1D> histpdf, double threshold){ // WITHOUT COSMIC BACKGROUND
 	// bin 0 is underflow
 	double onset = 0;	// onset value 
 	double bin = 1;		// bin onset
@@ -44,9 +53,24 @@ double firstWithVeto(ROOT::RDF::RResultPtr<TH1D> histpdf, double threshold){
 	return onset;
 }
 
+double algorithm_2017(ROOT::RDF::RResultPtr<TH1D> histpdf, double background){ //WITH COSMIC BACKGROUND
+	// bin 0 is underflow
+	double onset = 0;	// onset value 
+	double bin = 1;		// bin onset
+	for(int i = 1; i < histpdf->GetNbinsX(); i++){
+		if(histpdf->GetBinContent(i) > round(0 + background)){
+			if(histpdf->GetBinContent(i+1) > round(1 + background)){
+				onset = histpdf->GetBinCenter(i);
+				bin = i;
+				break;
+			}
+		}
+	}
+	//std::cout << "2017: " << " i: " << bin  << " bin content: " << histpdf->GetBinContent(bin) << std::endl;
+	return onset;
+}
 
-
-double algorithm_2017(ROOT::RDF::RResultPtr<TH1D> histpdf){
+double algorithm_2017(ROOT::RDF::RResultPtr<TH1D> histpdf){ //WITHOUT COSMIC BACKGROUND
 	// bin 0 is underflow
 	double onset = 0;	// onset value 
 	double bin = 1;		// bin onset
@@ -63,15 +87,28 @@ double algorithm_2017(ROOT::RDF::RResultPtr<TH1D> histpdf){
 	return onset;
 }
 
-double reverse_2017(ROOT::RDF::RResultPtr<TH1D> histpdf){
+double reverse_2017(ROOT::RDF::RResultPtr<TH1D> histpdf, double background){ // WITH COSMIC BACKGROUND
 	// bin 0 is underflow
 	double onset = 0;			// onset value 
 	double bin = histpdf->GetNbinsX();	// bin onset
-	//std::cout << "last bin " << bin << " content: " << histpdf->GetBinContent(bin) << std::endl;
-	//std::cout << "Loop" << std::endl;
 	for(int i = histpdf->GetMaximumBin(); i >= 1; --i){
-		//std::cout << "current bin: " << i << " content: " << histpdf->GetBinContent(i) << std::endl;
-		//std::cout << "   following bin: " << i -1 << " content: " <<  histpdf->GetBinContent(i -1) << std::endl;
+		if(histpdf->GetBinContent(i) < round(3 + background) && histpdf->GetBinContent(i-1) < round(2 + background)){
+			bin = i;
+			onset = histpdf->GetBinCenter(i);
+			break;
+		}
+		onset = histpdf->GetBinCenter(i);
+		bin = i;
+	}
+	std::cout << "2017 reversed" << " i: " << bin << " frequency: " << histpdf->GetBinCenter(bin)  << " bin content: " << histpdf->GetBinContent(bin) << std::endl;
+	return onset;
+}
+
+double reverse_2017(ROOT::RDF::RResultPtr<TH1D> histpdf){ // WITHOUT COSMIC BACKGROUND
+	// bin 0 is underflow
+	double onset = 0;			// onset value 
+	double bin = histpdf->GetNbinsX();	// bin onset
+	for(int i = histpdf->GetMaximumBin(); i >= 1; --i){
 		if(histpdf->GetBinContent(i) < 3 && histpdf->GetBinContent(i-1) < 2){
 			bin = i;
 			onset = histpdf->GetBinCenter(i);
@@ -80,18 +117,18 @@ double reverse_2017(ROOT::RDF::RResultPtr<TH1D> histpdf){
 		onset = histpdf->GetBinCenter(i);
 		bin = i;
 	}
-	//std::cout << "2017 reversed" << " i: " << bin << " frequency: " << histpdf->GetBinCenter(bin)  << " bin content: " << histpdf->GetBinContent(bin) << std::endl;
+	std::cout << "2017 reversed" << " i: " << bin << " frequency: " << histpdf->GetBinCenter(bin)  << " bin content: " << histpdf->GetBinContent(bin) << std::endl;
 	return onset;
 }
 
-double constFrac(ROOT::RDF::RResultPtr<TH1D> histpdf, double fraction, double expectedNoise){
+double constFrac(ROOT::RDF::RResultPtr<TH1D> histpdf, double fraction, double background){ // WITH BACKGROUND
 // bin 0 is underflow
 	double onset = 0;	// onset value 
 	double bin = 1;		// bin onset
-	double threshold = fraction*(histpdf->GetMaximum() - expectedNoise);
+	double threshold = fraction*(histpdf->GetMaximum() - background);
 	for(int i = 1; i < histpdf->GetNbinsX(); i++){
 		bin = i;
-		if(histpdf->GetBinContent(i) > (threshold + expectedNoise)){
+		if(histpdf->GetBinContent(i) > (threshold + background)){
 			onset = histpdf->GetBinCenter(i);
 			bin = i;
 			break;
@@ -102,7 +139,7 @@ double constFrac(ROOT::RDF::RResultPtr<TH1D> histpdf, double fraction, double ex
 
 }
 
-double constFrac(ROOT::RDF::RResultPtr<TH1D> histpdf, double fraction){
+double constFrac(ROOT::RDF::RResultPtr<TH1D> histpdf, double fraction){ // WITHOUT BACKGROUND
 // bin 0 is underflow
 	double onset = 0;	// onset value 
 	double bin = 1;		// bin onset
@@ -117,10 +154,9 @@ double constFrac(ROOT::RDF::RResultPtr<TH1D> histpdf, double fraction){
 	}
 	//std::cout << "ConstFrac: " << threshold << " frequency: " << histpdf->GetBinCenter(bin) << " bin content: " << histpdf->GetBinContent(bin) << std::endl;
 	return onset;
-
 }
 
-double sumNeighbors(ROOT::RDF::RResultPtr<TH1D> histpdf, double background, int N){
+double sumNeighbors(ROOT::RDF::RResultPtr<TH1D> histpdf, int N, double background){
 	// bin 0 is underflow
 	double onset = 0;	// onset value 
 	double bin = 1;		// bin onset
@@ -136,7 +172,7 @@ double sumNeighbors(ROOT::RDF::RResultPtr<TH1D> histpdf, double background, int 
 		}
 		onset = histpdf->GetBinCenter(i);
 	}
-	std::cout << "sumNeighbors: " << threshold << " background: " << background << " frequency: " << histpdf->GetBinCenter(bin) << " bin content: " << histpdf->GetBinContent(bin) << std::endl;
+	//std::cout << "sumNeighbors: " << threshold << " background: " << background << " frequency: " << histpdf->GetBinCenter(bin) << " bin content: " << histpdf->GetBinContent(bin) << std::endl;
 	return onset;
 }
 
@@ -156,7 +192,7 @@ double hybrid_cfSum(ROOT::RDF::RResultPtr<TH1D> histpdf, double fraction ,double
 		}
 		onset = histpdf->GetBinCenter(i);
 	}
-	std::cout << "hybrid: " << threshold << " background: " << background << " frequency: " << histpdf->GetBinCenter(bin) << " bin content: " << histpdf->GetBinContent(bin) << std::endl;
+	//std::cout << "hybrid: " << threshold << " background: " << background << " frequency: " << histpdf->GetBinCenter(bin) << " bin content: " << histpdf->GetBinContent(bin) << std::endl;
 	return onset;	
 }
 #endif

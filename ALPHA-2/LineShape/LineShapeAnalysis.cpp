@@ -32,18 +32,37 @@ void LineShapeAnalysis(TString directory = "linear/",
 	
 	// Show the first two files
 	ROOT::RDataFrame rdf("myTree", {FileList[0], FileList[1]});
-	auto hist_ctob = rdf.Filter("runNumber == 0")
+	auto hist_ctob = rdf.Filter("runNumber == 1 || type != 2")
 			.Filter("frequence <= 1000")
 			.Filter("type != 2")
 			.Histo1D({"Counts"," c to b",static_cast<int>(SweepStep),startPdf1, startPdf1 + SweepStep*FrequencyStep }, "frequence");
-	auto ctob_withCosmic = rdf.Filter("runNumber == 0")
+	auto ctob_withCosmic = rdf.Filter("runNumber == 1 || type != 2")
 			.Filter("frequence <= 1000")
 			//.Filter("type != 2")
 			.Histo1D({"Counts"," c to b",static_cast<int>(SweepStep),startPdf1, startPdf1 + SweepStep*FrequencyStep }, "frequence");
+	
 	auto histF4 = 	rdf.Filter("runNumber == 0")
 			.Filter("frequence >= 1000")
 			.Filter("type != 2")
 			.Histo1D({"Counts"," d to a",static_cast<int>(SweepStep), startPdf2, startPdf2 + SweepStep*FrequencyStep}, "frequence");
+
+	auto b = new TCanvas("b1", "Spectral lines");
+	auto pad = new TPad("pad1", "pad",0,0,1,1);
+	pad->Divide(2,1,0.001,0.001); pad->Draw();
+	pad->cd(1);
+	hist_ctob->SetTitle("c to b without cosmic events");
+	hist_ctob->SetMarkerStyle(21);
+	hist_ctob->SetMarkerColor(2);
+	hist_ctob->SetLineColor(4);
+	hist_ctob->DrawClone();
+	hist_ctob->DrawClone("SAME P");
+	pad->cd(2);
+	ctob_withCosmic->SetTitle("c to b with cosmic events");
+	ctob_withCosmic->SetMarkerStyle(21);
+	ctob_withCosmic->SetMarkerColor(2);
+	ctob_withCosmic->SetLineColor(4);
+	ctob_withCosmic->DrawClone();
+	ctob_withCosmic->DrawClone("SAME P");
 
 	// Define some vectors to store the results
 	vector<double> MCtruth;
@@ -59,6 +78,14 @@ void LineShapeAnalysis(TString directory = "linear/",
 		count  += 1; std::cout << "Analizzo DataFrame " << count << "\n" << std::endl;
 		
 		ROOT::RDataFrame frame("myTree", {FileList[i], FileList[i+1]});		// Load i-th dataset
+		auto Spectra1 = frame.Filter("frequence <= 1000")
+					.Filter("type != 2 || runNumber == 1")
+					.Histo1D({"Counts","Frequence", static_cast<int>(SweepStep),startPdf1, startPdf1 + SweepStep*FrequencyStep }, "frequence");
+		
+		auto Spectra2 = frame.Filter("frequence >= 1000")
+					.Filter("type != 2 || runNumber == 1")
+					.Histo1D({"Counts","Frequence", static_cast<int>(SweepStep), startPdf2, startPdf2 + SweepStep*FrequencyStep}, "frequence");
+		/*
 		auto Spectra1 = frame.Filter("runNumber == 1")
 							 .Filter("frequence <= 1000")
 							 //.Filter("type != 2")
@@ -68,7 +95,7 @@ void LineShapeAnalysis(TString directory = "linear/",
 							 .Filter("frequence >= 1000")
 							 //.Filter("type != 2")
 							 .Histo1D({"Counts","Frequence", static_cast<int>(SweepStep), startPdf2, startPdf2 + SweepStep*FrequencyStep}, "frequence");
-		
+		*/
 		auto frame1 = frame.Filter("runNumber == 1").Filter("frequence <= 1000").Mean<double>("lineShift");
 		auto frame2 = frame.Filter("runNumber == 1").Filter("frequence >= 1000").Mean<double>("lineShift");
 		// Load the shifts of the lineshapes
@@ -104,6 +131,7 @@ void LineShapeAnalysis(TString directory = "linear/",
 		v1_rev.push_back(onset1 - (Params.x_cb_start + lineShiftcb[0]));
 		v2_rev.push_back(onset2 - (Params.x_da_start + lineShiftda[0]));
 		diff_rev.push_back(onset2 - onset1 - (Params.x_da_start + lineShiftda[0] - Params.x_cb_start - lineShiftcb[0]));
+		//std::cout << "onset 1 - onset 2 - MCtruth: " << onset2 - onset1 - (Params.x_da_start + lineShiftda[0] - Params.x_cb_start - lineShiftcb[0]) << std::endl;
 		// CONSTANT FRACTION
 		onset1 = constFrac(Spectra1, fraction);
 		onset2 = constFrac(Spectra2, fraction);
@@ -120,42 +148,26 @@ void LineShapeAnalysis(TString directory = "linear/",
 		diff_neigh.push_back(onset2 - onset1 - (Params.x_da_start + lineShiftda[0] - Params.x_cb_start - lineShiftcb[0]));
 		
 	}
-
-	// PLOTS 
-
-	auto b = new TCanvas("b1", "Spectral lines");
-	auto pad = new TPad("pad1", "pad",0,0,1,1);
-	pad->Divide(2,1,0.001,0.001); pad->Draw();
-	pad->cd(1);
-	hist_ctob->SetTitle("c to b without cosmic events");
-	hist_ctob->SetMarkerStyle(21);
-	hist_ctob->SetMarkerColor(2);
-	hist_ctob->SetLineColor(4);
-	hist_ctob->DrawClone();
-	hist_ctob->DrawClone("SAME P");
-	pad->cd(2);
-	ctob_withCosmic->SetTitle("c to b with cosmic events");
-	ctob_withCosmic->SetMarkerStyle(21);
-	ctob_withCosmic->SetMarkerColor(2);
-	ctob_withCosmic->SetLineColor(4);
-	ctob_withCosmic->DrawClone();
-	ctob_withCosmic->DrawClone("SAME P");
 	
+	// Plots
 	auto h1 = new TH1D("h1","onset_{algorithm} - onset_{true}", 121, -70.5, 50.5);
 	auto h2 = new TH1D("h2","onset_{algorithm} - onset_{true}", 121, -70.5 , 50.5);
-	auto h3 = new TH1D("h2","(onset_{pdf1} - onset_{pdf2}) - MC_{truth}",121, -70.5 , 50.5);
-	auto h4 = new TH1D("h1","onset_{algorithm} - onset_{true}", 121, -70.5, 50.5);
-	auto h5 = new TH1D("h2","onset_{algorithm} - onset_{true}", 121, -70.5 , 50.5);
-	auto h6 = new TH1D("h2","(onset_{pdf1} - onset_{pdf2}) - MC_{truth}",121, -70.5 , 50.5);
-	auto h7 = new TH1D("h1","onset_{algorithm} - onset_{true}", 121, -70.5, 50.5);
-	auto h8 = new TH1D("h2","onset_{algorithm} - onset_{true}", 121, -70.5 , 50.5);
-	auto h9 = new TH1D("h2","(onset_{pdf1} - onset_{pdf2}) - MC_{truth}",121, -70.5 , 50.5);
-	auto h10 = new TH1D("h1","onset_{algorithm} - onset_{true}", 121, -70.5, 50.5);
-	auto h11 = new TH1D("h2","onset_{algorithm} - onset_{true}", 121, -70.5 , 50.5);
-	auto h12 = new TH1D("h2","(onset_{pdf1} - onset_{pdf2}) - MC_{truth}",121, -70.5 , 50.5);
-	auto h13 = new TH1D("h1","onset_{algorithm} - onset_{true}", 121, -70.5, 50.5);
-	auto h14 = new TH1D("h2","onset_{algorithm} - onset_{true}", 121, -70.5 , 50.5);
-	auto h15 = new TH1D("h2","(onset_{pdf1} - onset_{pdf2}) - MC_{truth}",121, -70.5 , 50.5);
+	auto h3 = new TH1D("h3","(onset_{pdf1} - onset_{pdf2}) - MC_{truth}",121, -70.5 , 50.5);
+	auto h4 = new TH1D("h4","onset_{algorithm} - onset_{true}", 121, -70.5, 50.5);
+	auto h5 = new TH1D("h5","onset_{algorithm} - onset_{true}", 121, -70.5 , 50.5);
+	auto h6 = new TH1D("h6","(onset_{pdf1} - onset_{pdf2}) - MC_{truth}",121, -300 , 300);
+	auto h7 = new TH1D("h7","onset_{algorithm} - onset_{true}", 121, -70.5, 50.5);
+	auto h8 = new TH1D("h8","onset_{algorithm} - onset_{true}", 121, -70.5 , 50.5);
+	auto h9 = new TH1D("h9","(onset_{pdf1} - onset_{pdf2}) - MC_{truth}",121, -70.5 , 50.5);
+	auto h10 = new TH1D("h10","onset_{algorithm} - onset_{true}", 121, -70.5, 50.5);
+	auto h11 = new TH1D("h11","onset_{algorithm} - onset_{true}", 121, -70.5 , 50.5);
+	auto h12 = new TH1D("h12","(onset_{pdf1} - onset_{pdf2}) - MC_{truth}",121, -70.5 , 50.5);
+	auto h13 = new TH1D("h13","onset_{algorithm} - onset_{true}", 121, -70.5, 50.5);
+	auto h14 = new TH1D("h14","onset_{algorithm} - onset_{true}", 121, -70.5 , 50.5);
+	auto h15 = new TH1D("h15","(onset_{pdf1} - onset_{pdf2}) - MC_{truth}",121, -70.5 , 50.5);
+		
+	
+	
 	////////////////////////////////
 	//2017 FOWARD
 	std::vector<double> w(v1_2017.size(),1); // weights vector
@@ -163,7 +175,10 @@ void LineShapeAnalysis(TString directory = "linear/",
    	h1->FillN(v1_2017.size(),v1_2017.data(), w.data());
    	h2->FillN(v2_2017.size(),v2_2017.data(), w.data());
    	h3->FillN(diff_2017.size(), diff_2017.data(), w.data());
+   	
    	auto g = new TGraph(MCtruth.size(), MCtruth.data(), diff_2017.data());
+	auto hh1 = new TH2D("hh1", "Scatter plot; MC_{truth} ;(onset_{pdf1} - onset_{pdf2}) - MC_{truth}",100, 1419.96e3,1420.02e3,100,-35,+35); // 2d hist
+   	hh1->FillN(MCtruth.size(), MCtruth.data(),diff_2017.data(),w.data());
    	
    	auto canvas = new TCanvas("d", "2017 algorithm", 1000,550);
 	auto pad2 = new TPad("pad2", "pad2",0,0,0,0);
@@ -188,11 +203,14 @@ void LineShapeAnalysis(TString directory = "linear/",
 	h3->SetLineColor(38);
 	h3->Draw();
 	pad2->cd(4);
+	hh1->Draw("COLZ");
+	/*
 	g->SetMarkerStyle(7); // Medium Dot
 	g->SetMarkerColor(9);
 	g->SetLineStyle(0);
-	g->SetTitle("Scatter plot; (onset_{pdf1} - onset_{pdf2}) - MC_{truth}; MC_{truth}");
+	g->SetTitle("Scatter plot; MC_{truth} ;(onset_{pdf1} - onset_{pdf2}) - MC_{truth} ");
 	g->Draw("AP");
+	*/
 	
 	TString name = "2017_foward"; TString endname = ".pdf"; 
 	int numero = 0;
@@ -223,6 +241,9 @@ void LineShapeAnalysis(TString directory = "linear/",
    	h5->FillN(v2_rev.size(),v2_rev.data(), w.data());
    	h6->FillN(diff_rev.size(), diff_rev.data(), w.data());
 	
+	auto hh2 = new TH2D("hh2", "Scatter plot; MC_{truth} ;(onset_{pdf1} - onset_{pdf2}) - MC_{truth}",100, 1419.96e3,1420.02e3,100,-35,+35); // 2d hist
+	hh2->FillN(MCtruth.size(), MCtruth.data(),diff_rev.data(),w.data());
+	
 	auto canvas1 = new TCanvas("d1", "2017 reversed", 1000,550);
 	auto pad3 = new TPad("pad3", "pad2",0,0,0,0);
 	gStyle->SetOptStat(1);
@@ -246,7 +267,9 @@ void LineShapeAnalysis(TString directory = "linear/",
 	h6->SetLineColor(38);
 	h6->Draw();
 	name = TString::Format("2017_reversed");
-	
+	pad3-cd(4);
+	hh2->Draw("COLZ");
+
 	numero = 0;
 	while(!gSystem->AccessPathName(folder + name + endname)){
 		numero += 1;
@@ -274,6 +297,9 @@ void LineShapeAnalysis(TString directory = "linear/",
    	h8->FillN(v2_thr.size(),v2_thr.data(), w.data());
    	h9->FillN(diff_thr.size(), diff_thr.data(), w.data());
 	
+	auto hh3 = new TH2D("hh3", "Scatter plot; MC_{truth} ;(onset_{pdf1} - onset_{pdf2}) - MC_{truth}",100, 1419.96e3,1420.02e3,100,-35,+35); // 2d hist
+	hh3->FillN(MCtruth.size(), MCtruth.data(),diff_thr.data(),w.data());
+	
 	auto canvas2 = new TCanvas("d2", "threshold", 1000,550);
 	auto pad4 = new TPad("pad4", "pad2",0,0,0,0);
 	gStyle->SetOptStat(1);
@@ -296,6 +322,8 @@ void LineShapeAnalysis(TString directory = "linear/",
 	h9->SetLineWidth(2);
 	h9->SetLineColor(38);
 	h9->Draw();
+	pad4-cd(4);
+	hh3->Draw("COLZ");
 	
 	name = TString::Format("Threshold_%d", static_cast<int>(mu));
 	numero = 0;
@@ -326,6 +354,9 @@ void LineShapeAnalysis(TString directory = "linear/",
    	h12->FillN(diff_cfrac.size(), diff_cfrac.data(), w.data());
    	auto g1 = new TGraph(MCtruth.size(), MCtruth.data(), diff_cfrac.data());
 	
+	auto hh4 = new TH2D("hh4", "Scatter plot; MC_{truth} ;(onset_{pdf1} - onset_{pdf2}) - MC_{truth}",100, 1419.96e3,1420.02e3,100,-35,+35); // 2d hist
+	hh4->FillN(MCtruth.size(), MCtruth.data(),diff_cfrac.data(),w.data());
+	
 	auto canvas3 = new TCanvas("d3", "constFract", 1000,550);
 	auto pad5 = new TPad("pad5", "pad2",0,0,0,0);
 	gStyle->SetOptStat(1);
@@ -349,12 +380,14 @@ void LineShapeAnalysis(TString directory = "linear/",
 	h12->SetLineColor(38);
 	h12->Draw();
 	pad5->cd(4);
+	hh4->Draw("COLZ");
+	/*
 	g1->SetMarkerStyle(7); // Medium Dot
 	g1->SetMarkerColor(9);
 	g1->SetLineStyle(0);
-	g1->SetTitle("Scatter plot; (onset_{pdf1} - onset_{pdf2}) - MC_{truth}; MC_{truth}");
+	g1->SetTitle("Scatter plot; MC_{truth} ;(onset_{pdf1} - onset_{pdf2}) - MC_{truth} ");
 	g1->Draw("AP");
-	
+	*/
 	name = TString::Format("constFract_%d", static_cast<int>(100*fraction));
 	numero = 0;
 	while(!gSystem->AccessPathName(folder + name + endname)){
@@ -382,6 +415,10 @@ void LineShapeAnalysis(TString directory = "linear/",
 	h13->FillN(v1_neigh.size(),v1_neigh.data(), w.data());
    	h14->FillN(v2_neigh.size(),v2_neigh.data(), w.data());
    	h15->FillN(diff_neigh.size(), diff_neigh.data(), w.data());
+	auto g2 = new TGraph(MCtruth.size(), MCtruth.data(), diff_neigh.data());
+	
+	auto hh5 = new TH2D("hh5", "Scatter plot; MC_{truth} ;(onset_{pdf1} - onset_{pdf2}) - MC_{truth}",100, 1419.96e3,1420.02e3,100,-35,+35); // 2d hist
+	hh5->FillN(MCtruth.size(), MCtruth.data(),diff_neigh.data(),w.data());
 	
 	auto canvas4 = new TCanvas("d4", "sumNeighbours", 1000,550);
 	auto pad6 = new TPad("pad6", "pad2",0,0,0,0);
@@ -405,7 +442,15 @@ void LineShapeAnalysis(TString directory = "linear/",
 	h15->SetLineWidth(2);
 	h15->SetLineColor(38);
 	h15->Draw();
-	
+	pad6->cd(4);
+	hh5->Draw("COLZ");
+	/*
+	g2->SetMarkerStyle(7); // Medium Dot
+	g2->SetMarkerColor(9);
+	g2->SetLineStyle(0);
+	g2->SetTitle("Scatter plot; MC_{truth} ;(onset_{pdf1} - onset_{pdf2}) - MC_{truth} ");
+	g2->Draw("AP");
+	*/
 	name = TString::Format("sumNeighbors_sigma%d", static_cast<int>(mu));
 	numero = 0;
 	while(!gSystem->AccessPathName(folder + name + endname)){
