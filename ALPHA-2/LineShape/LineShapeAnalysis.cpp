@@ -72,12 +72,17 @@ void LineShapeAnalysis(TString directory = "linear/",
 	vector<double> v1_cfrac, v2_cfrac;
 	vector<double> v1_neigh, v2_neigh;
 	vector<double> diff_2017, diff_rev, diff_thr, diff_cfrac, diff_neigh;
+	
+	//Onsetcb and Onset da
+	vector<double> v1_cb, v2_da;
+	
 	int count = 0;
 	// IMPLEMENTING THE TOY FOR THE ALGORITHM
 	for(int i = 0; i < FileList.size(); i += 2){
 		count  += 1; std::cout << "Analizzo DataFrame " << count << "\n" << std::endl;
 		
 		ROOT::RDataFrame frame("myTree", {FileList[i], FileList[i+1]});		// Load i-th dataset
+		/*
 		auto Spectra1 = frame.Filter("frequence <= 1000")
 					.Filter("type != 2 || runNumber == 1")
 					.Histo1D({"Counts","Frequence", static_cast<int>(SweepStep),startPdf1, startPdf1 + SweepStep*FrequencyStep }, "frequence");
@@ -85,7 +90,7 @@ void LineShapeAnalysis(TString directory = "linear/",
 		auto Spectra2 = frame.Filter("frequence >= 1000")
 					.Filter("type != 2 || runNumber == 1")
 					.Histo1D({"Counts","Frequence", static_cast<int>(SweepStep), startPdf2, startPdf2 + SweepStep*FrequencyStep}, "frequence");
-		/*
+		*/
 		auto Spectra1 = frame.Filter("runNumber == 1")
 							 .Filter("frequence <= 1000")
 							 //.Filter("type != 2")
@@ -95,14 +100,16 @@ void LineShapeAnalysis(TString directory = "linear/",
 							 .Filter("frequence >= 1000")
 							 //.Filter("type != 2")
 							 .Histo1D({"Counts","Frequence", static_cast<int>(SweepStep), startPdf2, startPdf2 + SweepStep*FrequencyStep}, "frequence");
-		*/
+		
 		auto frame1 = frame.Filter("runNumber == 1").Filter("frequence <= 1000").Mean<double>("lineShift");
 		auto frame2 = frame.Filter("runNumber == 1").Filter("frequence >= 1000").Mean<double>("lineShift");
 		// Load the shifts of the lineshapes
 		auto frame3 = frame.Filter("runNumber == 1").Filter("frequence >= 1000").Take<double>("lineShift");
 		auto frame4 = frame.Filter("runNumber == 1").Filter("frequence <= 1000").Take<double>("lineShift");
-		auto lineShiftda = frame3.GetValue(); std::cout << "LineShift c to b : " << lineShiftda[0] << std::endl;
-		auto lineShiftcb = frame4.GetValue(); std::cout << "LineShift c to b : " << lineShiftcb[0] << std::endl;
+		auto lineShiftda = frame3.GetValue(); //std::cout << "LineShift d to a : " << lineShiftda[0] << std::endl;
+		auto lineShiftcb = frame4.GetValue(); //std::cout << "LineShift c to b : " << lineShiftcb[0] << std::endl;
+		std::cout << std::setprecision(10);
+		std::cout << "d to a onset: " <<  Params.x_da_start << std::endl;
 		
 		double onset1;				// Reconstructed onset
 		double onset2;				// Reconstructed onset
@@ -128,6 +135,7 @@ void LineShapeAnalysis(TString directory = "linear/",
 		onset1 = reverse_2017(Spectra1);
 		onset2 = reverse_2017(Spectra2);
 		
+		v1_cb.push_back(onset1); v2_da.push_back(onset2);
 		v1_rev.push_back(onset1 - (Params.x_cb_start + lineShiftcb[0]));
 		v2_rev.push_back(onset2 - (Params.x_da_start + lineShiftda[0]));
 		diff_rev.push_back(onset2 - onset1 - (Params.x_da_start + lineShiftda[0] - Params.x_cb_start - lineShiftcb[0]));
@@ -150,9 +158,9 @@ void LineShapeAnalysis(TString directory = "linear/",
 	}
 	
 	// Plots
-	auto h1 = new TH1D("h1","onset_{algorithm} - onset_{true}", 121, -70.5, 50.5);
-	auto h2 = new TH1D("h2","onset_{algorithm} - onset_{true}", 121, -70.5 , 50.5);
-	auto h3 = new TH1D("h3","(onset_{pdf1} - onset_{pdf2}) - MC_{truth}",121, -70.5 , 50.5);
+	auto h1 = new TH1D("h1","onset_{algorithm} - onset_{true}", 81, -40.5, 40.5);
+	auto h2 = new TH1D("h2","onset_{algorithm} - onset_{true}", 81, -40.5 , 40.5);
+	auto h3 = new TH1D("h3","(onset_{pdf1} - onset_{pdf2}) - MC_{truth}",61, -20.5 , 40.5);
 	auto h4 = new TH1D("h4","onset_{algorithm} - onset_{true}", 121, -70.5, 50.5);
 	auto h5 = new TH1D("h5","onset_{algorithm} - onset_{true}", 121, -70.5 , 50.5);
 	auto h6 = new TH1D("h6","(onset_{pdf1} - onset_{pdf2}) - MC_{truth}",121, -300 , 300);
@@ -165,8 +173,9 @@ void LineShapeAnalysis(TString directory = "linear/",
 	auto h13 = new TH1D("h13","onset_{algorithm} - onset_{true}", 121, -70.5, 50.5);
 	auto h14 = new TH1D("h14","onset_{algorithm} - onset_{true}", 121, -70.5 , 50.5);
 	auto h15 = new TH1D("h15","(onset_{pdf1} - onset_{pdf2}) - MC_{truth}",121, -70.5 , 50.5);
-		
-	
+	//Plots for High rates
+	auto h16 = new TH1D("h16","onset_{algorithm} c to b", 26, 147.5, 277.5);
+	auto h17 = new TH1D("h17","onset_{algorithm} d to a", 26, 1420000 + 147.5 , 1420000 + 277.5);
 	
 	////////////////////////////////
 	//2017 FOWARD
@@ -177,7 +186,7 @@ void LineShapeAnalysis(TString directory = "linear/",
    	h3->FillN(diff_2017.size(), diff_2017.data(), w.data());
    	
    	auto g = new TGraph(MCtruth.size(), MCtruth.data(), diff_2017.data());
-	auto hh1 = new TH2D("hh1", "Scatter plot; MC_{truth} ;(onset_{pdf1} - onset_{pdf2}) - MC_{truth}",100, 1419.96e3,1420.02e3,100,-35,+35); // 2d hist
+	auto hh1 = new TH2D("hh1", "Scatter plot; MC_{truth} ;(onset_{pdf1} - onset_{pdf2}) - MC_{truth}",100, 1419.96e3,1420.02e3,100,-11,+31); // 2d hist
    	hh1->FillN(MCtruth.size(), MCtruth.data(),diff_2017.data(),w.data());
    	
    	auto canvas = new TCanvas("d", "2017 algorithm", 1000,550);
@@ -234,7 +243,23 @@ void LineShapeAnalysis(TString directory = "linear/",
 	}
 	delta->SaveAs(folder + name + endname);
 
-
+ 	h16->FillN(v1_cb.size(),v1_cb.data(), w.data());
+   	h17->FillN(v2_da.size(),v2_da.data(), w.data());
+	auto onsets = new TCanvas("onsets", "(onset_{cb} and  onset_{da})");
+	auto pad7 = new TPad("pad7", "pad2",0,0,1,1);
+	pad7->Divide(2,1,0.001,0.001);
+	pad7->Draw();
+	pad7->cd(1);
+	h16->GetXaxis()->SetTitle("frequency [kHz]");
+	h16->SetLineColor(2);
+	h16->SetLineWidth(2);
+	h16->Draw();
+	pad7->cd(2);	
+	h17->GetXaxis()->SetTitle("frequency [kHz]");
+	h17->SetLineColor(2);
+	h17->SetLineWidth(2);
+	h17->Draw();
+	
 	////////////////////////////////
 	// 2017 REVERSED
    	h4->FillN(v1_rev.size(),v1_rev.data(), w.data());
@@ -267,7 +292,7 @@ void LineShapeAnalysis(TString directory = "linear/",
 	h6->SetLineColor(38);
 	h6->Draw();
 	name = TString::Format("2017_reversed");
-	pad3-cd(4);
+	pad3->cd(4);
 	hh2->Draw("COLZ");
 
 	numero = 0;
@@ -322,7 +347,7 @@ void LineShapeAnalysis(TString directory = "linear/",
 	h9->SetLineWidth(2);
 	h9->SetLineColor(38);
 	h9->Draw();
-	pad4-cd(4);
+	pad4->cd(4);
 	hh3->Draw("COLZ");
 	
 	name = TString::Format("Threshold_%d", static_cast<int>(mu));

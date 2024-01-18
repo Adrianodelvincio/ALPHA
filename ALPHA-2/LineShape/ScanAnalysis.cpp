@@ -56,8 +56,14 @@ std::vector<double> ScanAnalysis(TString directory,
 	vector<double> v1_cfrac, v2_cfrac;
 	vector<double> v1_classic, v2_classic;
 	vector<double> v1_neigh, v2_neigh;
+	vector<double> v1_runningDiff, v2_runningDiff;
 	vector<double> v1_hybrid, v2_hybrid;
-	vector<double> diff_2017, diff_bk_2017 , diff_rev, diff_bk_rev, diff_thr, diff_bk_thr, diff_cfrac, diff_neigh, cfrac_classic, diff_hybrid;
+	vector<double> diff_2017, diff_bk_2017;
+	vector<double> diff_rev, diff_bk_rev;
+	vector<double> diff_thr, diff_bk_thr;
+	vector<double> diff_cfrac, diff_neigh;
+	vector<double> cfrac_classic, diff_hybrid;
+	vector<double> diff_runningDiff;
 	int count = 0;
 	// IMPLEMENTING THE TOY FOR THE ALGORITHM
 	for(int i = 0; i < FileList.size(); i += 2){
@@ -165,6 +171,12 @@ std::vector<double> ScanAnalysis(TString directory,
 		v1_neigh.push_back(onset1 - (Params.x_cb_start + lineShiftcb[0]));
 		v2_neigh.push_back(onset2 - (Params.x_da_start + lineShiftda[0]));
 		diff_neigh.push_back(onset2 - onset1 - (Params.x_da_start + lineShiftda[0] - Params.x_cb_start - lineShiftcb[0]));
+		// Running Difference
+		onset1 = runningDiff(Spectra1);
+		onset2 = runningDiff(Spectra2);
+		v1_runningDiff.push_back(onset1 - (Params.x_cb_start + lineShiftcb[0]));
+		v2_runningDiff.push_back(onset2 - (Params.x_da_start + lineShiftda[0]));
+		diff_runningDiff.push_back(onset2 - onset1 - (Params.x_da_start + lineShiftda[0] - Params.x_cb_start - lineShiftcb[0]));
 		// Hybrid Method
 		onset1 = hybrid_cfSum(Spectra1, fraction ,CosmicBackground);
 		onset2 = hybrid_cfSum(Spectra2, fraction ,CosmicBackground);
@@ -182,11 +194,58 @@ std::vector<double> ScanAnalysis(TString directory,
 	auto h7 = new TH1D("h7","onset_{algorithm} - onset_{true}", 121, -70.5, 50.5);
 	auto h8 = new TH1D("h8","onset_{algorithm} - onset_{true}", 121, -70.5 , 50.5);
 	auto h9 = new TH1D("h9","(onset_{pdf1} - onset_{pdf2}) - MC_{truth}",121, -70.5 , 50.5);
+	auto h10 = new TH1D("h10","onset_{algorithm} - onset_{true}", 121, -70.5, 50.5);
+	auto h11 = new TH1D("h11","onset_{algorithm} - onset_{true}", 121, -70.5 , 50.5);
+	auto h12 = new TH1D("h12","(onset_{pdf1} - onset_{pdf2}) - MC_{truth}",121, -70.5 , 50.5);
 	
 	TString name;
 	TString endname = ".pdf"; 
 	int numero = 0; 
 	std::vector<double> w(v1_2017.size(),1); // weights vector
+	
+	//2017 FOWARD
+	
+   	h10->FillN(v1_2017.size(),v1_2017.data(), w.data());
+   	h11->FillN(v2_2017.size(),v2_2017.data(), w.data());
+   	h12->FillN(diff_2017.size(), diff_2017.data(), w.data());
+   	
+   	auto g = new TGraph(MCtruth.size(), MCtruth.data(), diff_2017.data());
+	auto hh10 = new TH2D("hh10", "Scatter plot; MC_{truth} ;(onset_{pdf1} - onset_{pdf2}) - MC_{truth}",100, 1419.96e3,1420.02e3,100,-35,+35); // 2d hist
+   	hh10->FillN(MCtruth.size(), MCtruth.data(),diff_2017.data(),w.data());
+   	
+   	auto canvas = new TCanvas("d", "2017 algorithm", 1000,550);
+	auto pad2 = new TPad("pad2", "pad2",0,0,1,1);
+	gStyle->SetOptStat(1);
+	gStyle->SetPadTickX(1);
+	gStyle->SetPadTickY(1);
+	pad2->Divide(2,2,0.001,0.001);
+	pad2->Draw();
+	pad2->cd(1);
+	h10->GetXaxis()->SetTitle("frequency [kHz]");
+	h10->SetLineColor(2);
+	h10->SetLineWidth(2);
+	h10->Draw();
+	pad2->cd(2);
+	h11->GetXaxis()->SetTitle("frequency [kHz]");
+	h11->SetLineColor(2);
+	h11->SetLineWidth(2);
+	h11->Draw();
+	pad2->cd(3);
+	h12->GetXaxis()->SetTitle("frequency [kHz]");
+	h12->SetLineWidth(2);
+	h12->SetLineColor(38);
+	h12->Draw();
+	pad2->cd(4);
+	hh10->Draw("COLZ");
+	
+	name = "2017_foward";
+	numero = 0;
+	while(!gSystem->AccessPathName(folder + name + endname)){
+		numero += 1;
+		TString add = TString::Format("_%d", numero);
+		name = name + add;
+	}
+	canvas->SaveAs(folder + name + endname);
 	
 	//COSTANT FRACTION
 	h1->FillN(v1_cfrac.size(),v1_cfrac.data(), w.data());
@@ -329,7 +388,7 @@ std::vector<double> ScanAnalysis(TString directory,
 			mean(diff_bk_2017),	stdev(diff_bk_2017),		//with background
 			mean(diff_rev),		stdev(diff_rev),         // REVERSED
 			mean(diff_bk_rev),	stdev(diff_bk_rev),		//with background
-			mean(cfrac_classic),	stdev(cfrac_classic), // CONSTANT FRACTION 
+			mean(cfrac_classic),	stdev(cfrac_classic), 	// CONSTANT FRACTION 
 			mean(diff_cfrac),	stdev(diff_cfrac),       	//with backgrounf
 			mean(diff_neigh),	stdev(diff_neigh),       // SUM NEIGHBORS
 			mean(diff_hybrid),	stdev(diff_hybrid),      // HYBRID METHOD
@@ -337,6 +396,12 @@ std::vector<double> ScanAnalysis(TString directory,
 			mean(v1_2017),		mean(v1bk_2017),
 			mean(v1_rev), 		mean(v1bk_rev),
 			mean(v1_classic),	mean(v1_cfrac),
-			mean(v1_neigh),		mean(v1_hybrid)};
+			mean(v1_neigh),		mean(v1_hybrid),
+			mean(v2_thr),		mean(v2bk_thr),
+			mean(v2_2017),		mean(v2bk_2017),
+			mean(v2_rev), 		mean(v2bk_rev),
+			mean(v2_classic),	mean(v2_cfrac),
+			mean(v2_neigh),		mean(v2_hybrid),
+			mean(diff_runningDiff),	stdev(diff_runningDiff)};
 }
 

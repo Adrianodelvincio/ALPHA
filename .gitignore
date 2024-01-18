@@ -95,6 +95,11 @@ ALPHA-2/LineShape/point3/
 ALPHA-2/LineShape/point4/
 ALPHA-2/LineShape/DelayedLineShift/
 ALPHA-2/LineShape/UniformLineShift/
+ALPHA-2/LineShape/scanMvaData
+ALPHA-2/LineShape/splitting(-15,+15)
+ALPHA-2/LineShape/Plot/Trash
+ALPHA-2/LineShape/Plot
+ALPHA-2/LineShape/.ipynb_checkpoints/
 
 ALPHA-2/LineShape/uniformShift/
 ALPHA-2/LineShape/uniformShift/ToyConfiguration.txt
@@ -102,8 +107,19 @@ ALPHA-2/Note/Report.aux
 ALPHA-2/Note/Report.bbl
 ALPHA-2/Note/Report.blg
 ALPHA-2/Note/Report.log
+Report/Report.aux
+Report/Report.log
+Report/Report.out
+Report/Report.synctex.gz
+Report/Report2.aux
+Report/Report2.log
+Report/Report2.out
+Report/Report2.synctex.gz
+
+
 ALPHA-2/Note/Report.out
 s41586-018-0435-1.pdf
 s41586-020-2006-5.pdf
 s41586-023-06527-1.pdf
+
 

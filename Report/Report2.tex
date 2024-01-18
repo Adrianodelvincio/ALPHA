@@ -17,7 +17,7 @@
 
 \title{%
  \vspace{-2.0cm}
- Onset Finding Algorithms: A Monte Carlo Simulation For Hyperfine Splitting Measurement Of Anti-Hydrogen
+ Exploring Onset Finding Algorithms: A Monte Carlo \\ Simulation For  Hyperfine Splitting Measurement of Anti-Hydrogen
 }
 
 \date{\vspace{-5ex}}
@@ -30,12 +30,19 @@
 \maketitle
 \begin{abstract}
 \centering
-
+In this report we present a simple Monte Carlo simulation developed within the context of ALPHA-2 Hyperfine Splitting measurement. The objective of this study is to assess the statistical uncertainty and bias of the algorithm utilized in 2017 analysis when applied to the new arrangement of data collected in 2023. In addition to this, different algorithms have been tested, as alternatives of the algorithm used in the previous analysis.
 \end{abstract}
 
 \paragraph{Introduction}
-This study is done using \textit{ROOT} and \textit{RDataFrame}. All the software used for this analysis is can be found here: {\color{blue}{\url{https://github.com/Adrianodelvincio/ALPHA.git}}}
 
+The Hyperfine Splitting Measurement consists on the determination of the $\Delta f$ frequency transitions between $c \rightarrow b$ and $ d \rightarrow a$ states of anti-hydrogen. This measure is carried out in ALPHA-2, where the anti-hydrogen is irradiated with the light produced by a laser with variable frequency. Due to the transitions induced by the light, a certain amount of anti-hydrogen is released from the trap and annihilates. The counts of anti-hydrogen annihilation per frequency constitutes the experimental \textit{line-shape}. During the experiment, the \textit{line-shape} of the $c \rightarrow b$ and $ d \rightarrow a$ transitions are measured. The Hyperfine Splitting is determined by the frequency interval between the two \textit{line-shapes}, which is estimated taking the difference of the frequency onset of the two \textit{line-shapes}. This study is done using \textit{ROOT} and \textit{RDataFrame} framework. All the software used for the simulation can be found here: {\color{blue}{\url{https://github.com/Adrianodelvincio/ALPHA.git}}}
 
+\section{High Statistic Line-shape, Cosmic Background and Annihilation due to Residual Gas}
+
+\section{Structure of the Simulation}
+
+\section{Parameters of the Simulation}
+
+\section{Results}
 
 \end{document}
