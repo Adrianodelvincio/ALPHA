@@ -1,0 +1,26 @@
+
+
+- scanMvaData
+
+this folder contains all the datasets generated for each MVA point. The hyperfine splitting is uniformly generated around the cpt value with interval (-30, + 10) kHz.
+
+- scanMvaData2
+
+this folder contains all the datasets generated for each MVA point. The hyperfine splitting is uniformly generated around the cpt value with interval (-15, + 15) kHz.
+
+- Passcut
+
+Passcut dataset
+
+- point 1 
+
+Data corresponding to MVA working point mu = 0.046, efficiency = 0.775
+
+- point 2
+
+Data corresponding to MVA working point mu = 0.01, efficiency = 0.638
+
+- point 3
+
+Data corresponding to MVA working point mu = 0.23, efficiency = 0.86
+

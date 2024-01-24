@@ -36,6 +36,7 @@ stop = start + Nstep*5
 x = np.arange(start,stop,5) # Total Number of Swipes
 y = Cruijff(x,x_cb_start,x0,sigma0,sigma1,k0,k1,Norm)
 y = y/y.sum() 	# Normalizzo la lineshape campionata
+print("Normalized peak values of the lineshape: ", np.max(y))
 y = Ntot*y 	# Scalo con la statistica in esame
 print("Total Number of event sampled: ", int(y.sum()), " Ntot: ", Ntot)
 

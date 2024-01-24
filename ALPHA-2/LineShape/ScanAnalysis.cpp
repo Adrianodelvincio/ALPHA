@@ -6,33 +6,36 @@
 #include "../Headers/Algorithms.h"
 using namespace RooFit;
 
-double mean(std::vector<double> v){
+double Mean(std::vector<double> v){
 	double sum = std::accumulate(v.begin(), v.end(), 0.0);
 	return sum/ v.size();
 }
 
-double stdev(std::vector<double> v){
+double Stdev(std::vector<double> v){
 	double accum = 0.0;
-	double m = mean(v);
+	double m = Mean(v);
 	std::for_each (std::begin(v), std::end(v), [&](const double d) {
     	accum += (d - m) * (d - m);
 	});
 	return sqrt(accum/(v.size() - 1));
 }
 
-std::vector<double> ScanAnalysis(TString directory,
-					TString ConfFile,
-					int start,
-					int stop,
-					double N,
-					double fraction,
-					double Nsigma,
-					double Nfilter,
-					double rate,
-					TString folder
+std::vector<double> ScanAnalysis(	TString directory,
+					TString ConfFile,	// Configuration files
+					int stop,		// Number of runs to be analysed
+					double Nfilter,		// Filter for the running sum
+					double fraction,	// Parameter of Constant Fraction
+					double Nsigma,		// Paratemer for t-student test
+					double Nthr,		// Parameter of Threshold algorithm
+					double thr1,
+					double thr2,
+					double rate,		// Background rate from MVA point
+					TString folder		// Where to save the plots
 					){
 	//ConfFile = directory + "ToyConfiguration.txt";
 	//std::cout << ConfFile << std::endl;
+	
+	
 	ReadConfFile Params(ConfFile); // Read the values from the configuration file 
 	//Params.Print();
 	Params.CosmicRate = rate;
@@ -43,7 +46,7 @@ std::vector<double> ScanAnalysis(TString directory,
 	double SweepStep = Params.SweepStep; // number of bin for each lineshape
 	
 	std::vector<std::string> FileList;
-	FileList = getFiles(start,stop, directory); // file list to be analyzed
+	FileList = getFiles(0,stop, directory); // file list to be analyzed
 
 	// Define some vectors to store the results
 	vector<double> MCtruth;
@@ -68,7 +71,7 @@ std::vector<double> ScanAnalysis(TString directory,
 	// IMPLEMENTING THE TOY FOR THE ALGORITHM
 	for(int i = 0; i < FileList.size(); i += 2){
 		count  += 1; 
-		std::cout << directory << " Analizzo DataFrame " << count << std::endl;
+		//std::cout << directory << " Analizzo DataFrame " << count << std::endl;
 		
 		ROOT::RDataFrame frame("myTree", {FileList[i], FileList[i+1]});		// Load i-th dataset
 		
@@ -91,8 +94,6 @@ std::vector<double> ScanAnalysis(TString directory,
 			 //.Filter("type != 2")
 			 .Histo1D({"Counts","Frequence", static_cast<int>(SweepStep), startPdf2, startPdf2 + SweepStep*FrequencyStep}, "frequence");
 
-		auto frame1 = frame.Filter("runNumber == 1").Filter("frequence <= 1000").Mean<double>("lineShift");
-		auto frame2 = frame.Filter("runNumber == 1").Filter("frequence >= 1000").Mean<double>("lineShift");
 		// Load the shifts of the lineshapes
 		auto frame3 = frame.Filter("runNumber == 1").Filter("frequence >= 1000").Take<double>("lineShift");
 		auto frame4 = frame.Filter("runNumber == 1").Filter("frequence <= 1000").Take<double>("lineShift");
@@ -103,32 +104,34 @@ std::vector<double> ScanAnalysis(TString directory,
 		
 		double onset1;				// Reconstructed onset
 		double onset2;				// Reconstructed onset
-		double threshold = N*CosmicBackground; // threshold considering the cosmic background
+		double threshold = Nthr*CosmicBackground; // threshold considering the cosmic background
 		
 		// SAVE THE GENERATED MONTECARLO
 		MCtruth.push_back((Params.x_da_start + lineShiftda[0] - Params.x_cb_start - lineShiftcb[0]));
 		
 		// THRESHOLD
 			// With Cosmic Background
-		onset1 = firstOverThreshold(Spectra1, N, CosmicBackground);
-		onset2 = firstOverThreshold(Spectra2, N, CosmicBackground);
+		onset1 = firstOverThreshold(Spectra1, Nthr, CosmicBackground);
+		onset2 = firstOverThreshold(Spectra2, Nthr, CosmicBackground);
 		v1bk_thr.push_back(onset1 - (Params.x_cb_start + lineShiftcb[0]));
 		v2bk_thr.push_back(onset2 - (Params.x_da_start + lineShiftda[0]));
 		diff_bk_thr.push_back(onset2 - onset1 - (Params.x_da_start + lineShiftda[0] - Params.x_cb_start - lineShiftcb[0]));		
+		
 			// Without Cosmic Background
-		onset1 = firstOverThreshold(Spectra1, N);
-		onset2 = firstOverThreshold(Spectra2, N);
+		onset1 = firstOverThreshold(Spectra1, Nthr);
+		onset2 = firstOverThreshold(Spectra2, Nthr);
 		v1_thr.push_back(onset1 - (Params.x_cb_start + lineShiftcb[0]));
 		v2_thr.push_back(onset2 - (Params.x_da_start + lineShiftda[0]));
 		diff_thr.push_back(onset2 - onset1 - (Params.x_da_start + lineShiftda[0] - Params.x_cb_start - lineShiftcb[0]));
 		
 		// 2017 FOWARD
 			// With Cosmic Background
-		onset1 = algorithm_2017(Spectra1, CosmicBackground);
-		onset2 = algorithm_2017(Spectra2, CosmicBackground);
+		onset1 = algorithm_2017(Spectra1, CosmicBackground, thr1, thr2);
+		onset2 = algorithm_2017(Spectra2, CosmicBackground, thr1, thr2);
 		v1bk_2017.push_back(onset1 - (Params.x_cb_start + lineShiftcb[0]));
 		v2bk_2017.push_back(onset2 - (Params.x_da_start + lineShiftda[0])); 
 		diff_bk_2017.push_back(onset2 - onset1 - (Params.x_da_start + lineShiftda[0] - Params.x_cb_start - lineShiftcb[0]));
+		
 			// Without Cosmic Background
 		onset1 = algorithm_2017(Spectra1);
 		onset2 = algorithm_2017(Spectra2);
@@ -138,11 +141,12 @@ std::vector<double> ScanAnalysis(TString directory,
 		
 		// REVERSED 2017
 			// with cosmic background
-		onset1 = reverse_2017(Spectra1, CosmicBackground);
-		onset2 = reverse_2017(Spectra2, CosmicBackground);
+		onset1 = reverse_2017(Spectra1, CosmicBackground, thr1, thr2);
+		onset2 = reverse_2017(Spectra2, CosmicBackground, thr1, thr2);
 		v1bk_rev.push_back(onset1 - (Params.x_cb_start + lineShiftcb[0]));
 		v2bk_rev.push_back(onset2 - (Params.x_da_start + lineShiftda[0]));
 		diff_bk_rev.push_back(onset2 - onset1 - (Params.x_da_start + lineShiftda[0] - Params.x_cb_start - lineShiftcb[0]));
+		
 			// without cosmic background
 		onset1 = reverse_2017(Spectra1);
 		onset2 = reverse_2017(Spectra2);
@@ -152,11 +156,12 @@ std::vector<double> ScanAnalysis(TString directory,
 		
 		// CONSTANT FRACTION
 			// with cosmic subtraction
-		onset1 = constFrac(Spectra1, fraction, CosmicBackground);
-		onset2 = constFrac(Spectra2, fraction, CosmicBackground);
+		onset1 = constFrac(Spectra1, fraction, CosmicBackground,Nfilter);
+		onset2 = constFrac(Spectra2, fraction, CosmicBackground,Nfilter);
 		v1_cfrac.push_back(onset1 - (Params.x_cb_start + lineShiftcb[0]));
 		v2_cfrac.push_back(onset2 - (Params.x_da_start + lineShiftda[0]));
 		diff_cfrac.push_back(onset2 - onset1 - (Params.x_da_start + lineShiftda[0] - Params.x_cb_start - lineShiftcb[0]));
+		
 			// without cosmic subtraction
 		onset1 = constFrac(Spectra1, fraction);
 		onset2 = constFrac(Spectra2, fraction);
@@ -164,27 +169,22 @@ std::vector<double> ScanAnalysis(TString directory,
 		v2_classic.push_back(onset2 - (Params.x_da_start + lineShiftda[0]));
 		cfrac_classic.push_back(onset2 - onset1 - (Params.x_da_start + lineShiftda[0] - Params.x_cb_start - lineShiftcb[0]));
 		
-		// ALGORITMI CON FITRO/SOMMA SU BINS
 		// SUM NEIGHBORS
-		onset1 = sumNeighbors(Spectra1, Nsigma, CosmicBackground);
-		onset2 = sumNeighbors(Spectra2, Nsigma, CosmicBackground);
+		onset1 = sumNeighbors(Spectra1, Nsigma, CosmicBackground, Nfilter);
+		onset2 = sumNeighbors(Spectra2, Nsigma, CosmicBackground, Nfilter);
 		v1_neigh.push_back(onset1 - (Params.x_cb_start + lineShiftcb[0]));
 		v2_neigh.push_back(onset2 - (Params.x_da_start + lineShiftda[0]));
 		diff_neigh.push_back(onset2 - onset1 - (Params.x_da_start + lineShiftda[0] - Params.x_cb_start - lineShiftcb[0]));
+		
 		// Running Difference
 		onset1 = runningDiff(Spectra1);
 		onset2 = runningDiff(Spectra2);
 		v1_runningDiff.push_back(onset1 - (Params.x_cb_start + lineShiftcb[0]));
 		v2_runningDiff.push_back(onset2 - (Params.x_da_start + lineShiftda[0]));
 		diff_runningDiff.push_back(onset2 - onset1 - (Params.x_da_start + lineShiftda[0] - Params.x_cb_start - lineShiftcb[0]));
-		// Hybrid Method
-		onset1 = hybrid_cfSum(Spectra1, fraction ,CosmicBackground);
-		onset2 = hybrid_cfSum(Spectra2, fraction ,CosmicBackground);
-		v1_hybrid.push_back(onset1 - (Params.x_cb_start + lineShiftcb[0]));
-		v2_hybrid.push_back(onset2 - (Params.x_da_start + lineShiftda[0]));
-		diff_hybrid.push_back(onset2 - onset1 - (Params.x_da_start + lineShiftda[0] - Params.x_cb_start - lineShiftcb[0]));	
-	}
-	
+		}
+
+	/*
 	auto h1 = new TH1D("h1","onset_{algorithm} - onset_{true}", 121, -70.5, 50.5);
 	auto h2 = new TH1D("h2","onset_{algorithm} - onset_{true}", 121, -70.5 , 50.5);
 	auto h3 = new TH1D("h3","(onset_{pdf1} - onset_{pdf2}) - MC_{truth}",121, -70.5 , 50.5);
@@ -378,30 +378,31 @@ std::vector<double> ScanAnalysis(TString directory,
 		name = name + add;
 	}
 	canvas5->SaveAs(folder + name + endname);
+	*/
+	
 	
 	//delete h1,h2,h3,h4,h5,h6;
 	
-	//std::cout << "rate " << rate << " reversed variance: " << stdev(diff_rev) << " foward variance: " << stdev(diff_2017) << std::endl;
-	return 		{mean(diff_thr),	stdev(diff_thr),         // THRESHOLD
-			mean(diff_bk_thr),	stdev(diff_bk_thr),		//with background
-			mean(diff_2017),	stdev(diff_2017),        // FOWARD
-			mean(diff_bk_2017),	stdev(diff_bk_2017),		//with background
-			mean(diff_rev),		stdev(diff_rev),         // REVERSED
-			mean(diff_bk_rev),	stdev(diff_bk_rev),		//with background
-			mean(cfrac_classic),	stdev(cfrac_classic), 	// CONSTANT FRACTION 
-			mean(diff_cfrac),	stdev(diff_cfrac),       	//with backgrounf
-			mean(diff_neigh),	stdev(diff_neigh),       // SUM NEIGHBORS
-			mean(diff_hybrid),	stdev(diff_hybrid),      // HYBRID METHOD
-			mean(v1_thr),		mean(v1bk_thr),
-			mean(v1_2017),		mean(v1bk_2017),
-			mean(v1_rev), 		mean(v1bk_rev),
-			mean(v1_classic),	mean(v1_cfrac),
-			mean(v1_neigh),		mean(v1_hybrid),
-			mean(v2_thr),		mean(v2bk_thr),
-			mean(v2_2017),		mean(v2bk_2017),
-			mean(v2_rev), 		mean(v2bk_rev),
-			mean(v2_classic),	mean(v2_cfrac),
-			mean(v2_neigh),		mean(v2_hybrid),
-			mean(diff_runningDiff),	stdev(diff_runningDiff)};
+	//std::cout << "rate " << rate << " reversed variance: " << Stdev(diff_rev) << " foward variance: " << Stdev(diff_2017) << std::endl;
+	return 		{Mean(diff_thr),	Stdev(diff_thr),         // THRESHOLD
+			Mean(diff_bk_thr),	Stdev(diff_bk_thr),		//with background
+			Mean(diff_2017),	Stdev(diff_2017),        // FOWARD
+			Mean(diff_bk_2017),	Stdev(diff_bk_2017),		//with background
+			Mean(diff_rev),		Stdev(diff_rev),         // REVERSED
+			Mean(diff_bk_rev),	Stdev(diff_bk_rev),		//with background
+			Mean(cfrac_classic),	Stdev(cfrac_classic), 	// CONSTANT FRACTION 
+			Mean(diff_cfrac),	Stdev(diff_cfrac),       	//with backgrounf
+			Mean(diff_neigh),	Stdev(diff_neigh),       // SUM NEIGHBORS
+			Mean(v1_thr),		Mean(v1bk_thr),
+			Mean(v1_2017),		Mean(v1bk_2017),
+			Mean(v1_rev), 		Mean(v1bk_rev),
+			Mean(v1_classic),	Mean(v1_cfrac),
+			Mean(v1_neigh),		
+			Mean(v2_thr),		Mean(v2bk_thr),		
+			Mean(v2_2017),		Mean(v2bk_2017),	
+			Mean(v2_rev), 		Mean(v2bk_rev),
+			Mean(v2_classic),	Mean(v2_cfrac),
+			Mean(v2_neigh),
+			Mean(diff_runningDiff),	Stdev(diff_runningDiff)};
 }
 

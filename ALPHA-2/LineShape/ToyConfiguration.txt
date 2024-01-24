@@ -24,6 +24,9 @@ x_cb_end = 320
 x_da_start = 1420175
 x_da_peak = 1420220
 x_da_end = 1420320
+# HFS generation parameter
+delta_right = -30
+delta_left = +10
 # Parameters of the Cruijff function
 x0_cb = 220.65
 sigma0_cb = 8.76

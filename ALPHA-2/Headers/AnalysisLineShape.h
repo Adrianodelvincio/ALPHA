@@ -11,7 +11,7 @@ std::vector<std::string> getFiles(int start, int stop, TString Directory){
 	std::vector<string> elenco;
 	TString Namefile1 = "LoopDataPdf1_";
 	TString Namefile2 = "LoopDataPdf2_";
-	std::cout << "Creating list of files" << std::endl;
+	//std::cout << "Creating list of files" << std::endl;
 	
 	for(int i = start; i <= stop; i++){
 		TString endfile = TString::Format("%d.root", i);
@@ -45,6 +45,20 @@ bool CheckEmpty(TString RunName){
 	else{
 		return false;
 	}
+}
+
+double mean(std::vector<double> v){
+	double sum = std::accumulate(v.begin(), v.end(), 0.0);
+	return sum/ v.size();
+}
+
+double stdev(std::vector<double> v){
+	double accum = 0.0;
+	double m = mean(v);
+	std::for_each (std::begin(v), std::end(v), [&](const double d) {
+    	accum += (d - m) * (d - m);
+	});
+	return sqrt(accum/(v.size() - 1));
 }
 
 #endif
