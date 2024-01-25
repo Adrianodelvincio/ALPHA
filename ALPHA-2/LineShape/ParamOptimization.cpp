@@ -6,7 +6,12 @@
 #include "../Headers/Algorithms.h"
 using namespace RooFit;
 
-std::vector<double> Optimization(	TString directory,
+struct Result {
+	vector<double> Mean_Sigma;
+	vector<double> Mean_SquareResidual;
+} ;
+
+std::vector<double> ParamOptimization(	TString directory,
 					TString ConfFile,	// Configuration files
 					int stop,		// Number of runs to be analysed
 					double Nfilter,		// Filter for the running sum
@@ -48,6 +53,18 @@ std::vector<double> Optimization(	TString directory,
 	vector<double> diff_cfrac;
 	vector<double> diff_neigh;
 	vector<double> diff_sign;
+	
+	vector<double> x_2017;
+	vector<double> x_rev;
+	vector<double> x_thr;
+	vector<double> x_cfrac;
+	vector<double> x_neigh;
+	vector<double> x_sign;
+	
+	// Define the struct for the return
+	Result object;
+	
+	
 	int count = 0;
 	// IMPLEMENTING THE TOY FOR THE ALGORITHM
 	for(int i = 0; i < FileList.size(); i += 2){
@@ -96,6 +113,7 @@ std::vector<double> Optimization(	TString directory,
 		onset2 = firstOverThreshold(Spectra2, Nthr, CosmicBackground);
 		v1bk_thr.push_back(onset1 - (Params.x_cb_start + lineShiftcb[0]));
 		v2bk_thr.push_back(onset2 - (Params.x_da_start + lineShiftda[0]));
+		x_thr.push_back(onset2 - onset1);
 		diff_bk_thr.push_back(onset2 - onset1 - (Params.x_da_start + lineShiftda[0] - Params.x_cb_start - lineShiftcb[0]));		
 		
 		
@@ -104,7 +122,8 @@ std::vector<double> Optimization(	TString directory,
 		onset1 = algorithm_2017(Spectra1, CosmicBackground, thr1, thr2);
 		onset2 = algorithm_2017(Spectra2, CosmicBackground, thr1, thr2);
 		v1bk_2017.push_back(onset1 - (Params.x_cb_start + lineShiftcb[0]));
-		v2bk_2017.push_back(onset2 - (Params.x_da_start + lineShiftda[0])); 
+		v2bk_2017.push_back(onset2 - (Params.x_da_start + lineShiftda[0]));
+		x_2017.push_back(onset2 - onset1);
 		diff_bk_2017.push_back(onset2 - onset1 - (Params.x_da_start + lineShiftda[0] - Params.x_cb_start - lineShiftcb[0]));
 
 		
@@ -114,6 +133,7 @@ std::vector<double> Optimization(	TString directory,
 		onset2 = reverse_2017(Spectra2, CosmicBackground, thr1, thr2);
 		v1bk_rev.push_back(onset1 - (Params.x_cb_start + lineShiftcb[0]));
 		v2bk_rev.push_back(onset2 - (Params.x_da_start + lineShiftda[0]));
+		x_rev.push_back(onset2 - onset1);
 		diff_bk_rev.push_back(onset2 - onset1 - (Params.x_da_start + lineShiftda[0] - Params.x_cb_start - lineShiftcb[0]));
 		
 		
@@ -123,6 +143,7 @@ std::vector<double> Optimization(	TString directory,
 		onset2 = constFrac(Spectra2, fraction, CosmicBackground,Nfilter);
 		v1_cfrac.push_back(onset1 - (Params.x_cb_start + lineShiftcb[0]));
 		v2_cfrac.push_back(onset2 - (Params.x_da_start + lineShiftda[0]));
+		x_cfrac.push_back(onset2 - onset1);
 		diff_cfrac.push_back(onset2 - onset1 - (Params.x_da_start + lineShiftda[0] - Params.x_cb_start - lineShiftcb[0]));
 		
 		
@@ -131,6 +152,7 @@ std::vector<double> Optimization(	TString directory,
 		onset2 = sumNeighbors(Spectra2, Nsigma, CosmicBackground, Nfilter);
 		v1_neigh.push_back(onset1 - (Params.x_cb_start + lineShiftcb[0]));
 		v2_neigh.push_back(onset2 - (Params.x_da_start + lineShiftda[0]));
+		x_neigh.push_back(onset2 - onset1);
 		diff_neigh.push_back(onset2 - onset1 - (Params.x_da_start + lineShiftda[0] - Params.x_cb_start - lineShiftcb[0]));
 		
 		// SIGNIFICANCE
@@ -138,15 +160,25 @@ std::vector<double> Optimization(	TString directory,
 		onset2 = Significance(Spectra2, Nsigma, CosmicBackground, Nfilter);
 		v1_sign.push_back(onset1 - (Params.x_cb_start + lineShiftcb[0]));
 		v2_sign.push_back(onset2 - (Params.x_da_start + lineShiftda[0]));
+		x_sign.push_back(onset2 - onset1);
 		diff_sign.push_back(onset2 - onset1 - (Params.x_da_start + lineShiftda[0] - Params.x_cb_start - lineShiftcb[0]));
 		}
-
+		
 	return 		{mean(diff_bk_thr),	stdev(diff_bk_thr),		//with background
 			mean(diff_bk_2017),	stdev(diff_bk_2017),		//with background
 			mean(diff_bk_rev),	stdev(diff_bk_rev),		//with background
 			mean(diff_cfrac),	stdev(diff_cfrac),       	//with backgrounf
 			mean(diff_neigh),	stdev(diff_neigh),      	// SUM NEIGHBORS
-			mean(diff_sign),	stdev(diff_sign)	       	// SIGNIFICANCE
-			};
+			mean(diff_sign),	stdev(diff_sign),	       	// SIGNIFICANCE
+			ResSquare(diff_bk_thr),	Corr(x_thr,MCtruth),
+			ResSquare(diff_bk_2017),Corr(x_2017,MCtruth),
+			ResSquare(diff_bk_rev),	Corr(x_rev,MCtruth),
+			ResSquare(diff_cfrac),	Corr(x_cfrac,MCtruth),
+			ResSquare(diff_neigh),	Corr(x_neigh,MCtruth),      	// SUM NEIGHBORS
+			ResSquare(diff_sign),	Corr(x_sign, MCtruth),	       	// SIGNIFICANCE
+			stdev(x_thr),		stdev(x_2017),
+			stdev(x_rev),		stdev(x_cfrac),
+			stdev(x_neigh),		stdev(x_sign),
+			stdev(MCtruth)};
 }
 
