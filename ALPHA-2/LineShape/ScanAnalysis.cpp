@@ -6,20 +6,6 @@
 #include "../Headers/Algorithms.h"
 using namespace RooFit;
 
-double Mean(std::vector<double> v){
-	double sum = std::accumulate(v.begin(), v.end(), 0.0);
-	return sum/ v.size();
-}
-
-double Stdev(std::vector<double> v){
-	double accum = 0.0;
-	double m = Mean(v);
-	std::for_each (std::begin(v), std::end(v), [&](const double d) {
-    	accum += (d - m) * (d - m);
-	});
-	return sqrt(accum/(v.size() - 1));
-}
-
 std::vector<double> ScanAnalysis(	TString directory,
 					TString ConfFile,	// Configuration files
 					int stop,		// Number of runs to be analysed
@@ -383,26 +369,26 @@ std::vector<double> ScanAnalysis(	TString directory,
 	
 	//delete h1,h2,h3,h4,h5,h6;
 	
-	//std::cout << "rate " << rate << " reversed variance: " << Stdev(diff_rev) << " foward variance: " << Stdev(diff_2017) << std::endl;
-	return 		{Mean(diff_thr),	Stdev(diff_thr),         // THRESHOLD
-			Mean(diff_bk_thr),	Stdev(diff_bk_thr),		//with background
-			Mean(diff_2017),	Stdev(diff_2017),        // FOWARD
-			Mean(diff_bk_2017),	Stdev(diff_bk_2017),		//with background
-			Mean(diff_rev),		Stdev(diff_rev),         // REVERSED
-			Mean(diff_bk_rev),	Stdev(diff_bk_rev),		//with background
-			Mean(cfrac_classic),	Stdev(cfrac_classic), 	// CONSTANT FRACTION 
-			Mean(diff_cfrac),	Stdev(diff_cfrac),       	//with backgrounf
-			Mean(diff_neigh),	Stdev(diff_neigh),       // SUM NEIGHBORS
-			Mean(v1_thr),		Mean(v1bk_thr),
-			Mean(v1_2017),		Mean(v1bk_2017),
-			Mean(v1_rev), 		Mean(v1bk_rev),
-			Mean(v1_classic),	Mean(v1_cfrac),
-			Mean(v1_neigh),		
-			Mean(v2_thr),		Mean(v2bk_thr),		
-			Mean(v2_2017),		Mean(v2bk_2017),	
-			Mean(v2_rev), 		Mean(v2bk_rev),
-			Mean(v2_classic),	Mean(v2_cfrac),
-			Mean(v2_neigh),
-			Mean(diff_runningDiff),	Stdev(diff_runningDiff)};
+	//std::cout << "rate " << rate << " reversed variance: " << stdev(diff_rev) << " foward variance: " << stdev(diff_2017) << std::endl;
+	return 		{mean(diff_thr),	stdev(diff_thr),         // THRESHOLD
+			mean(diff_bk_thr),	stdev(diff_bk_thr),		//with background
+			mean(diff_2017),	stdev(diff_2017),        // FOWARD
+			mean(diff_bk_2017),	stdev(diff_bk_2017),		//with background
+			mean(diff_rev),		stdev(diff_rev),         // REVERSED
+			mean(diff_bk_rev),	stdev(diff_bk_rev),		//with background
+			mean(cfrac_classic),	stdev(cfrac_classic), 	// CONSTANT FRACTION 
+			mean(diff_cfrac),	stdev(diff_cfrac),       	//with backgrounf
+			mean(diff_neigh),	stdev(diff_neigh),       // SUM NEIGHBORS
+			mean(v1_thr),		mean(v1bk_thr),
+			mean(v1_2017),		mean(v1bk_2017),
+			mean(v1_rev), 		mean(v1bk_rev),
+			mean(v1_classic),	mean(v1_cfrac),
+			mean(v1_neigh),		
+			mean(v2_thr),		mean(v2bk_thr),		
+			mean(v2_2017),		mean(v2bk_2017),	
+			mean(v2_rev), 		mean(v2bk_rev),
+			mean(v2_classic),	mean(v2_cfrac),
+			mean(v2_neigh),
+			mean(diff_runningDiff),	stdev(diff_runningDiff)};
 }
 

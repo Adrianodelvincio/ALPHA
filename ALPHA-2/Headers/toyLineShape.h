@@ -102,7 +102,9 @@ auto FillDataFrame(ROOT::RDataFrame &d1, RooDataSet &data,
 				 	vector<int> &vType,
 				 	vector<double> &vTot,
 				 	int &j,
-				 	vector<Double_t> &rn,
+				 	int &TimeStep,
+				 	double &FrequencyStep,
+				 	vector<double> &start_sweep, 
 				 	vector<int> &RunNumber,
 				 	vector<double> &freqDelay
 				 	){
@@ -112,16 +114,20 @@ auto FillDataFrame(ROOT::RDataFrame &d1, RooDataSet &data,
 	[&RunNumber, &j](){
 		return RunNumber[j];
 	})
-	.Define("random",
-	[&rn, &j](){			//To subsample and randomize 
-		return rn[j];
-		})
 	.Define("lineShift", [&freqDelay, &RunNumber, &j](){
 		return freqDelay[RunNumber[j]];
 	})
 	.Define("frequence",	// Frequence of the event
 	[&j, &f](){
 		return f[j]; 
+		})
+	.Define("time",	// Frequence of the event
+	[&j, &f, &TimeStep, &FrequencyStep, &start_sweep,&RunNumber](){
+		//std::cout << "run number " << RunNumber[j] << std::endl;
+		//std::cout << "start_sweep " << start_sweep[RunNumber[j]] << std::endl;
+		//std::cout << "timestep: " << TimeStep << std::endl;
+		//std::cout << "frequencystep: " << FrequencyStep << std::endl;
+		return (f[j] - start_sweep[RunNumber[j]])*(TimeStep/FrequencyStep); 
 		})
 	.Define("type", 		// Type of the event (0 wall, 1 res gas, 2 cosmic)
 		[&j, &vType](){

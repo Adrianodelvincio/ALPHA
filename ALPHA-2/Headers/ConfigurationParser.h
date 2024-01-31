@@ -46,6 +46,11 @@ class ReadConfFile{
 						if (strcmp(sBuffer, "Norm_da") == 0)		{ Norm_da = buffer;}
 						if (strcmp(sBuffer, "delta_right") == 0)	{ delta_right = buffer;}
 						if (strcmp(sBuffer, "delta_left") == 0)		{ delta_left = buffer;}
+						if (strcmp(sBuffer, "FrequencyMaxBeforeOnset") == 0){ FrequencyMaxBeforeOnset = buffer;}
+						if (strcmp(sBuffer, "FrequencyMinBeforeOnset") == 0){ FrequencyMinBeforeOnset = buffer;}
+						if (strcmp(sBuffer, "Bdrift") == 0)		{ Bdrift = buffer;}
+						if (strcmp(sBuffer, "sigmaDrift") == 0)		{ sigmaDrift = buffer;}
+						
 					} // fill the parameters
 					int IntBuffer;
 					if (sscanf(line.c_str(), "%s = %d", sBuffer, &IntBuffer) == 2) {
@@ -81,18 +86,20 @@ class ReadConfFile{
 			std::cout << "pwall_ad      " << WallComponent_ad << std::endl;
 			std::cout << "pwall_cb      " << WallComponent_cb << std::endl;
 			std::cout << "delay         " << delay << std::endl;
+			std::cout << "Bdrift        " << Bdrift << std::endl;
+			
 			std::cout << "Cruijff Paramters		" << std::endl;
-			std::cout << "x0_cb			" << x0_cb << std::endl;
-			std::cout << "sigma0_cb			" << sigma0_cb << std::endl;
-			std::cout << "sigma1_cb			" << sigma1_cb << std::endl;
-			std::cout << "k0_cb			" << k0_cb << std::endl;
-			std::cout << "k1_cb			" << k1_cb << std::endl;
-			std::cout << "Norm_cb			" << Norm_cb << std::endl;
-			std::cout << "sigma0_da			" << sigma0_da << std::endl;
-			std::cout << "sigma1_da			" << sigma1_da << std::endl;
-			std::cout << "k0_da			" << k0_da << std::endl;
-			std::cout << "k1_da			" << k1_da << std::endl;
-			std::cout << "Norm_da			" << Norm_da << std::endl;
+			std::cout << "x0_cb     " << x0_cb << std::endl;
+			std::cout << "sigma0_cb	" << sigma0_cb << std::endl;
+			std::cout << "sigma1_cbì " << sigma1_cb << std::endl;
+			std::cout << "k0_cb      " << k0_cb << std::endl;
+			std::cout << "k1_cb      " << k1_cb << std::endl;
+			std::cout << "Norm_cb    " << Norm_cb << std::endl;
+			std::cout << "sigma0_da  " << sigma0_da << std::endl;
+			std::cout << "sigma1_da  " << sigma1_da << std::endl;
+			std::cout << "k0_da      " << k0_da << std::endl;
+			std::cout << "k1_da      " << k1_da << std::endl;
+			std::cout << "Norm_da    " << Norm_da << std::endl;
 			std::cout << "\n" << std::endl;
 		}
 		
@@ -117,6 +124,11 @@ class ReadConfFile{
 	double WallComponent_ad;
 	double C;
 	double delay;
+	double delta_left;
+	double delta_right;
+	double FrequencyMaxBeforeOnset;
+	double FrequencyMinBeforeOnset;
+	double Bdrift, sigmaDrift;
 	// Parameters of the Cruijff Function
 	double x0_cb;
 	double sigma0_cb;
@@ -130,7 +142,6 @@ class ReadConfFile{
 	double k0_da;
 	double k1_da;
 	double Norm_da;
-	double delta_left;
-	double delta_right;
+		
 };
 #endif

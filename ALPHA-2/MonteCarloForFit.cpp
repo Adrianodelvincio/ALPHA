@@ -279,8 +279,8 @@ canvas0->SaveAs(percorso + nameFile0);
 
 auto g1 = new TGraph(weight.size(),weight.data(),mixErrors.data());
 g1->SetMarkerStyle(21);
-g1->SetTitle("MIX: #sigma vs weight");
-g1->GetYaxis()->SetTitle("#sigma_{Nmix} vs. a");
+g1->SetTitle("MIX: #sigma^{2} vs weight");
+g1->GetYaxis()->SetTitle("#sigma_{Nmix}^{2} vs. a");
 g1->GetXaxis()->SetTitle("a");
 if(N > 500){
 g1->SetMinimum(50);

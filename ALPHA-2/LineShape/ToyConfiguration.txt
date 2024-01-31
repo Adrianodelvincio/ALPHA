@@ -10,10 +10,11 @@ C = 0.5
 # step in frequency and time interval, delay of the onset, number of frequencies
 FrequencyStep = 5
 TimeStep = 8
-delay = 2.5
 SweepStep = 24
 TotalStep = 50
 BinBeforeOnset = 3
+FrequencyMinBeforeOnset = -15
+FrequencyMaxBeforeOnset = -30
 # cosmic rate is expressed in event/second, efficiency (point of work of the experiment)
 CosmicRate = 1
 Efficiency = 1
@@ -27,6 +28,9 @@ x_da_end = 1420320
 # HFS generation parameter
 delta_right = -30
 delta_left = +10
+# Bdrift [kHz/s]
+Bdrift = 0.020292
+sigmaDrift = 0.000343
 # Parameters of the Cruijff function
 x0_cb = 220.65
 sigma0_cb = 8.76

@@ -82,19 +82,19 @@ std::vector<double> ParamOptimization(	TString directory,
 					.Filter("type != 2 || runNumber == 1")
 					.Histo1D({"Counts","Frequence", static_cast<int>(SweepStep), startPdf2, startPdf2 + SweepStep*FrequencyStep}, "frequence");*/
 		
-		auto Spectra1 = frame.Filter("runNumber == 1")
+		auto Spectra1 = frame.Filter("runNumber == 0")
 			 .Filter("frequence <= 1000")
 			 //.Filter("type != 2")
 			 .Histo1D({"Counts","Frequence", static_cast<int>(SweepStep),startPdf1, startPdf1 + SweepStep*FrequencyStep }, "frequence");
 		
-		auto Spectra2 = frame.Filter("runNumber == 1")
+		auto Spectra2 = frame.Filter("runNumber == 0")
 			 .Filter("frequence >= 1000")
 			 //.Filter("type != 2")
 			 .Histo1D({"Counts","Frequence", static_cast<int>(SweepStep), startPdf2, startPdf2 + SweepStep*FrequencyStep}, "frequence");
 
 		// Load the shifts of the lineshapes
-		auto frame3 = frame.Filter("runNumber == 1").Filter("frequence >= 1000").Take<double>("lineShift");
-		auto frame4 = frame.Filter("runNumber == 1").Filter("frequence <= 1000").Take<double>("lineShift");
+		auto frame3 = frame.Filter("runNumber == 0").Filter("frequence >= 1000").Take<double>("lineShift");
+		auto frame4 = frame.Filter("runNumber == 0").Filter("frequence <= 1000").Take<double>("lineShift");
 		auto lineShiftda = frame3.GetValue();
 		//std::cout << "LineShift d to a : " << lineShiftda[0] << std::endl;
 		auto lineShiftcb = frame4.GetValue();
@@ -163,7 +163,21 @@ std::vector<double> ParamOptimization(	TString directory,
 		x_sign.push_back(onset2 - onset1);
 		diff_sign.push_back(onset2 - onset1 - (Params.x_da_start + lineShiftda[0] - Params.x_cb_start - lineShiftcb[0]));
 		}
-		
+	
+	return 		{mean(diff_bk_thr),	stdev(diff_bk_thr),		//with background
+			mean(diff_bk_2017),	stdev(diff_bk_2017),		//with background
+			mean(diff_bk_rev),	stdev(diff_bk_rev),		//with background
+			mean(diff_cfrac),	stdev(diff_cfrac),       	//with backgrounf
+			mean(diff_neigh),	stdev(diff_neigh),      	// SUM NEIGHBORS
+			mean(diff_sign),	stdev(diff_sign),	       	// SIGNIFICANCE
+			stdev(x_thr),	Corr(x_thr,MCtruth),
+			stdev(x_2017),	Corr(x_2017,MCtruth),
+			stdev(x_rev),	Corr(x_rev,MCtruth),
+			stdev(x_cfrac),	Corr(x_cfrac,MCtruth),
+			stdev(x_neigh),	Corr(x_neigh,MCtruth),      	// SUM NEIGHBORS
+			stdev(x_sign),	Corr(x_sign, MCtruth),	       	// SIGNIFICANCE
+			stdev(MCtruth)};	
+/*
 	return 		{mean(diff_bk_thr),	stdev(diff_bk_thr),		//with background
 			mean(diff_bk_2017),	stdev(diff_bk_2017),		//with background
 			mean(diff_bk_rev),	stdev(diff_bk_rev),		//with background
@@ -180,5 +194,6 @@ std::vector<double> ParamOptimization(	TString directory,
 			stdev(x_rev),		stdev(x_cfrac),
 			stdev(x_neigh),		stdev(x_sign),
 			stdev(MCtruth)};
+*/
 }
 

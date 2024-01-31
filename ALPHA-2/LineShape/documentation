@@ -8,11 +8,9 @@ this folder contains all the datasets generated for each MVA point. The hyperfin
 
 this folder contains all the datasets generated for each MVA point. The hyperfine splitting is uniformly generated around the cpt value with interval (-15, + 15) kHz.
 
-- Passcut
-
-Passcut dataset
 
 - point 1 
+
 
 Data corresponding to MVA working point mu = 0.046, efficiency = 0.775
 
@@ -24,3 +22,40 @@ Data corresponding to MVA working point mu = 0.01, efficiency = 0.638
 
 Data corresponding to MVA working point mu = 0.23, efficiency = 0.86
 
+- Test_1
+
+Test 1 of the cost function.
+
+Interval of generation:  (-20,20)
+
+- Test_2
+
+Test 2 of the cost function
+
+interval of generation [-40,0] (pay attention, binbeforeonset = 4)
+
+- Test_3
+
+Test 3 of the cost function
+
+interval of generation [-40, 40] (pay attention, binbeforeonset = 4)
+
+- Test_4 
+
+Test 4 of the cost function
+
+interval of generation [-40, 20] (pay attention, binbeforeonset = 4)
+
+-------------------------------------------------------------------------
+------------------------------------------------------------------------
+FROM HERE, ALL THE DATASET HAVE BDRIFT
+
+- Passcut
+
+Passcut dataset, The hyperfine splitting is uniformly generated around the cpt value with interval (-30, + 10) kHz.
+
+
+- scanMvaData3
+
+this folder contains all the datasets generated for each MVA point. The hyperfine splitting is uniformly generated around the cpt value with interval (-30, + 10) kHz.
+The Bdrift effects are simulated, also the start of the sweep is considered with operator error.

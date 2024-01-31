@@ -31,7 +31,7 @@ RooDataHist mix_h("dh0", "dh0", x, Import(*histMix));
 RooPlot *frame1 = x.frame(Title("Annihilation on Walls Dataset"));
 RooHistPdf PdfMixing("mixingpdf", "mixingpdf", x, mix_h, 0);
 mix_h.plotOn(frame1);
-//PdfMixing.plotOn(frame1);
+PdfMixing.plotOn(frame1);
 
 // FIT
 RooRealVar media("mean", "mean of gaussian", 1, -1000, 1000);
@@ -44,6 +44,13 @@ Double_t AnnOnWallChisq = frame1->chiSquare(); 	// Compute the chisquare
 TString chisqLabel = TString::Format("#chi^{2} = %.1f #pm %1.f ndof %d", AnnOnWallChisq*28, sqrt(2*28), 28); // Print in the legend 
 gauss.paramOn(frame1, Label(chisqLabel), Layout(0.12,0.5,0.9)); // Plot the legend on the Plot
 
+auto canvas_2 = new TCanvas("Ann. on Walls 2", "Annihilation on Walls Dataset", 800,800);
+frame1->GetXaxis()->SetTitle("radius r [cm]");
+frame1->GetYaxis()->SetTitle("Counts");
+frame1->getAttText()->SetTextSize(0.03);
+frame1->Draw("hist");
+
+/*
 RooHist *hres = frame1->residHist();
 RooPlot *resframe = x.frame();
 resframe->addPlotable(hres,"P");
@@ -70,6 +77,8 @@ resframe->GetYaxis()->SetTitle("Residuals");
 resframe->SetTitleSize( 0.06, "X");
 resframe->SetTitleSize( 0.06, "Y");
 resframe->Draw();
+*/
+
 
 
 // UWLOSSES

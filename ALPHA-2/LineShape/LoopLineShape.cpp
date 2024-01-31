@@ -22,7 +22,7 @@ void LoopLineShape(	int Nloop,
 
 // ReadConfigurationFiles;
 ReadConfFile Params(ConfFile);
-//Params.Print();
+Params.Print();
 if(mvaScan == TString::Format("true")){
 	Params.Efficiency = Efficiency;
 	Params.CosmicRate = CosmicRate;
@@ -44,7 +44,6 @@ double x_cb_peak = Params.x_cb_peak;
 double x_da_start = Params.x_da_start;
 double x_da_end = Params.x_da_end;
 double x_da_peak = Params.x_da_peak;
-double range = Params.delay;						// Set range delay
 //	Cruijff Parameters
 double k0_cb = Params.k0_cb;
 double k1_cb = Params.k1_cb;
@@ -86,20 +85,11 @@ RooAddPdf genMix("model","model", RooArgList{gauss_Mix}, RooArgList{Nwall});
 RooAddPdf genGas("model1","model1", RooArgList{Rayleigh}, RooArgList{Ngas});
 RooAddPdf genCosmic("model2", "model2", RooArgList{linearFit}, RooArgList{Nbk});
 
-
-///////////////////
-// DISCRETIZED CONTAINER OF THE LINESHAPE
-double ScanStart1 = Params.x_cb_start - (FrequencyStep)*(BeforeOnset + 0.5);	// Start of frequency sweep c-b
-double ScanStart2 = Params.x_da_start - (FrequencyStep)*(BeforeOnset + 0.5);	// Start of frequency sweep d-a
-TH1F *genLineShape1 = new TH1F("hist1", "lineshape c to b", Nbin1, ScanStart1, ScanStart1 + Nbin1*(FrequencyStep));
-TH1F *genLineShape2 = new TH1F("hist2", "lineshape d to a", Nbin2, ScanStart2, ScanStart2 + Nbin2*(FrequencyStep));
-//////////////////
-
 /////////////////
 // EXTERNAL TOY LOOP
 TRandom3 *r = new TRandom3();
-
 	for(int l = 0; l < Ntrial; l++){				//LOOP ON TRIALS
+		// INITIALIZATION OF VARIABLES
 		RooDataSet dataPdf1("data", "data", RooArgSet(x));	// Dataset to store the events
 		RooDataSet dataPdf2("dati", "dati", RooArgSet(x));	// Dataset to store the events
 		vector<double>	f1, f2;					// Frequencies pdf1 , Frequencies pdf2
@@ -108,7 +98,8 @@ TRandom3 *r = new TRandom3();
 		vector<int>	RunNumber1, RunNumber2;			// Run Number (from 0 to Repetition)
 		vector<double>  cb_shift;				// shift of c to b onset
 		vector<double>	da_shift;				// shift of d to a onset
-
+		vector<double>  start_sweep_cb;
+		vector<double>  start_sweep_da;
 		// HYPERFINE SPLITTING GENERATION
 		double shift = r->Uniform(Params.delta_left,Params.delta_right); 		// generate a shift in the hyperfine splitting
 		double LineShift_cb = -(shift/2);	// shift of the c to b lineshape
@@ -117,16 +108,41 @@ TRandom3 *r = new TRandom3();
 		//std::cout << "LineShift d to a " << LineShift_da << std::endl;
 		/////////////
 		
+		// OPERATOR SET THE WINDOW BEFORE THE FIRST RUN, DEFINITION OF THE TRUE Bdrift
+		double OperatorError =  r->Uniform(Params.FrequencyMinBeforeOnset,Params.FrequencyMaxBeforeOnset);
+		double TrueBdrift = Params.Bdrift + r->Gaus(0,Params.sigmaDrift);
+		/////////////
+		double TimeInBetween = 0; (1.30 + r->Uniform(0,0.45))*3600; // In seconds
+		
 		// LOOP ON REPETITION
 		for(int run = 0; run < Repetition; run++){
 			//////////////
+			
+			TimeInBetween += (1.30 + r->Uniform(0,0.45))*3600;
 			// traslate the onset according to the HYPERFINE SPLITTING GENERATED
-			cb_shift.push_back(LineShift_cb); // Save shift
-			da_shift.push_back(LineShift_da); // Save shift
-			double start1 = x_cb_start + LineShift_cb; // onset c to b + shift
-			double peak1  = x_cb_peak  + LineShift_cb; // peak c to b + shift
-			double start2 = x_da_start + LineShift_da; // onset d to a + shift
-			double peak2  = x_da_peak  + LineShift_da; // peak d to a + shift
+			cb_shift.push_back(LineShift_cb - TrueBdrift*(TimeInBetween)); // Save shift
+			da_shift.push_back(LineShift_da - TrueBdrift*(TimeInBetween)); // Save shift
+			double start1 = x_cb_start + LineShift_cb - TrueBdrift*(TimeInBetween); // onset c to b + shift + drift
+			double peak1  = x_cb_peak  + LineShift_cb - TrueBdrift*(TimeInBetween); // peak c to b + shift + drift
+			
+			double da_drift  =  (SweepStep + 16)*Params.TimeStep*TrueBdrift;	      	   // relative drift between da and cb
+			double start2 = x_da_start + LineShift_da - TrueBdrift*(TimeInBetween) - da_drift; // onset d to a + shift + drift
+			double peak2  = x_da_peak  + LineShift_da - TrueBdrift*(TimeInBetween) - da_drift; // peak d to a + shift + drift
+			
+			///////////////////
+			// DISCRETIZED CONTAINER OF THE LINESHAPE
+			// Updated version with Bdrift
+			double ScanStart1 = Params.x_cb_start + OperatorError - Params.Bdrift*(TimeInBetween);	// Start of frequency sweep c-b
+			
+			TimeInBetween += TimeInBetween + (SweepStep + 16)*Params.TimeStep;			// Update the time after the first sweep
+			double ScanStart2 = Params.x_da_start + OperatorError - Params.Bdrift*(TimeInBetween);	// Start of frequency sweep d-a
+			
+			TH1F *genLineShape1 = new TH1F("hist1", "lineshape c to b", Nbin1, ScanStart1, ScanStart1 + Nbin1*(FrequencyStep));
+			TH1F *genLineShape2 = new TH1F("hist2", "lineshape d to a", Nbin2, ScanStart2, ScanStart2 + Nbin2*(FrequencyStep));
+			start_sweep_cb.push_back(ScanStart1 + FrequencyStep/2);
+			start_sweep_da.push_back(ScanStart2 + FrequencyStep/2);
+			//////////////////
+			
 			///////////////
 			// DISCTRETIZATION OF THE LINESHAPE
 			SetContent(genLineShape1,Nbin1,Cruijff, start1, peak1, sigma0_cb, sigma1_cb, k0_cb, k1_cb, Norm_cb);
@@ -217,8 +233,9 @@ TRandom3 *r = new TRandom3();
 				v2Tot.push_back(mixCount + gasCount + CosmicCount);
 				//std::cout << "line2 " << "Bin: " << bin << " frequence: " << frequence - 1420000 << " " << mixCount << " " << CosmicCount << std::endl;
 			} // Loop on Bin
-			genLineShape1->Reset("ICESM");
-			genLineShape2->Reset("ICESM");
+			
+			delete genLineShape1;
+			delete genLineShape2;
 		} // Loop on Repetition
 	
 		int Tot1 = std::accumulate(v1Tot.begin(), v1Tot.end(), 0);
@@ -230,10 +247,6 @@ TRandom3 *r = new TRandom3();
 		TString nameFile1 = TString::Format("LoopDataPdf1_%d.root", l);
 		TString nameFile2 = TString::Format("LoopDataPdf2_%d.root", l);
 		
-		vector<Double_t> rn; vector<Double_t> rn2;
-		for(int i = 0; i < v1Type.size(); i++){ rn.push_back(r->Uniform(1));}
-		for(int i = 0; i < v2Type.size(); i++){ rn2.push_back(r->Uniform(1));}
-		
 		int j(0);
 		auto FilledFrame1 = FillDataFrame(d1,
 						dataPdf1,
@@ -241,7 +254,9 @@ TRandom3 *r = new TRandom3();
 						v1Type,
 						v1Tot,
 						j,
-						rn,
+						Params.TimeStep,
+						Params.FrequencyStep,
+						start_sweep_cb,
 						RunNumber1,
 						cb_shift); // Fill RDataFrame
 		std::cout << "Save " <<  folder + nameFile1 << std::endl;
@@ -254,7 +269,9 @@ TRandom3 *r = new TRandom3();
 						v2Type,
 						v2Tot,
 						j,
-						rn2,
+						Params.TimeStep,
+						Params.FrequencyStep,
+						start_sweep_da,
 						RunNumber2,
 						da_shift); // Fill RDataFrame
 		std::cout << "Save " << folder + nameFile2 << std::endl;
@@ -305,6 +322,4 @@ TRandom3 *r = new TRandom3();
 	genLineShape3->Draw("histl");
 	genLineShape4->Draw("samehistl");
 	*/
-	delete genLineShape1;
-	delete genLineShape2;
 }

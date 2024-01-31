@@ -47,18 +47,43 @@ bool CheckEmpty(TString RunName){
 	}
 }
 
-double mean(std::vector<double> v){
+double mean(const std::vector<double> v){
 	double sum = std::accumulate(v.begin(), v.end(), 0.0);
 	return sum/ v.size();
 }
 
-double stdev(std::vector<double> v){
+double stdev(const std::vector<double> v){
 	double accum = 0.0;
 	double m = mean(v);
 	std::for_each (std::begin(v), std::end(v), [&](const double d) {
     	accum += (d - m) * (d - m);
 	});
 	return sqrt(accum/(v.size() - 1));
+}
+
+double ResSquare(const std::vector<double> v){
+	double result = 0;
+	for(int i = 0; i < v.size(); i++){
+		result += v[i]*v[i]; 
+	}
+	return result/v.size();
+}
+
+double Corr(const std::vector<double> v1, const std::vector<double> v2){
+	double m1 = mean(v1);
+	double m2 = mean(v2);
+	double sigma0 = stdev(v1);
+	double sigma1 = stdev(v2);
+	double accum = 0.0;
+	for(int i =0; i < v1.size(); i++){
+		accum += (v1[i] - m1)*(v2[i] - m2);
+	}
+	if(sigma0 != 0.0 && sigma1 != 0.0){
+	accum = accum/(sigma0*sigma1);}
+	else{
+	accum = 0;
+	}
+	return accum/v1.size();
 }
 
 #endif
