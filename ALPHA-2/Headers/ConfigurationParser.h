@@ -58,6 +58,7 @@ class ReadConfFile{
 						if (strcmp(sBuffer, "Repetition") == 0) 	{ Repetition = IntBuffer;}
 						if (strcmp(sBuffer, "TimeStep") == 0) 		{ TimeStep = IntBuffer;}
 						if (strcmp(sBuffer, "SweepStep") == 0) 		{ SweepStep = IntBuffer;}
+						if (strcmp(sBuffer, "ClearingStep") == 0) 	{ ClearingStep = IntBuffer;}
 						if (strcmp(sBuffer, "BinBeforeOnset") == 0) 	{ BinBeforeOnset = IntBuffer;}
 						if (strcmp(sBuffer, "TotalStep") == 0) 		{ TotalStep = IntBuffer;}
 					}
@@ -108,6 +109,7 @@ class ReadConfFile{
 	int Repetition;
 	int TimeStep;
 	int SweepStep;
+	int ClearingStep;
 	int BinBeforeOnset;
 	int TotalStep;
 	double NHbar;

@@ -9,8 +9,8 @@
 std::vector<std::string> getFiles(TString);
 std::vector<std::string> getFiles(int start, int stop, TString Directory){
 	std::vector<string> elenco;
-	TString Namefile1 = "LoopDataPdf1_";
-	TString Namefile2 = "LoopDataPdf2_";
+	TString Namefile1 = "run1_";
+	TString Namefile2 = "run2_";
 	//std::cout << "Creating list of files" << std::endl;
 	
 	for(int i = start; i <= stop; i++){

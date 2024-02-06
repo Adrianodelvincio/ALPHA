@@ -104,24 +104,37 @@ auto FillDataFrame(ROOT::RDataFrame &d1, RooDataSet &data,
 				 	int &j,
 				 	int &TimeStep,
 				 	double &FrequencyStep,
-				 	vector<double> &start_sweep, 
+				 	vector<double> &start_sweep,
+				 	vector<double> &time,
 				 	vector<int> &RunNumber,
-				 	vector<double> &freqDelay
+				 	vector<double> &onset
 				 	){
 	
 	auto rdf = d1
-	.Define("runNumber", 
+	.Define("repetition", 
 	[&RunNumber, &j](){
 		return RunNumber[j];
 	})
-	.Define("lineShift", [&freqDelay, &RunNumber, &j](){
-		return freqDelay[RunNumber[j]];
+	.Define("trueOnset", [&onset, &RunNumber, &j](){
+		return onset[RunNumber[j]];
 	})
-	.Define("frequence",	// Frequence of the event
+	.Define("deltaT",
+	[&j, &time, &RunNumber](){
+		return time[RunNumber[j]]; 
+		})
+	.Define("sweepStart",
+	[&j, &start_sweep, &RunNumber](){
+		return start_sweep[RunNumber[j]]; 
+		})
+	.Define("mwfrequence",	// Frequence of the event
 	[&j, &f](){
 		return f[j]; 
 		})
-	.Define("time",	// Frequence of the event
+	.Define("frequence",	// Frequence of the event
+	[&j, &f, &start_sweep, &RunNumber](){
+		return f[j] - start_sweep[RunNumber[j]]; 
+		})
+	.Define("time",	// time of the event
 	[&j, &f, &TimeStep, &FrequencyStep, &start_sweep,&RunNumber](){
 		//std::cout << "run number " << RunNumber[j] << std::endl;
 		//std::cout << "start_sweep " << start_sweep[RunNumber[j]] << std::endl;
