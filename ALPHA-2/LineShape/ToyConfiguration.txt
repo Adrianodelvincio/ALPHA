@@ -1,5 +1,5 @@
 # Stack, numer of antihydrogen per stack, repetition of the measurement
-Nstack = 20
+Nstack = 400
 NHbar = 20.58
 Repetition = 5
 # Percentage of annihilation on walls/gas
@@ -11,20 +11,21 @@ C = 0.5
 FrequencyStep = 5
 TimeStep = 8
 SweepStep = 24
+ClearingStep = 16
 TotalStep = 50
 BinBeforeOnset = 3
 FrequencyMinBeforeOnset = -15
 FrequencyMaxBeforeOnset = -30
 # cosmic rate is expressed in event/second, efficiency (point of work of the experiment)
-CosmicRate = 1
-Efficiency = 1
+CosmicRate = 0.046
+Efficiency = 0.68
 # The following are in kHz units
-x_cb_start = 175
-x_cb_peak = 220
-x_cb_end = 320
-x_da_start = 1420175
-x_da_peak = 1420220
-x_da_end = 1420320
+x_cb_start = 0
+x_cb_peak = 45
+x_cb_end = 145
+x_da_start = 1420000
+x_da_peak = 1420045
+x_da_end = 1420145
 # HFS generation parameter
 delta_right = -30
 delta_left = +10
@@ -32,7 +33,6 @@ delta_left = +10
 Bdrift = 0.020292
 sigmaDrift = 0.000343
 # Parameters of the Cruijff function
-x0_cb = 220.65
 sigma0_cb = 8.76
 sigma1_cb = 38.55
 k0_cb = 0.23

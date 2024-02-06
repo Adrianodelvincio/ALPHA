@@ -14,6 +14,7 @@
 \usepackage[toc]{appendix}
 \usepackage{eso-pic}
 \usepackage{hyperref}
+\usepackage{siunitx}
 
 \title{%
  \vspace{-2.0cm}
@@ -25,7 +26,7 @@
 \begin{document}
 
 \AddToShipoutPicture*
-    {\put(512.5,775){\includegraphics[width = 0.125\textwidth]{../logo/ALPHA_Logo.jpg}}}
+    {\put(512.5,775){\includegraphics[width = 0.125\textwidth]{/logo/ALPHA_Logo.jpg}}}
 
 \maketitle
 \begin{abstract}
@@ -41,7 +42,89 @@ The Hyperfine Splitting Measurement consists on the determination of the $\Delta
 
 \section{Structure of the Simulation}
 
-\section{Parameters of the Simulation}
+\section{Onset Finding Algorithms: Definitions and Optimization}
+
+\section{Magnetic field drift effects}
+
+The magnetic field $\vec{B}$ in the anti-hydrogen trap can produce several effects that influence the hyperfine splitting measurement. For instance, magnetic field in-homogeneity could locally modify the frequency transition for a part of the trapped $\overline{H}$, broadening the spectroscopic line of the transition. Also
+the variation of the magnetic field due to time influence both the onset frequency and shape of the \textit{cb} and \textit{da} transitions. The magnetic field drift $\vec{B}_{drift}$ (measured in $\SI{}{\kilo \hertz \second\tothe{-1}}$) is supposed to be constant over time, with magnitude of $ \simeq \SI{0.02}{\kilo \hertz \second\tothe{-1}}$ or equivalently $ \simeq \SI{70}{\kilo \hertz \hour\tothe{-1}}$.
+
+The shape of the transition  is modified due to the fact that the experimental measurement at each frequency are made a different times. Denoting the transition as $\psi(t,f,\vec{B})$ where we have made the time, frequency and $\vec{B}$ dependence explicit, the measurement are at each frequency are given by:
+
+\begin{eqnarray*}
+f_{0}& : &\psi(f_{0},B(t))   \\
+f_{1}& : &\psi(f_{1},B(t + \delta_{tstep})) = \psi(f_{0},B(t) - B_{drift} \cdot \delta t) \\
+f_{2}& : &\psi(f_{2},B(t + 2\delta_{tstep})) = \psi(f_{0},B(t) - B_{drift} \cdot 2 \delta t)\\
+... & ...
+\end{eqnarray*}
+
+In principle this effects could be simulated with a discretization of the line-shape which accounts for the explicit dependence over time. Despite this, for low magnitude of $B_{drift}$, the shift produced is of the order of $\SI{0.02}{\kilo \hertz \second \tothe{-1}} \cdot \delta t_{step} = \SI{0.16}{\kilo \hertz}$, having imposed $\delta t_{step} =\SI{8}{\second}$. The effect is relatively small compared to the frequency increment of $\SI{5}{\kilo \hertz}$ for each step. Despite this, since this effect accumulates over time, the biggest effect will occur for higher frequencies at the end of the sweep. For the very last been of the sweep, we expect to have $ \SI{0.16}{\kilo \hertz} \cdot 24  = \SI{3.84}{\kilo \hertz} $, where 24 is number of step in a single. In this case the result is comparable with the frequency sampling of 5 kHz, nevertheless this only modifies the shape of the right tail of the lineshape, with a negligible influence on the onset determination.
+
+A more significant effects, which is considered in the simulation, is directly related to the change over time of the onsets frequencies. Since the onsets of the \textit{cb} and \textit{da} transition are measured at a different time, the hyperfine splitting of anti-hydrongen, measured as the difference between the two onsets, is directly influenced by the $B_{drift}$ effect. 
+
+\begin{figure}[hbtp]
+\centering
+\includegraphics[scale= 0.60]{SchemeBdrift.pdf}
+\caption{Scheme of Bdrift effects on onset determination}\label{fig:SchemeBdrift}
+\end{figure}
+
+
+A quantitative estimation of this effect is calculated from the scheme shown in figure \ref{fig:SchemeBdrift}. The onset \textit{cb} is found when the blue line (which represent the variation of the onset frequency given by the $B_{drift}$ effects) intersects the step by step rising frequency of the micro wave laser used to induce the transitions. Considering an ideal algorithm without uncertainty, this is equivalent to:
+
+\begin{equation} \label{eq:cbOnset}
+f_{0} + \dfrac{f_{step}}{t_{dwell}} \cdot \Delta t' = f_{cb}(t) = f_{cb} - B_{drift} \cdot \Delta t'
+\end{equation}
+
+Resolving this equation in the variable $\Delta t'$, the time at which the onset is found, gives:
+
+\begin{equation}
+\Delta t' = \dfrac{f_{cb} - f_{0}}{ \frac{f_{step}}{t_{dwell}} + B_{drift}}
+\end{equation}
+
+Substituting in $f_{cb}(t)$ gives the measured onset for the \textit{cb} transition:
+
+\begin{equation}
+f_{cb}(t = \Delta t') = f_{cb} - B_{drift} \dfrac{f_{cb} - f_{0}}{ \frac{f_{step}}{t_{dwell}} + B_{drift}}
+\end{equation} 
+
+The onset for \textit{da} transition can be found with the same method, although we have to consider an additional time interval made up by the last frequency steps of the \textit{cb} transition and the 16 clearing step. With this additional information we can derive the equivalent equation of the \ref{eq:cbOnset}
+
+\begin{equation}
+f_{0} + hfs +  \dfrac{f_{step}}{t_{dwell}} \cdot \Delta t'' = f_{da} -B_{drift} \cdot (t_{sweep} + \Delta t'') 
+\end{equation}
+
+where $hfs$ indicates the frequency distance between the two starting point of the sweep (equal to the hyperfine splitting of hydrogen). The time $\Delta t''$ is:
+
+\begin{equation}
+\Delta t'' = \dfrac{f_{da} - B_{drift} \cdot t_{sweep} - f_{0} - hfs}{ \frac{f_{step}}{t_{dwell}} + B_{drift}}
+\end{equation} 
+
+As before, substituting in $f_{da}$ gives the result:
+
+\begin{equation}
+f_{da} - B_{drift} t_{sweep} - B_{drift} \dfrac{( f_{da} - B_{drift} t_{sweep} - f_{0} - hfs)}{ \frac{f_{step}}{t_{dwell}} + B_{drift}}
+\end{equation}
+
+It is interesting now to study the difference between the two onset, which allows to identify quantitatively how much the $B_{drift}$ influence the measurement. 
+
+\begin{equation} \label{eq:Systematiceffect}
+\overline{hfs}_{measured} = \overline{hfs} - B_{drift} \cdot t_{sweep} - B_{drift}  \dfrac{(\overline{hfs} - hfs - B_{drift} \cdot t_{sweep})}{ \frac{f_{step}}{t_{dwell}} + B_{drift}}
+\end{equation}
+
+If the $B_{drift}$ are small compared to $\frac{f_{step}}{t_{dwell}}$, we can simplify the expression above, obtaining:
+
+\begin{equation}
+\overline{hfs}_{measured} = \overline{hfs} - B_{drift} \cdot \biggl(t_{sweep} + \frac{ \overline{hfs} - hfs}{\frac{f_{step}}{t_{dwell}}} \biggl) + \, B_{drift}^{2} \cdot \biggl( t_{sweep} \, \frac{t_{dwell}}{f_{step}} \biggl)
+\end{equation}
+
+two additional terms are present, one which is proportional to the magnetic field drift, and one proportional to the square.
+\newpage
+\begin{figure}[hbtp]
+\centering
+\includegraphics[width = 0.75\textwidth]{SecondOrderTerm.pdf}
+\caption{Plot of the second order term of equation \ref{eq:Systematiceffect}. The $B_{drift}$ effects are computed for 5 possible scenarios which differentiate for the difference between the hyperfine splitting of hydrogen and anti ($\overline{hfs} - hfs$) }
+\end{figure}
+
 
 \section{Results}
 

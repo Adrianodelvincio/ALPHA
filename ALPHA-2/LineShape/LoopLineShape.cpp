@@ -23,20 +23,17 @@ void LoopLineShape(	int Nloop,
 // ReadConfigurationFiles;
 ReadConfFile Params(ConfFile);
 Params.Print();
+// Select the efficiency directly form args of the macro
 if(mvaScan == TString::Format("true")){
 	Params.Efficiency = Efficiency;
 	Params.CosmicRate = CosmicRate;
 }
 
-//	Parameters of the Simulation 
+// Compute expected number of cosmic annihilation and background
 double Ntot = Params.Nstack * Params.NHbar * Params.Efficiency;		// Number of Total Events
-double FrequencyStep = Params.FrequencyStep;				// Kilo hertz
-int SweepStep = Params.SweepStep;					// Number of FrequencyStep
-int BeforeOnset = Params.BinBeforeOnset;
-int Repetition = Params.Repetition;					// Repetition of the single run
-double pWall_c = Params.WallComponent_cb;				// Weight annihilation on walls for pdf1 (transition c -> b)
-double pWall_d = Params.WallComponent_ad;				// Weight annihilation on walls for pdf2 (transition d -> a)
-double Ncosmic = Params.TimeStep * Params.CosmicRate;			// Number of Cosmic Events
+double Nc = Ntot*Params.C; 				// Expected event for lineshape1
+double Nd = Ntot*(1 - Params.C); 			// Expected event for lineshape2
+double Ncosmic = Params.TimeStep * Params.CosmicRate;	// Number of Cosmic Events
 //	Lineshape Parameters
 double x_cb_start = Params.x_cb_start;
 double x_cb_end = Params.x_cb_end;
@@ -58,10 +55,8 @@ double Norm_da = Params.Norm_da;
 
 
 int Ntrial = Nloop;				// Ntrial
-double Nc = Ntot*Params.C; 			// Expected event for lineshape1
-double Nd = Ntot*(1 - Params.C); 		// Expected event for lineshape2
-double pGas_d = 1 - pWall_d; 			// Percentage of annihilation on residual gas
-double pGas_c = 1 - pWall_c; 			// Percentage of annihilation on residual gas
+double pGas_d = 1 - Params.WallComponent_ad; 			// Percentage of annihilation on residual gas
+double pGas_c = 1 - Params.WallComponent_cb; 			// Percentage of annihilation on residual gas
 
 int Nbin1 = Params.TotalStep;	// FIX NUMBER BIN EQUAL TO SWEEPSTEP
 int Nbin2 = Params.TotalStep;	// FIX NUMBER BIN EQUAL TO SWEEPSTEP
@@ -89,6 +84,7 @@ RooAddPdf genCosmic("model2", "model2", RooArgList{linearFit}, RooArgList{Nbk});
 // EXTERNAL TOY LOOP
 TRandom3 *r = new TRandom3();
 	for(int l = 0; l < Ntrial; l++){				//LOOP ON TRIALS
+		
 		// INITIALIZATION OF VARIABLES
 		RooDataSet dataPdf1("data", "data", RooArgSet(x));	// Dataset to store the events
 		RooDataSet dataPdf2("dati", "dati", RooArgSet(x));	// Dataset to store the events
@@ -96,66 +92,95 @@ TRandom3 *r = new TRandom3();
 		vector<double>	v1Tot, v2Tot;				// Total Counts
 		vector<int>	v1Type,v2Type;				// Type of Event
 		vector<int>	RunNumber1, RunNumber2;			// Run Number (from 0 to Repetition)
-		vector<double>  cb_shift;				// shift of c to b onset
-		vector<double>	da_shift;				// shift of d to a onset
+		vector<double>  generated_cb;				// shift of c to b onset
+		vector<double>	generated_da;				// shift of d to a onset
 		vector<double>  start_sweep_cb;
 		vector<double>  start_sweep_da;
+		vector<double>  time_cb;
+		vector<double>  time_da;
+		
 		// HYPERFINE SPLITTING GENERATION
-		double shift = r->Uniform(Params.delta_left,Params.delta_right); 		// generate a shift in the hyperfine splitting
-		double LineShift_cb = -(shift/2);	// shift of the c to b lineshape
-		double LineShift_da = +(shift/2);	// shift of the d to a lineshape
-		//std::cout << "LineShift c to b " << LineShift_cb << std::endl;
-		//std::cout << "LineShift d to a " << LineShift_da << std::endl;
-		/////////////
+		double delta = r->Uniform(Params.delta_left,Params.delta_right); 		// generate a shift in the hyperfine splitting
+		double LineShift_cb = -(delta/2);	// shift of the c to b lineshape
+		double LineShift_da = +(delta/2);	// shift of the d to a lineshape
+		//
 		
 		// OPERATOR SET THE WINDOW BEFORE THE FIRST RUN, DEFINITION OF THE TRUE Bdrift
 		double OperatorError =  r->Uniform(Params.FrequencyMinBeforeOnset,Params.FrequencyMaxBeforeOnset);
 		double TrueBdrift = Params.Bdrift + r->Gaus(0,Params.sigmaDrift);
-		/////////////
-		double TimeInBetween = 0; (1.30 + r->Uniform(0,0.45))*3600; // In seconds
+		//
+		
+		// Define time 
+		double TimeInBetween = 0; // In seconds
+		//
 		
 		// LOOP ON REPETITION
-		for(int run = 0; run < Repetition; run++){
+		for(int run = 0; run < Params.Repetition; run++){
 			//////////////
+			// C TO B TRANSITION
 			
-			TimeInBetween += (1.30 + r->Uniform(0,0.45))*3600;
-			// traslate the onset according to the HYPERFINE SPLITTING GENERATED
-			cb_shift.push_back(LineShift_cb - TrueBdrift*(TimeInBetween)); // Save shift
-			da_shift.push_back(LineShift_da - TrueBdrift*(TimeInBetween)); // Save shift
-			double start1 = x_cb_start + LineShift_cb - TrueBdrift*(TimeInBetween); // onset c to b + shift + drift
-			double peak1  = x_cb_peak  + LineShift_cb - TrueBdrift*(TimeInBetween); // peak c to b + shift + drift
+			// save time
+			time_cb.push_back(TimeInBetween);
 			
-			double da_drift  =  (SweepStep + 16)*Params.TimeStep*TrueBdrift;	      	   // relative drift between da and cb
-			double start2 = x_da_start + LineShift_da - TrueBdrift*(TimeInBetween) - da_drift; // onset d to a + shift + drift
-			double peak2  = x_da_peak  + LineShift_da - TrueBdrift*(TimeInBetween) - da_drift; // peak d to a + shift + drift
+			// generate and save true onset
+			double onset_cb = x_cb_start + LineShift_cb - TrueBdrift*(TimeInBetween); 	// onset c to b + shift + drift
+			double cbMaximum  = x_cb_peak  + LineShift_cb - TrueBdrift*(TimeInBetween);	// peak c to b + shift + drift	
+			//generated_cb.push_back(x_cb_start + LineShift_cb - TrueBdrift*(TimeInBetween)); 	
+			generated_cb.push_back(x_cb_start + LineShift_cb); 
 			
-			///////////////////
-			// DISCRETIZED CONTAINER OF THE LINESHAPE
-			// Updated version with Bdrift
-			double ScanStart1 = Params.x_cb_start + OperatorError - Params.Bdrift*(TimeInBetween);	// Start of frequency sweep c-b
+			// Start of frequency sweep c-b			
+			double startSweepCB = Params.x_cb_start + OperatorError - Params.Bdrift*(TimeInBetween);
+			start_sweep_cb.push_back(startSweepCB + Params.FrequencyStep/2);
 			
-			TimeInBetween += TimeInBetween + (SweepStep + 16)*Params.TimeStep;			// Update the time after the first sweep
-			double ScanStart2 = Params.x_da_start + OperatorError - Params.Bdrift*(TimeInBetween);	// Start of frequency sweep d-a
+			// Create the series of micro wave measurements for c to b
+			TH1F *genLineShape1 = new TH1F("hist1", "lineshape c to b", Nbin1, startSweepCB, startSweepCB + Nbin1*(Params.FrequencyStep));
+			SetContent(genLineShape1,Nbin1,Cruijff, onset_cb, cbMaximum, sigma0_cb, sigma1_cb, k0_cb, k1_cb, Norm_cb);
+
+			// update time
+			TimeInBetween += (Params.SweepStep + Params.ClearingStep)*Params.TimeStep; 
 			
-			TH1F *genLineShape1 = new TH1F("hist1", "lineshape c to b", Nbin1, ScanStart1, ScanStart1 + Nbin1*(FrequencyStep));
-			TH1F *genLineShape2 = new TH1F("hist2", "lineshape d to a", Nbin2, ScanStart2, ScanStart2 + Nbin2*(FrequencyStep));
-			start_sweep_cb.push_back(ScanStart1 + FrequencyStep/2);
-			start_sweep_da.push_back(ScanStart2 + FrequencyStep/2);
-			//////////////////
+			//////////////
+			// D TO A TRANSITION
+			// save time
+			time_da.push_back(TimeInBetween);
 			
-			///////////////
-			// DISCTRETIZATION OF THE LINESHAPE
-			SetContent(genLineShape1,Nbin1,Cruijff, start1, peak1, sigma0_cb, sigma1_cb, k0_cb, k1_cb, Norm_cb);
-			SetContent(genLineShape2,Nbin2,Cruijff, start2, peak2, sigma0_da, sigma1_da, k0_da, k1_da, Norm_da);
+			// generate and save true onset
+			double onset_da = x_da_start + LineShift_da - TrueBdrift*(TimeInBetween); 	// onset d to a + shift + drift
+			double daMaximum  = x_da_peak  + LineShift_da - TrueBdrift*(TimeInBetween); 	// peak d to a + shift + drift
+			//generated_da.push_back(x_da_start + LineShift_da - TrueBdrift*(TimeInBetween));
+			generated_da.push_back(x_da_start + LineShift_da);
 			
+			// Start of frequency sweep d-a
+			double startSweepDA = Params.x_da_start + OperatorError - Params.Bdrift*(TimeInBetween);
+			start_sweep_da.push_back(startSweepDA + Params.FrequencyStep/2);
+
+			// Create the series of micro wave measurements for d to a
+			TH1F *genLineShape2 = new TH1F("hist2", "lineshape d to a", Nbin2, startSweepDA, startSweepDA + Nbin2*(Params.FrequencyStep)); // create the transition
+			SetContent(genLineShape2,Nbin2,Cruijff, onset_da, daMaximum, sigma0_da, sigma1_da, k0_da, k1_da, Norm_da);
+
 			// GENERATE THE DATA, LOOP ON BINS
-			for(int bin = 1; bin <= SweepStep; bin++){
+			// time relative to the sweep start for each bin
+			double tbc = 0;
+			double tda = 0;
+			
+			for(int bin = 1; bin <= Params.SweepStep; bin++){
+				
+				// Bdrift correction for each bin
+				onset_cb  += - TrueBdrift*(Params.TimeStep);  	// onset c to b + shift + drift
+				cbMaximum += - TrueBdrift*(Params.TimeStep);	// peak c to b + shift + drift	
+				onset_da  += - TrueBdrift*(Params.TimeStep); 	// onset d to a + shift + drift
+				daMaximum += - TrueBdrift*(Params.TimeStep); 	// peak d to a + shift + drift
+				
+				// update the lineshape
+				SetContent(genLineShape1,Nbin1,Cruijff, onset_cb, cbMaximum, sigma0_cb, sigma1_cb, k0_cb, k1_cb, Norm_cb);
+				SetContent(genLineShape2,Nbin2,Cruijff, onset_da, daMaximum, sigma0_da, sigma1_da, k0_da, k1_da, Norm_da);
+				
 				/////////
 				// LINESHAPE C TO B
 				
 				// ANNIHILATION ON WALLS
 				double prob = ComputeProb(genLineShape1,bin);// Probability of the bin
-				SetCoefficients((pWall_c*Nc)*prob,(pGas_c*Nc)/SweepStep, Ncosmic, &Nwall,&Ngas,&Nbk);
+				SetCoefficients((Params.WallComponent_cb*Nc)*prob,(pGas_c*Nc)/Params.SweepStep, Ncosmic, &Nwall,&Ngas,&Nbk);
 				int gasCount = 0; int mixCount = 0; int CosmicCount = 0;
 				double frequence = genLineShape1->GetBinCenter(bin);
 				
@@ -198,7 +223,7 @@ TRandom3 *r = new TRandom3();
 				// ANNIHILATION ON WALLS
 				prob = ComputeProb(genLineShape2,bin);	// Probability of the bin
 				frequence = genLineShape2->GetBinCenter(bin);
-				SetCoefficients((pWall_d*Nd)*prob,(pGas_d*Nd)/SweepStep,Ncosmic, &Nwall,&Ngas,&Nbk);
+				SetCoefficients((Params.WallComponent_ad*Nd)*prob,(pGas_d*Nd)/Params.SweepStep,Ncosmic, &Nwall,&Ngas,&Nbk);
 				
 				if(prob > 0){
 				RooDataSet *dataLoopWall2 = genMix.generate(x,Extended());	// Generate Wall data
@@ -232,7 +257,14 @@ TRandom3 *r = new TRandom3();
 				// STORE USEFUL QUANTITIES
 				v2Tot.push_back(mixCount + gasCount + CosmicCount);
 				//std::cout << "line2 " << "Bin: " << bin << " frequence: " << frequence - 1420000 << " " << mixCount << " " << CosmicCount << std::endl;
+				
+				// update time
+				tda += Params.TimeStep;
+				tbc += Params.TimeStep;
 			} // Loop on Bin
+			
+			//update time for new repetition
+			TimeInBetween += (1.30 + r->Uniform(0,0.45))*3600;
 			
 			delete genLineShape1;
 			delete genLineShape2;
@@ -244,8 +276,8 @@ TRandom3 *r = new TRandom3();
 		ROOT::RDataFrame d1(Tot1 -1);	// PDF1
 		ROOT::RDataFrame d2(Tot2 -1); 	// PDF2
 		
-		TString nameFile1 = TString::Format("LoopDataPdf1_%d.root", l);
-		TString nameFile2 = TString::Format("LoopDataPdf2_%d.root", l);
+		TString nameFile1 = TString::Format("run1_%d.root", l);
+		TString nameFile2 = TString::Format("run2_%d.root", l);
 		
 		int j(0);
 		auto FilledFrame1 = FillDataFrame(d1,
@@ -257,8 +289,9 @@ TRandom3 *r = new TRandom3();
 						Params.TimeStep,
 						Params.FrequencyStep,
 						start_sweep_cb,
+						time_cb,
 						RunNumber1,
-						cb_shift); // Fill RDataFrame
+						generated_cb); // Fill RDataFrame
 		std::cout << "Save " <<  folder + nameFile1 << std::endl;
 		FilledFrame1.Snapshot("myTree", folder + nameFile1);
 
@@ -272,8 +305,9 @@ TRandom3 *r = new TRandom3();
 						Params.TimeStep,
 						Params.FrequencyStep,
 						start_sweep_da,
+						time_da,
 						RunNumber2,
-						da_shift); // Fill RDataFrame
+						generated_da); // Fill RDataFrame
 		std::cout << "Save " << folder + nameFile2 << std::endl;
 		FilledFrame2.Snapshot("myTree", folder + nameFile2);
 		//std::cout << "Efficiency: " << Params.Efficiency << " Background: " << Params.CosmicRate << std::endl;

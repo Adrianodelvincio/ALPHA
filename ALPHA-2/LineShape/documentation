@@ -46,7 +46,7 @@ Test 4 of the cost function
 
 interval of generation [-40, 20] (pay attention, binbeforeonset = 4)
 
--------------------------------------------------------------------------
+------------------------------------------------------------------------
 ------------------------------------------------------------------------
 FROM HERE, ALL THE DATASET HAVE BDRIFT
 
@@ -59,3 +59,7 @@ Passcut dataset, The hyperfine splitting is uniformly generated around the cpt v
 
 this folder contains all the datasets generated for each MVA point. The hyperfine splitting is uniformly generated around the cpt value with interval (-30, + 10) kHz.
 The Bdrift effects are simulated, also the start of the sweep is considered with operator error.
+
+-ScanMvaData4
+
+Same ad scanMvaData3 but ALL the Bdrift effects are simulated.

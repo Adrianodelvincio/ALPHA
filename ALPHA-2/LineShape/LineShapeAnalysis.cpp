@@ -7,11 +7,11 @@
 using namespace RooFit;
 
 
-void LineShapeAnalysis(TString directory = "linear/",
+void LineShapeAnalysis(			TString directory,
 					int start = 0,
 					int stop = 999,
 					double mu = 3, 			// Threshold coefficient
-					double fraction = 0.1, 	// constant fraction discrimination
+					double fraction = 0.1, 		// constant fraction discrimination
 					TString folder = "Plot/"
 					){
 	TString ConfFile = directory + "ToyConfiguration.txt";
@@ -32,16 +32,16 @@ void LineShapeAnalysis(TString directory = "linear/",
 	
 	// Show the first two files
 	ROOT::RDataFrame rdf("myTree", {FileList[0], FileList[1]});
-	auto hist_ctob = rdf.Filter("runNumber == 1 || type != 2")
+	auto hist_ctob = rdf.Filter("repetition == 1 || type != 2")
 			.Filter("frequence <= 1000")
 			.Filter("type != 2")
 			.Histo1D({"Counts"," c to b",static_cast<int>(SweepStep),startPdf1, startPdf1 + SweepStep*FrequencyStep }, "frequence");
-	auto ctob_withCosmic = rdf.Filter("runNumber == 1 || type != 2")
+	auto ctob_withCosmic = rdf.Filter("repetition == 1 || type != 2")
 			.Filter("frequence <= 1000")
 			//.Filter("type != 2")
 			.Histo1D({"Counts"," c to b",static_cast<int>(SweepStep),startPdf1, startPdf1 + SweepStep*FrequencyStep }, "frequence");
 	
-	auto histF4 = 	rdf.Filter("runNumber == 0")
+	auto histF4 = 	rdf.Filter("repetition == 0")
 			.Filter("frequence >= 1000")
 			.Filter("type != 2")
 			.Histo1D({"Counts"," d to a",static_cast<int>(SweepStep), startPdf2, startPdf2 + SweepStep*FrequencyStep}, "frequence");
@@ -84,31 +84,33 @@ void LineShapeAnalysis(TString directory = "linear/",
 		ROOT::RDataFrame frame("myTree", {FileList[i], FileList[i+1]});		// Load i-th dataset
 		/*
 		auto Spectra1 = frame.Filter("frequence <= 1000")
-					.Filter("type != 2 || runNumber == 1")
+					.Filter("type != 2 || repetition == 1")
 					.Histo1D({"Counts","Frequence", static_cast<int>(SweepStep),startPdf1, startPdf1 + SweepStep*FrequencyStep }, "frequence");
 		
 		auto Spectra2 = frame.Filter("frequence >= 1000")
-					.Filter("type != 2 || runNumber == 1")
+					.Filter("type != 2 || repetition == 1")
 					.Histo1D({"Counts","Frequence", static_cast<int>(SweepStep), startPdf2, startPdf2 + SweepStep*FrequencyStep}, "frequence");
 		*/
-		auto Spectra1 = frame.Filter("runNumber == 1")
+		auto Spectra1 = frame.Filter("repetition == 1")
 							 .Filter("frequence <= 1000")
 							 //.Filter("type != 2")
 							 .Histo1D({"Counts","Frequence", static_cast<int>(SweepStep),startPdf1, startPdf1 + SweepStep*FrequencyStep }, "frequence");
 		
-		auto Spectra2 = frame.Filter("runNumber == 1")
+		auto Spectra2 = frame.Filter("repetition == 1")
 							 .Filter("frequence >= 1000")
 							 //.Filter("type != 2")
 							 .Histo1D({"Counts","Frequence", static_cast<int>(SweepStep), startPdf2, startPdf2 + SweepStep*FrequencyStep}, "frequence");
 		
-		auto frame1 = frame.Filter("runNumber == 1").Filter("frequence <= 1000").Mean<double>("lineShift");
-		auto frame2 = frame.Filter("runNumber == 1").Filter("frequence >= 1000").Mean<double>("lineShift");
-		// Load the shifts of the lineshapes
-		auto frame3 = frame.Filter("runNumber == 1").Filter("frequence >= 1000").Take<double>("lineShift");
-		auto frame4 = frame.Filter("runNumber == 1").Filter("frequence <= 1000").Take<double>("lineShift");
+		auto frame1 = frame.Filter("repetition == 1").Filter("frequence <= 1000").Mean<double>("lineShift");
+		auto frame2 = frame.Filter("repetition == 1").Filter("frequence >= 1000").Mean<double>("lineShift");
+		auto frame3 = frame.Filter("repetition == 1").Filter("frequence >= 1000").Take<double>("lineShift");
+		auto frame4 = frame.Filter("repetition == 1").Filter("frequence <= 1000").Take<double>("lineShift");
+		
 		auto lineShiftda = frame3.GetValue(); //std::cout << "LineShift d to a : " << lineShiftda[0] << std::endl;
 		auto lineShiftcb = frame4.GetValue(); //std::cout << "LineShift c to b : " << lineShiftcb[0] << std::endl;
-		std::cout << std::setprecision(10);
+		
+		std::cout << std::setprecision(10
+		);
 		std::cout << "d to a onset: " <<  Params.x_da_start << std::endl;
 		
 		double onset1;				// Reconstructed onset
@@ -212,14 +214,6 @@ void LineShapeAnalysis(TString directory = "linear/",
 	h3->SetLineColor(38);
 	h3->Draw();
 	pad2->cd(4);
-	hh1->Draw("COLZ");
-	/*
-	g->SetMarkerStyle(7); // Medium Dot
-	g->SetMarkerColor(9);
-	g->SetLineStyle(0);
-	g->SetTitle("Scatter plot; MC_{truth} ;(onset_{pdf1} - onset_{pdf2}) - MC_{truth} ");
-	g->Draw("AP");
-	*/
 	
 	TString name = "2017_foward"; TString endname = ".pdf"; 
 	int numero = 0;
@@ -406,13 +400,7 @@ void LineShapeAnalysis(TString directory = "linear/",
 	h12->Draw();
 	pad5->cd(4);
 	hh4->Draw("COLZ");
-	/*
-	g1->SetMarkerStyle(7); // Medium Dot
-	g1->SetMarkerColor(9);
-	g1->SetLineStyle(0);
-	g1->SetTitle("Scatter plot; MC_{truth} ;(onset_{pdf1} - onset_{pdf2}) - MC_{truth} ");
-	g1->Draw("AP");
-	*/
+
 	name = TString::Format("constFract_%d", static_cast<int>(100*fraction));
 	numero = 0;
 	while(!gSystem->AccessPathName(folder + name + endname)){
@@ -436,7 +424,7 @@ void LineShapeAnalysis(TString directory = "linear/",
 	delta3->SaveAs(folder + name + endname);
 
 	////////////////////////////////
-	// SUMNEIGHBORS	
+	// SIGNIFICANCE
 	h13->FillN(v1_neigh.size(),v1_neigh.data(), w.data());
    	h14->FillN(v2_neigh.size(),v2_neigh.data(), w.data());
    	h15->FillN(diff_neigh.size(), diff_neigh.data(), w.data());

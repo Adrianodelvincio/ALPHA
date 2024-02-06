@@ -20,7 +20,6 @@ std::vector<double> ParamOptimization(	TString directory,
 					double Nthr,		// Parameter of Threshold algorithm
 					double thr1,
 					double thr2,
-					double rate,		// Background rate from MVA point
 					TString folder		// Where to save the plots
 					){
 	//ConfFile = directory + "ToyConfiguration.txt";
@@ -29,7 +28,6 @@ std::vector<double> ParamOptimization(	TString directory,
 	
 	ReadConfFile Params(ConfFile); // Read the values from the configuration file 
 	//Params.Print();
-	Params.CosmicRate = rate;
 	double CosmicBackground = Params.TimeStep * Params.CosmicRate;	// Number of Cosmic Events
 	double FrequencyStep = Params.FrequencyStep;
 	double startPdf1 = Params.x_cb_start - (FrequencyStep)*(Params.BinBeforeOnset + 0.5);	// Start of frequency sweep c-b
@@ -162,7 +160,9 @@ std::vector<double> ParamOptimization(	TString directory,
 		v2_sign.push_back(onset2 - (Params.x_da_start + lineShiftda[0]));
 		x_sign.push_back(onset2 - onset1);
 		diff_sign.push_back(onset2 - onset1 - (Params.x_da_start + lineShiftda[0] - Params.x_cb_start - lineShiftcb[0]));
-		}
+		} // Loop on Runs
+	
+	
 	
 	return 		{mean(diff_bk_thr),	stdev(diff_bk_thr),		//with background
 			mean(diff_bk_2017),	stdev(diff_bk_2017),		//with background
@@ -174,26 +174,8 @@ std::vector<double> ParamOptimization(	TString directory,
 			stdev(x_2017),	Corr(x_2017,MCtruth),
 			stdev(x_rev),	Corr(x_rev,MCtruth),
 			stdev(x_cfrac),	Corr(x_cfrac,MCtruth),
-			stdev(x_neigh),	Corr(x_neigh,MCtruth),      	// SUM NEIGHBORS
+			stdev(x_neigh),	Corr(x_neigh,MCtruth),      	// old significace algorithm
 			stdev(x_sign),	Corr(x_sign, MCtruth),	       	// SIGNIFICANCE
 			stdev(MCtruth)};	
-/*
-	return 		{mean(diff_bk_thr),	stdev(diff_bk_thr),		//with background
-			mean(diff_bk_2017),	stdev(diff_bk_2017),		//with background
-			mean(diff_bk_rev),	stdev(diff_bk_rev),		//with background
-			mean(diff_cfrac),	stdev(diff_cfrac),       	//with backgrounf
-			mean(diff_neigh),	stdev(diff_neigh),      	// SUM NEIGHBORS
-			mean(diff_sign),	stdev(diff_sign),	       	// SIGNIFICANCE
-			ResSquare(diff_bk_thr),	Corr(x_thr,MCtruth),
-			ResSquare(diff_bk_2017),Corr(x_2017,MCtruth),
-			ResSquare(diff_bk_rev),	Corr(x_rev,MCtruth),
-			ResSquare(diff_cfrac),	Corr(x_cfrac,MCtruth),
-			ResSquare(diff_neigh),	Corr(x_neigh,MCtruth),      	// SUM NEIGHBORS
-			ResSquare(diff_sign),	Corr(x_sign, MCtruth),	       	// SIGNIFICANCE
-			stdev(x_thr),		stdev(x_2017),
-			stdev(x_rev),		stdev(x_cfrac),
-			stdev(x_neigh),		stdev(x_sign),
-			stdev(MCtruth)};
-*/
 }
 
