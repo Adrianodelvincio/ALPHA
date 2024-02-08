@@ -27,7 +27,7 @@ std::vector<double> ParamOptimization(	TString directory,
 	
 	
 	ReadConfFile Params(ConfFile); // Read the values from the configuration file 
-	//Params.Print();
+	Params.Print();
 	double CosmicBackground = Params.TimeStep * Params.CosmicRate;	// Number of Cosmic Events
 	double FrequencyStep = Params.FrequencyStep;
 	double startPdf1 = Params.x_cb_start - (FrequencyStep)*(Params.BinBeforeOnset + 0.5);	// Start of frequency sweep c-b
@@ -35,7 +35,7 @@ std::vector<double> ParamOptimization(	TString directory,
 	double SweepStep = Params.SweepStep; // number of bin for each lineshape
 	
 	std::vector<std::string> FileList;
-	FileList = getFiles(0,stop, directory); // file list to be analyzed
+	FileList = get_oldFiles(0,stop, directory); // file list to be analyzed
 
 	// Define some vectors to store the results
 	vector<double> MCtruth;
@@ -70,16 +70,6 @@ std::vector<double> ParamOptimization(	TString directory,
 		//std::cout << directory << " Analizzo DataFrame " << count << std::endl;
 		
 		ROOT::RDataFrame frame("myTree", {FileList[i], FileList[i+1]});		// Load i-th dataset
-		
-		/*
-		auto Spectra1 = frame.Filter("frequence <= 1000")
-					.Filter("type != 2 || runNumber == 1")
-					.Histo1D({"Counts","Frequence", static_cast<int>(SweepStep),startPdf1, startPdf1 + SweepStep*FrequencyStep }, "frequence");
-		
-		auto Spectra2 = frame.Filter("frequence >= 1000")
-					.Filter("type != 2 || runNumber == 1")
-					.Histo1D({"Counts","Frequence", static_cast<int>(SweepStep), startPdf2, startPdf2 + SweepStep*FrequencyStep}, "frequence");*/
-		
 		auto Spectra1 = frame.Filter("runNumber == 0")
 			 .Filter("frequence <= 1000")
 			 //.Filter("type != 2")
@@ -169,13 +159,13 @@ std::vector<double> ParamOptimization(	TString directory,
 			mean(diff_bk_rev),	stdev(diff_bk_rev),		//with background
 			mean(diff_cfrac),	stdev(diff_cfrac),       	//with backgrounf
 			mean(diff_neigh),	stdev(diff_neigh),      	// SUM NEIGHBORS
-			mean(diff_sign),	stdev(diff_sign),	       	// SIGNIFICANCE
+			mean(diff_sign),	stdev(diff_sign),
 			stdev(x_thr),	Corr(x_thr,MCtruth),
 			stdev(x_2017),	Corr(x_2017,MCtruth),
 			stdev(x_rev),	Corr(x_rev,MCtruth),
 			stdev(x_cfrac),	Corr(x_cfrac,MCtruth),
-			stdev(x_neigh),	Corr(x_neigh,MCtruth),      	// old significace algorithm
-			stdev(x_sign),	Corr(x_sign, MCtruth),	       	// SIGNIFICANCE
+			stdev(x_neigh),	Corr(x_neigh,MCtruth),
+			stdev(x_sign),	Corr(x_sign, MCtruth),
 			stdev(MCtruth)};	
 }
 

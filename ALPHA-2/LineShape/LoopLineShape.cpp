@@ -22,12 +22,14 @@ void LoopLineShape(	int Nloop,
 
 // ReadConfigurationFiles;
 ReadConfFile Params(ConfFile);
-Params.Print();
+
 // Select the efficiency directly form args of the macro
 if(mvaScan == TString::Format("true")){
 	Params.Efficiency = Efficiency;
 	Params.CosmicRate = CosmicRate;
 }
+Params.Print();
+
 
 // Compute expected number of cosmic annihilation and background
 double Ntot = Params.Nstack * Params.NHbar * Params.Efficiency;		// Number of Total Events
@@ -35,12 +37,12 @@ double Nc = Ntot*Params.C; 				// Expected event for lineshape1
 double Nd = Ntot*(1 - Params.C); 			// Expected event for lineshape2
 double Ncosmic = Params.TimeStep * Params.CosmicRate;	// Number of Cosmic Events
 //	Lineshape Parameters
-double x_cb_start = Params.x_cb_start;
-double x_cb_end = Params.x_cb_end;
-double x_cb_peak = Params.x_cb_peak;
-double x_da_start = Params.x_da_start;
-double x_da_end = Params.x_da_end;
-double x_da_peak = Params.x_da_peak;
+double cb_start = Params.cb_start;
+double cb_end = Params.cb_end;
+double cb_peak = Params.cb_peak;
+double da_start = Params.da_start;
+double da_end = Params.da_end;
+double da_peak = Params.da_peak;
 //	Cruijff Parameters
 double k0_cb = Params.k0_cb;
 double k1_cb = Params.k1_cb;
@@ -123,13 +125,13 @@ TRandom3 *r = new TRandom3();
 			time_cb.push_back(TimeInBetween);
 			
 			// generate and save true onset
-			double onset_cb = x_cb_start + LineShift_cb - TrueBdrift*(TimeInBetween); 	// onset c to b + shift + drift
-			double cbMaximum  = x_cb_peak  + LineShift_cb - TrueBdrift*(TimeInBetween);	// peak c to b + shift + drift	
-			//generated_cb.push_back(x_cb_start + LineShift_cb - TrueBdrift*(TimeInBetween)); 	
-			generated_cb.push_back(x_cb_start + LineShift_cb); 
+			double onset_cb = cb_start + LineShift_cb - TrueBdrift*(TimeInBetween); 	// onset c to b + shift + drift
+			double cbMaximum  = cb_peak  + LineShift_cb - TrueBdrift*(TimeInBetween);	// peak c to b + shift + drift	
+			//generated_cb.push_back(cb_start + LineShift_cb - TrueBdrift*(TimeInBetween)); 	
+			generated_cb.push_back(cb_start + LineShift_cb); 
 			
 			// Start of frequency sweep c-b			
-			double startSweepCB = Params.x_cb_start + OperatorError - Params.Bdrift*(TimeInBetween);
+			double startSweepCB = Params.cb_start + OperatorError - Params.Bdrift*(TimeInBetween);
 			start_sweep_cb.push_back(startSweepCB + Params.FrequencyStep/2);
 			
 			// Create the series of micro wave measurements for c to b
@@ -145,13 +147,13 @@ TRandom3 *r = new TRandom3();
 			time_da.push_back(TimeInBetween);
 			
 			// generate and save true onset
-			double onset_da = x_da_start + LineShift_da - TrueBdrift*(TimeInBetween); 	// onset d to a + shift + drift
-			double daMaximum  = x_da_peak  + LineShift_da - TrueBdrift*(TimeInBetween); 	// peak d to a + shift + drift
-			//generated_da.push_back(x_da_start + LineShift_da - TrueBdrift*(TimeInBetween));
-			generated_da.push_back(x_da_start + LineShift_da);
+			double onset_da = da_start + LineShift_da - TrueBdrift*(TimeInBetween); 	// onset d to a + shift + drift
+			double daMaximum  = da_peak  + LineShift_da - TrueBdrift*(TimeInBetween); 	// peak d to a + shift + drift
+			//generated_da.push_back(da_start + LineShift_da - TrueBdrift*(TimeInBetween));
+			generated_da.push_back(da_start + LineShift_da);
 			
 			// Start of frequency sweep d-a
-			double startSweepDA = Params.x_da_start + OperatorError - Params.Bdrift*(TimeInBetween);
+			double startSweepDA = Params.da_start + OperatorError - Params.Bdrift*(TimeInBetween);
 			start_sweep_da.push_back(startSweepDA + Params.FrequencyStep/2);
 
 			// Create the series of micro wave measurements for d to a
@@ -166,10 +168,10 @@ TRandom3 *r = new TRandom3();
 			for(int bin = 1; bin <= Params.SweepStep; bin++){
 				
 				// Bdrift correction for each bin
-				onset_cb  += - TrueBdrift*(Params.TimeStep);  	// onset c to b + shift + drift
-				cbMaximum += - TrueBdrift*(Params.TimeStep);	// peak c to b + shift + drift	
-				onset_da  += - TrueBdrift*(Params.TimeStep); 	// onset d to a + shift + drift
-				daMaximum += - TrueBdrift*(Params.TimeStep); 	// peak d to a + shift + drift
+				//onset_cb  += - TrueBdrift*(Params.TimeStep);  	// onset c to b + shift + drift
+				//cbMaximum += - TrueBdrift*(Params.TimeStep);	// peak c to b + shift + drift	
+				//onset_da  += - TrueBdrift*(Params.TimeStep); 	// onset d to a + shift + drift
+				//daMaximum += - TrueBdrift*(Params.TimeStep); 	// peak d to a + shift + drift
 				
 				// update the lineshape
 				SetContent(genLineShape1,Nbin1,Cruijff, onset_cb, cbMaximum, sigma0_cb, sigma1_cb, k0_cb, k1_cb, Norm_cb);
@@ -318,8 +320,8 @@ TRandom3 *r = new TRandom3();
 	
 	// Show the lineshape
 	/*
-	SetContent(genLineShape1,Nbin1,Cruijff, x_cb_start, x_cb_peak, sigma0_cb, sigma1_cb, k0_cb, k1_cb, Norm_cb);
-	SetContent(genLineShape2,Nbin2,Cruijff, x_da_start, x_da_peak, sigma0_da, sigma1_da, k0_da, k1_da, Norm_da);
+	SetContent(genLineShape1,Nbin1,Cruijff, cb_start, cb_peak, sigma0_cb, sigma1_cb, k0_cb, k1_cb, Norm_cb);
+	SetContent(genLineShape2,Nbin2,Cruijff, da_start, da_peak, sigma0_da, sigma1_da, k0_da, k1_da, Norm_da);
 	TH1F *genLineShape3 = new TH1F("hist3", "lineshape", 500,0,400);
 	TH1F *genLineShape4 = new TH1F("hist4", "lineshape", 500,0,400);
 	SetContent(genLineShape3,500,Cruijff, 0, 220, sigma0_cb, sigma1_cb, k0_cb, k1_cb, Norm_cb);

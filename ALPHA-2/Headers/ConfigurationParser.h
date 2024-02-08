@@ -10,23 +10,21 @@ class ReadConfFile{
 		ReadConfFile(TString fileName){
 				std::string file(fileName.Data());
 				std::ifstream myfile (file.c_str());	// Open the file
-				std::string line; 						// Parse each line
+				std::string line; 			// Parse each line
 				
 				while(myfile.is_open() && getline(myfile,line)){
-					// If the line is a comment
-					// std::cout << line << std::endl; // Print Parsed Line
 					if(line.find("#")!=std::string::npos) continue;
-					char sBuffer[20]; float buffer;
+					char sBuffer[50]; float buffer;
 					if (sscanf(line.c_str(), "%s = %f", sBuffer, &buffer) == 2) {
 						if (strcmp(sBuffer, "WallComponent_cb") == 0) 		{ WallComponent_cb = buffer;}
 						if (strcmp(sBuffer, "WallComponent_ad") == 0) 		{ WallComponent_ad = buffer;}
 						if (strcmp(sBuffer, "C") == 0) 			{ C = buffer;}
-						if (strcmp(sBuffer, "x_cb_start") == 0) 	{ x_cb_start = buffer;}
-						if (strcmp(sBuffer, "x_cb_end") == 0) 		{ x_cb_end = buffer;}
-						if (strcmp(sBuffer, "x_cb_peak") == 0) 		{ x_cb_peak = buffer;}
-						if (strcmp(sBuffer, "x_da_start") == 0) 	{ x_da_start = buffer;}
-						if (strcmp(sBuffer, "x_da_peak") == 0) 		{ x_da_peak = buffer;}
-						if (strcmp(sBuffer, "x_da_end") == 0) 		{ x_da_end = buffer;}
+						if (strcmp(sBuffer, "cb_start") == 0) 		{ cb_start = buffer;}
+						if (strcmp(sBuffer, "cb_end") == 0) 		{ cb_end = buffer;}
+						if (strcmp(sBuffer, "cb_peak") == 0) 		{ cb_peak = buffer;}
+						if (strcmp(sBuffer, "da_start") == 0) 		{ da_start = buffer;}
+						if (strcmp(sBuffer, "da_peak") == 0) 		{ da_peak = buffer;}
+						if (strcmp(sBuffer, "da_end") == 0) 		{ da_end = buffer;}
 						if (strcmp(sBuffer, "CosmicRate") == 0) 	{ CosmicRate = buffer;}
 						if (strcmp(sBuffer, "Efficiency") == 0) 	{ Efficiency = buffer;}
 						if (strcmp(sBuffer, "delay") == 0) 		{ delay = buffer;}
@@ -77,12 +75,12 @@ class ReadConfFile{
 			std::cout << "FrequencyStep " << FrequencyStep << std::endl;
 			std::cout << "Efficiency    " << Efficiency << std::endl;
 			std::cout << "CosmicRate    " << CosmicRate  << std::endl;
-			std::cout << "x_cb_start    " << x_cb_start << std::endl;
-			std::cout << "x_cb_end      " << x_cb_end << std::endl;
-			std::cout << "x_cb_peak     " << x_cb_peak << std::endl;
-			std::cout << "x_da_start    " << x_da_start << std::endl;
-			std::cout << "x_da_peak     " << x_da_peak << std::endl;
-			std::cout << "x_da_end      " << x_da_end << std::endl;
+			std::cout << "cb_start    " << cb_start << std::endl;
+			std::cout << "cb_end      " << cb_end << std::endl;
+			std::cout << "cb_peak     " << cb_peak << std::endl;
+			std::cout << "da_start    " << da_start << std::endl;
+			std::cout << "da_peak     " << da_peak << std::endl;
+			std::cout << "da_end      " << da_end << std::endl;
 			std::cout << "C             " << C << std::endl;
 			std::cout << "pwall_ad      " << WallComponent_ad << std::endl;
 			std::cout << "pwall_cb      " << WallComponent_cb << std::endl;
@@ -114,12 +112,12 @@ class ReadConfFile{
 	int TotalStep;
 	double NHbar;
 	double FrequencyStep;
-	double x_cb_start;
-	double x_cb_end;
-	double x_cb_peak;
-	double x_da_start;
-	double x_da_peak;
-	double x_da_end;
+	double cb_start;
+	double cb_end;
+	double cb_peak;
+	double da_start;
+	double da_peak;
+	double da_end;
 	double CosmicRate;
 	double Efficiency;
 	double WallComponent_cb;

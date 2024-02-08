@@ -7,48 +7,52 @@
 using namespace RooFit;
 
 
-void LineShapeAnalysis(			TString directory,
-					int start,
-					int stop,
-					double Nfilter,		// Filter for the running sum
-					double fraction,	// Parameter of Constant Fraction
-					double Nsigma,		// Paratemer for t-student test
-					double Nthr,		// Parameter of Threshold algorithm
-					double thr1,
-					double thr2,
-					TString folder = "Plot/"
-					){
+void  Analysis(	TString directory,
+		int start,              // analyze trials starting from start
+		int stop,		// analyze trials until stop
+		double Nfilter,		// Filter parameter
+		double fraction,	// Parameter of Constant Fraction
+		double Nsigma,		// Paratemer for t-student test
+		double Nthr,		// Parameter of Threshold algorithm
+		double thr1,            // first threshold for forward
+		double thr2,            // second threshold for forward
+		TString folder = "Plot/"
+		){
+
 	TString ConfFile = directory + "ToyConfiguration.txt";
 	std::cout << ConfFile << std::endl;
-	//gInterpreter->GenerateDictionary("ToyParser","../Headers/ConfigurationParser.h");
-	//gInterpreter->GenerateDictionary("ReadFiles", "../Headers/AnalysisLineShape.h");
 	
+	// Read configuration values
 	ReadConfFile Params(ConfFile); // Read the values from the configuration file 
+	// Print configuration values
 	Params.Print();
-	double CosmicBackground = Params.TimeStep * Params.CosmicRate;	// Number of Cosmic Events
-	double FrequencyStep = Params.FrequencyStep;
-	double startPdf1 = Params.x_cb_start - (FrequencyStep)*(Params.BinBeforeOnset + 0.5);	// Start of frequency sweep c-b
-	double startPdf2 = Params.x_da_start - (FrequencyStep)*(Params.BinBeforeOnset + 0.5);	// Start of frequency sweep d-a
-	double SweepStep = Params.SweepStep; // number of bin for each lineshape
-	
+
 	std::vector<std::string> FileList;
-	FileList = get_oldFiles(start,stop, directory); // file list to be analyzed
+	FileList = getFiles(start,stop, directory); // file list to be analyzed
 	
+	double CosmicBackground = Params.TimeStep * Params.CosmicRate;	// Baseline
+	double FrequencyStep = Params.FrequencyStep;
+
+	// JUST FOR VISUALIZATION, uncomment to watch the data
 	// Show the first two files
-	ROOT::RDataFrame rdf("myTree", {FileList[0], FileList[1]});
-	auto hist_ctob = rdf.Filter("runNumber == 1 || type != 2")
-			.Filter("frequence <= 1000")
-			.Filter("type != 2")
-			.Histo1D({"Counts"," c to b",static_cast<int>(SweepStep),startPdf1, startPdf1 + SweepStep*FrequencyStep }, "frequence");
-	auto ctob_withCosmic = rdf.Filter("runNumber == 1 || type != 2")
-			.Filter("frequence <= 1000")
-			//.Filter("type != 2")
-			.Histo1D({"Counts"," c to b",static_cast<int>(SweepStep),startPdf1, startPdf1 + SweepStep*FrequencyStep }, "frequence");
 	
-	auto histF4 = 	rdf.Filter("runNumber == 0")
-			.Filter("frequence >= 1000")
-			.Filter("type != 2")
-			.Histo1D({"Counts"," d to a",static_cast<int>(SweepStep), startPdf2, startPdf2 + SweepStep*FrequencyStep}, "frequence");
+	double startPdf1 = Params.cb_start - (Params.FrequencyStep)*(6 + 0.5);	// Start of frequency sweep c-b
+	double startPdf2 = Params.da_start - (Params.FrequencyStep)*(6 + 0.5);	// Start of frequency sweep d-a
+	
+	ROOT::RDataFrame rdf("myTree", {FileList[0], FileList[1]});
+	auto hist_ctob = rdf.Filter("repetition == 0")
+			.Filter("mwfrequence <= 1000")
+			//.Filter("type != 2")
+			.Histo1D({"Counts"," c to b",static_cast<int>(50),startPdf1, startPdf1 + 50*Params.FrequencyStep }, "mwfrequence");
+	auto ctob_withCosmic = rdf.Filter("repetition == 0")
+			.Filter("mwfrequence <= 1000")
+			//.Filter("type != 2")
+			.Histo1D({"Counts"," c to b",static_cast<int>(50),startPdf1, startPdf1 + 50*Params.FrequencyStep }, "mwfrequence");
+	
+	auto histF4 = 	rdf.Filter("repetition == 0")
+			.Filter("mwfrequence >= 1000")
+			//.Filter("type != 2")
+			.Histo1D({"Counts"," d to a",static_cast<int>(50), startPdf2, startPdf2 + 50*Params.FrequencyStep}, "mwfrequence");
 
 	auto b = new TCanvas("b1", "Spectral lines");
 	auto pad = new TPad("pad1", "pad",0,0,1,1);
@@ -61,16 +65,16 @@ void LineShapeAnalysis(			TString directory,
 	hist_ctob->DrawClone();
 	hist_ctob->DrawClone("SAME P");
 	pad->cd(2);
-	ctob_withCosmic->SetTitle("c to b with cosmic events");
-	ctob_withCosmic->SetMarkerStyle(21);
-	ctob_withCosmic->SetMarkerColor(2);
-	ctob_withCosmic->SetLineColor(4);
-	ctob_withCosmic->DrawClone();
-	ctob_withCosmic->DrawClone("SAME P");
-
+	histF4->SetTitle("d to a with cosmic events");
+	histF4->SetMarkerStyle(21);
+	histF4->SetMarkerColor(2);
+	histF4->SetLineColor(4);
+	histF4->DrawClone();
+	histF4->DrawClone("SAME P");
+        
 	// Define some vectors to store the results
-	vector<double> MCtruth;
-	vector<double> v1_2017, v2_2017;
+	vector<double> MCtruth;         // save MC true hyperfine splitting
+	vector<double> v1_2017, v2_2017;// 
 	vector<double> v1_rev, v2_rev;
 	vector<double> v1_thr, v2_thr;
 	vector<double> v1_cfrac, v2_cfrac;
@@ -80,86 +84,92 @@ void LineShapeAnalysis(			TString directory,
 	//Onsetcb and Onset da
 	vector<double> v1_cb, v2_da;
 	
-	int count = 0;
-	// IMPLEMENTING THE TOY FOR THE ALGORITHM
+	int trial = 0;
+	// LOOP ON TRIALS
 	for(int i = 0; i < FileList.size(); i += 2){
-		count  += 1; std::cout << "Analizzo DataFrame " << count << "\n" << std::endl;
+		trial  += 1; std::cout << "Analizzo DataFrame " << trial << "\n" << std::endl;
 		
-		ROOT::RDataFrame frame("myTree", {FileList[i], FileList[i+1]});		// Load i-th dataset
-		/*
-		auto Spectra1 = frame.Filter("frequence <= 1000")
-					.Filter("type != 2 || runNumber == 1")
-					.Histo1D({"Counts","Frequence", static_cast<int>(SweepStep),startPdf1, startPdf1 + SweepStep*FrequencyStep }, "frequence");
+		ROOT::RDataFrame frame("myTree", {FileList[i], FileList[i+1]});
 		
-		auto Spectra2 = frame.Filter("frequence >= 1000")
-					.Filter("type != 2 || runNumber == 1")
-					.Histo1D({"Counts","Frequence", static_cast<int>(SweepStep), startPdf2, startPdf2 + SweepStep*FrequencyStep}, "frequence");
-		*/
-		auto Spectra1 = frame.Filter("runNumber == 1")
-							 .Filter("frequence <= 1000")
-							 //.Filter("type != 2")
-							 .Histo1D({"Counts","Frequence", static_cast<int>(SweepStep),startPdf1, startPdf1 + SweepStep*FrequencyStep }, "frequence");
+		// Extract from the dataset the starting frequency of the transition
+		auto sweepStart_cb = frame.Filter("repetition == 0")
+		                     .Filter("mwfrequence <= 1000")   // filter on the micro wave frequency to identify the c to b transition
+		                     .Take<double>("sweepStart");
+		auto actualStart_cb = sweepStart_cb.GetValue();       // get starting frequency from Rdataframe node
 		
-		auto Spectra2 = frame.Filter("runNumber == 1")
-							 .Filter("frequence >= 1000")
-							 //.Filter("type != 2")
-							 .Histo1D({"Counts","Frequence", static_cast<int>(SweepStep), startPdf2, startPdf2 + SweepStep*FrequencyStep}, "frequence");
+		// Load the data and save it in a Histogram (raw lineshape)
+		// the histogram start from actualStart_cb, with a step given by Params.FrequencyStep
+		auto SpectraCB = frame.Filter("repetition == 0")
+				.Filter("mwfrequence <= 1000")   // filter on the micro wave frequency to identify the c to b transition
+				 //.Filter("type != 2")          // uncomment to filter the background events
+				.Histo1D({"Counts","mwfrequence", static_cast<int>(Params.SweepStep),actualStart_cb[0], actualStart_cb[0] + Params.SweepStep*Params.FrequencyStep }, "mwfrequence");
 		
-		auto frame1 = frame.Filter("runNumber == 1").Filter("frequence <= 1000").Mean<double>("lineShift");
-		auto frame2 = frame.Filter("runNumber == 1").Filter("frequence >= 1000").Mean<double>("lineShift");
-		auto frame3 = frame.Filter("runNumber == 1").Filter("frequence >= 1000").Take<double>("lineShift");
-		auto frame4 = frame.Filter("runNumber == 1").Filter("frequence <= 1000").Take<double>("lineShift");
 		
-		auto lineShiftda = frame3.GetValue(); //std::cout << "LineShift d to a : " << lineShiftda[0] << std::endl;
-		auto lineShiftcb = frame4.GetValue(); //std::cout << "LineShift c to b : " << lineShiftcb[0] << std::endl;
+		// Extract from the dataset the starting frequency of the transition	
+		auto sweepStart_da = frame.Filter("repetition == 0")
+		                     .Filter("mwfrequence >= 1000")
+		                     .Take<double>("sweepStart");
+		auto actualStart_da = sweepStart_da.GetValue(); // get starting frequency from Rdataframe node
 		
-		double onset1;				// Reconstructed onset
-		double onset2;				// Reconstructed onset
+		// Load the data and save it in a Histogram (raw lineshape)
+		 // the histogram start from actualStart_cb, with a step given by Params.FrequencyStep
+		auto SpectraDA = frame.Filter("repetition == 0")
+		                 .Filter("mwfrequence >= 1000")
+		                 //.Filter("type != 2") // uncomment to filter the background events
+		                 .Histo1D({"Counts","mwfrequence", static_cast<int>(Params.SweepStep), actualStart_da[0], actualStart_da[0] + Params.SweepStep*Params.FrequencyStep}, "mwfrequence");
+
+		auto getOnsetCB = frame.Filter("repetition == 0").Filter("mwfrequence >= 1000").Take<double>("trueOnset");
+		auto getOnsetDA = frame.Filter("repetition == 0").Filter("mwfrequence <= 1000").Take<double>("trueOnset");
+		auto onsetda = getOnsetCB.GetValue(); //std::cout << "onset d to a : " << onsetda[0] << std::endl;
+		auto onsetcb = getOnsetDA.GetValue(); //std::cout << "onset c to b : " << onsetcb[0] << std::endl;
+		
+		double onset1; // Reconstructed onset
+		double onset2; // Reconstructed onset
 		
 		// SAVE THE GENERATED MONTECARLO
-		MCtruth.push_back((Params.x_da_start + lineShiftda[0] - Params.x_cb_start - lineShiftcb[0]));
+		MCtruth.push_back((onsetda[0] - onsetcb[0]));
 		
 		// THRESHOLD
-		onset1 = firstOverThreshold(Spectra1, Nthr);
-		onset2 = firstOverThreshold(Spectra2, Nthr);
-		v1_thr.push_back(onset1 - (Params.x_cb_start + lineShiftcb[0]));
-		v2_thr.push_back(onset2 - (Params.x_da_start + lineShiftda[0]));
-		diff_thr.push_back(onset2 - onset1 - (Params.x_da_start + lineShiftda[0] - Params.x_cb_start - lineShiftcb[0]));
+		onset1 = firstOverThreshold(SpectraCB, Nthr); // find onset cb
+		onset2 = firstOverThreshold(SpectraDA, Nthr); // find onset da
+		v1_thr.push_back(onset1 - (onsetcb[0]));
+		v2_thr.push_back(onset2 - (onsetda[0]));
+		diff_thr.push_back(onset2 - onset1 - (onsetda[0]  - onsetcb[0]));
 		// 2017 FOWARD
-		onset1 = algorithm_2017(Spectra1);
-		onset2 = algorithm_2017(Spectra2);
+		onset1 = algorithm_2017(SpectraCB); // find onset cb
+		onset2 = algorithm_2017(SpectraDA); // find onset da
 		
-		v1_2017.push_back(onset1 - (Params.x_cb_start + lineShiftcb[0]));
-		v2_2017.push_back(onset2 - (Params.x_da_start + lineShiftda[0])); 
-		diff_2017.push_back(onset2 - onset1 - (Params.x_da_start + lineShiftda[0] - Params.x_cb_start - lineShiftcb[0]));
+		v1_2017.push_back(onset1 - (onsetcb[0]));
+		v2_2017.push_back(onset2 - (onsetda[0])); 
+		diff_2017.push_back(onset2 - onset1 - (onsetda[0]   - onsetcb[0]));
 		// REVERSED 2017 
-		onset1 = reverse_2017(Spectra1);
-		onset2 = reverse_2017(Spectra2);
+		onset1 = reverse_2017(SpectraCB); // find onset cb
+		onset2 = reverse_2017(SpectraDA); // find onset da
 		
 		v1_cb.push_back(onset1); v2_da.push_back(onset2);
-		v1_rev.push_back(onset1 - (Params.x_cb_start + lineShiftcb[0]));
-		v2_rev.push_back(onset2 - (Params.x_da_start + lineShiftda[0]));
-		diff_rev.push_back(onset2 - onset1 - (Params.x_da_start + lineShiftda[0] - Params.x_cb_start - lineShiftcb[0]));
-		//std::cout << "onset 1 - onset 2 - MCtruth: " << onset2 - onset1 - (Params.x_da_start + lineShiftda[0] - Params.x_cb_start - lineShiftcb[0]) << std::endl;
+		v1_rev.push_back(onset1 - (onsetcb[0]));
+		v2_rev.push_back(onset2 - (onsetda[0]));
+		diff_rev.push_back(onset2 - onset1 - (onsetda[0]   - onsetcb[0]));
+		//std::cout << "onset 1 - onset 2 - MCtruth: " << onset2 - onset1 - (onsetda[0] -   - onsetcb[0]) << std::endl;
 		// CONSTANT FRACTION
-		onset1 = constFrac(Spectra1, fraction, CosmicBackground,Nfilter);
-		onset2 = constFrac(Spectra2, fraction, CosmicBackground,Nfilter);
+		onset1 = constFrac(SpectraCB, fraction, CosmicBackground,Nfilter); // find onset cb
+		onset2 = constFrac(SpectraDA, fraction, CosmicBackground,Nfilter); // find onset da
 		
-		v1_cfrac.push_back(onset1 - (Params.x_cb_start + lineShiftcb[0]));
-		v2_cfrac.push_back(onset2 - (Params.x_da_start + lineShiftda[0]));
-		diff_cfrac.push_back(onset2 - onset1 - (Params.x_da_start + lineShiftda[0] - Params.x_cb_start - lineShiftcb[0]));
+		v1_cfrac.push_back(onset1 - (onsetcb[0]));
+		v2_cfrac.push_back(onset2 - (onsetda[0]));
+		diff_cfrac.push_back(onset2 - onset1 - (onsetda[0]  - onsetcb[0]));
 		
 		std::cout << std::setprecision(10);
 		std::cout << "c to b onset: " <<  onset1 << std::endl;
 		std::cout << "d to a onset: " <<  onset2 << std::endl;
 		
 		// SUM NEIGHBORS
-		onset1 = sumNeighbors(Spectra1, Nsigma, CosmicBackground, Nfilter);
-		onset2 = sumNeighbors(Spectra2, Nsigma, CosmicBackground, Nfilter);
+		onset1 = Significance(SpectraCB, Nsigma, CosmicBackground, Nfilter); // find onset cb
+		onset2 = Significance(SpectraDA, Nsigma, CosmicBackground, Nfilter); // find onset da
 		
-		v1_neigh.push_back(onset1 - (Params.x_cb_start + lineShiftcb[0]));
-		v2_neigh.push_back(onset2 - (Params.x_da_start + lineShiftda[0]));
-		diff_neigh.push_back(onset2 - onset1 - (Params.x_da_start + lineShiftda[0] - Params.x_cb_start - lineShiftcb[0]));
+		v1_neigh.push_back(onset1 - (onsetcb[0]));
+		v2_neigh.push_back(onset2 - (onsetda[0]));
+		diff_neigh.push_back(onset2 - onset1 - (onsetda[0]  - onsetcb[0]));
 		
 	}
 	
@@ -218,7 +228,6 @@ void LineShapeAnalysis(			TString directory,
 	h3->SetLineColor(38);
 	h3->Draw();
 	pad2->cd(4);
-	hh1->Draw("COLZ");
 	
 	TString name = "2017_foward"; TString endname = ".pdf"; 
 	int numero = 0;
@@ -469,7 +478,7 @@ void LineShapeAnalysis(			TString directory,
 	g2->SetTitle("Scatter plot; MC_{truth} ;(onset_{pdf1} - onset_{pdf2}) - MC_{truth} ");
 	g2->Draw("AP");
 	*/
-	name = TString::Format("sumNeighbors_sigma%d", static_cast<int>(Nthr));
+	name = TString::Format("significance_sigma%d", static_cast<int>(Nthr));
 	numero = 0;
 	while(!gSystem->AccessPathName(folder + name + endname)){
 		numero += 1;
@@ -483,7 +492,7 @@ void LineShapeAnalysis(			TString directory,
 	h15->SetLineWidth(2);
 	h15->SetLineColor(38);
 	h15->Draw();
-	name = TString::Format("delta_sumNeighbors_sigma%d", static_cast<int>(Nthr));
+	name = TString::Format("delta_significance_sigma%d", static_cast<int>(Nthr));
 	while(!gSystem->AccessPathName(folder + name + endname)){
 		numero += 1;
 		TString add = TString::Format("_%d", numero);

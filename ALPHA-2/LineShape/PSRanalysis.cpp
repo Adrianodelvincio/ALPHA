@@ -11,151 +11,128 @@ struct Result {
 	vector<double> Mean_SquareResidual;
 } ;
 
-void PSRanalysis(	TString directory,
-					TString ConfFile,	// Configuration files
-					double Nfilter,		// Filter for the running sum
-					double fraction,	// Parameter of Constant Fraction
-					double Nsigma,		// Paratemer for t-student test
-					double Nthr,		// Parameter of Threshold algorithm
-					double thr1,
-					double thr2,
-					TString folder		// Where to save the plots
+void PSRanalysis(	TString directory,      // Directory to the data
+			TString ConfFile,	// Configuration files
+			double Nfilter,		// Filter for the running sum
+			double fraction,	// Parameter of Constant Fraction
+			double Nsigma,		// Paratemer for t-student test
+			double Nthr,		// Parameter of Threshold algorithm
+			double thr1,            // first threshold for forward/reversed
+			double thr2,            // second threshold for forward/reversed
+			TString folder		// Where to save the plots
 					){
 	
-	
+	// Read configuration values
 	ReadConfFile Params(ConfFile); // Read the values from the configuration file 
+	// Print configuration values
 	//Params.Print();
-	double CosmicBackground = Params.TimeStep * Params.CosmicRate;	// Number of Cosmic Events
-	double FrequencyStep = Params.FrequencyStep;
-	double startPdf1 = Params.x_cb_start - (FrequencyStep)*(Params.BinBeforeOnset + 0.5);	// Start of frequency sweep c-b
-	double startPdf2 = Params.x_da_start - (FrequencyStep)*(Params.BinBeforeOnset + 0.5);	// Start of frequency sweep d-a
-	double SweepStep = Params.SweepStep; // number of bin for each lineshape
 	
+	// Compute the baseline
+	double CosmicBackground = Params.TimeStep * Params.CosmicRate;	// Baseline
+	
+	// Dataset List
 	vector<string> File = {"scanMvaData3/run1_1.root", "scanMvaData3/run2_1.root"};
+	
 	// Define some vectors to store the results
-	vector<double> MCtruth;
-	vector<double> v1_cfrac, v2_cfrac;
-	vector<double> onsets;
-	vector<double> v1_sign, v2_sign;
-
-	vector<double> time;
-	vector<double> cb_time;
-	vector<double> da_time;
-	double threshold = Nthr*CosmicBackground; // threshold considering the cosmic background
+	vector<double> MCtruth;             // MC generated values
+	vector<double> v1_cfrac, v2_cfrac;  // save constant fraction results
+	vector<double> v1_sign, v2_sign;    // save significance results
 	
-	// Show the first two files
-	ROOT::RDataFrame rdf("myTree", {File[0], File[1]});
-	auto hist_ctob = rdf.Filter("repetition == 0")
-			.Filter("mwfrequence <= 1000")
-			.Histo1D({"Counts"," c to b",static_cast<int>(SweepStep),startPdf1, startPdf1 + SweepStep*FrequencyStep }, "frequence");
-	
-	auto histF4 = 	rdf.Filter("repetition == 0")
-			.Filter("mwfrequence >= 1000")
-			.Histo1D({"Counts"," d to a",static_cast<int>(SweepStep), startPdf2, startPdf2 + SweepStep*FrequencyStep}, "frequence");
-	
-	auto b = new TCanvas("b1", "Spectral lines");
-	auto pad1 = new TPad("pad1", "pad",0,0,1,1);
-	pad1->Divide(2,1,0.001,0.001); pad1->Draw();
-	pad1->cd(1);
-	hist_ctob->SetTitle("c to b without cosmic events");
-	hist_ctob->SetMarkerStyle(21);
-	hist_ctob->SetMarkerColor(2);
-	hist_ctob->SetLineColor(4);
-	hist_ctob->DrawClone();
-	hist_ctob->DrawClone("SAME P");
-	pad1->cd(2);
-	histF4->SetTitle("d to a with cosmic events");
-	histF4->SetMarkerStyle(21);
-	histF4->SetMarkerColor(2);
-	histF4->SetLineColor(4);
-	histF4->DrawClone();
-	histF4->DrawClone("SAME P");
-	//
+	vector<double> cb_time;             // time of the cb repetitions
+	vector<double> da_time;             // time of the da repetitions
 	
 	
 	// REPRODUCE PSR analysis
 	ROOT::RDataFrame frame("myTree", {File[0], File[1]}); // Load dataset
 	
 	for(int i = 0; i < Params.Repetition ; ++i){
+	
+		TString repetition = TString::Format("repetition == %d", i); // string for Selecting with RdataFrame the repetition
 		
-		TString repetition = TString::Format("repetition == %d", i); // repetition
-		auto timecb = frame.Filter(repetition.Data()).Filter("mwfrequence <= 1000").Take<double>("deltaT");
-		auto timeda = frame.Filter(repetition.Data()).Filter("mwfrequence >= 1000").Take<double>("deltaT");
+		auto timecb = frame.Filter(repetition.Data())
+		              .Filter("mwfrequence <= 1000")   // filter on the micro wave frequency to identify the c to b transition
+		              .Take<double>("deltaT");  // extract start time of cb transition
+		
+		auto timeda = frame.Filter(repetition.Data())
+		              .Filter("mwfrequence >= 1000")   // filter on the micro wave frequency to identify the d to a transition
+		              .Take<double>("deltaT");  // extract start time of da transition
+		
 		// C TO B ANALYSIS
+		auto actualtime_cb = timecb.GetValue(); // get time from Rdataframe node
+		cb_time.push_back(actualtime_cb[0]);    // save time in the vector
 		
-		auto actualtime_cb = timecb.GetValue();
+		// Extract from the dataset the starting frequency of the transition
+		auto sweepStart_cb = frame.Filter(repetition.Data())
+		                     .Filter("mwfrequence <= 1000")
+		                     .Take<double>("sweepStart");
+		auto actualStart_cb = sweepStart_cb.GetValue(); // get starting frequency from Rdataframe node
 		
-		time.push_back(actualtime_cb[0]);
-		cb_time.push_back(actualtime_cb[0]);
-		
-		// starting frequency of the sweep 
-		auto sweepStart_cb = frame.Filter(repetition.Data()).Filter("mwfrequence <= 1000").Take<double>("sweepStart");
-		auto actualStart_cb = sweepStart_cb.GetValue();
-		
-		// load the sweep in a histogram
+		// Load the data and save it in a Histogram (raw lineshape)
+		 // the histogram start from actualStart_cb, with a step given by Params.FrequencyStep
 		auto Spectra1 = frame.Filter(repetition.Data())
-		 	.Filter("frequence <= 1000")
-		 	.Histo1D({"Counts","Frequence", static_cast<int>(SweepStep),actualStart_cb[0], actualStart_cb[0] + SweepStep*FrequencyStep}, "frequence");
+		     .Filter("mwfrequence <= 1000")    // filter on the micro wave frequency to identify the c to b transition
+		     .Histo1D({"Counts","Frequence", static_cast<int>(Params.SweepStep),actualStart_cb[0], actualStart_cb[0] +  Params.SweepStep* Params.FrequencyStep}, "mwfrequence");
+
+		// ONSET FINDING
+		  // Constant fraction algorithm
+		double onset1;              // variable where to save the onset
+		onset1 = constFrac(Spectra1, fraction, CosmicBackground,Nfilter); 
+		v1_cfrac.push_back(onset1); // save the onset in a vector
 		
-		// measure and save the onset
-		double onset1;				// Reconstructed onset
-		onset1 = constFrac(Spectra1, fraction, CosmicBackground,Nfilter);
-		v1_cfrac.push_back(onset1);
-		onsets.push_back(onset1);
-		std::cout << actualtime_cb[0] << " onset cb: " << onset1  << std::endl;
+		 // significance algorithm
 		onset1 = Significance(Spectra1, Nsigma, CosmicBackground, Nfilter);
-		v1_sign.push_back(onset1);
-		
+		v1_sign.push_back(onset1); // save the onset in a vector
 		
 		// D TO A ANALYSIS
-		auto actualtime_da = timeda.GetValue();
-		time.push_back(actualtime_da[0]);
-		da_time.push_back(actualtime_da[0]);
+		auto actualtime_da = timeda.GetValue();  // get time from Rdataframe node
+		da_time.push_back(actualtime_da[0]);     // save time in the vector
 		
-		// starting frequency of the sweep 		
+		// Extract from the dataset the starting frequency of the transition	
 		auto sweepStart_da = frame.Filter(repetition.Data()).Filter("mwfrequence >= 1000").Take<double>("sweepStart");
-		auto actualStart_da = sweepStart_da.GetValue();
+		auto actualStart_da = sweepStart_da.GetValue(); // get starting frequency from Rdataframe node
 		
-		// load the sweep in a histogram		
+		// Load the data and save it in a Histogram (raw lineshape)
+		  // the histogram start from actualStart_da, with a step given by Params.FrequencyStep
 		auto Spectra2 = frame.Filter(repetition.Data())
-		 .Filter("mwfrequence >= 1000")
-		 .Histo1D({"Counts","Frequence", static_cast<int>(SweepStep), actualStart_da[0], actualStart_da[0] + SweepStep*FrequencyStep}, "frequence");
+		     .Filter("mwfrequence >= 1000")   // filter on the micro wave frequency to identify the d to a transition
+		     .Histo1D({"Counts","Frequence", static_cast<int>( Params.SweepStep), actualStart_da[0], actualStart_da[0] +  Params.SweepStep* Params.FrequencyStep}, "mwfrequence");
 		
-		// measure and save the onset
-		double onset2;	// Reconstructed onset
+		// ONSET FINDING
+		  // Constant fraction algorithm
+		double onset2;	// variable where to save the onset
 		onset2 = constFrac(Spectra2, fraction, CosmicBackground,Nfilter);
-		v2_cfrac.push_back(onset2);
-		onsets.push_back(onset2);
-		std::cout << actualtime_da[0] << " onset da: " << onset2  << std::endl;
+		v2_cfrac.push_back(onset2);  // save the onset in a vector
+
+		// ONSET FINDING
+		  // Significance algorithm
 		onset2 = Significance(Spectra2, Nsigma, CosmicBackground, Nfilter);
 		v2_sign.push_back(onset2);
-		/**/
-		// Load the shifts of the lineshapes
+		
+		// LOAD THE TRUE ONSET VALUE FROM THE DATA
 		auto frame3 = frame.Filter(repetition.Data()).Filter("mwfrequence >= 1000").Take<double>("trueOnset");
 		auto frame4 = frame.Filter(repetition.Data()).Filter("mwfrequence <= 1000").Take<double>("trueOnset");
 		auto true_da = frame3.GetValue();
 		auto true_cb = frame4.GetValue();
+		
 		// SAVE THE GENERATED MONTECARLO
-		MCtruth.push_back((true_da[0] - true_cb[0]));
+		MCtruth.push_back(true_da[0] - true_cb[0]);
 		}
    	
    	auto canvas = new TCanvas("canvas", "Constant Fraction", 1000,550);
 	auto pad = new TPad("pad", "pad",0,0,1,1);
 	
 	TMultiGraph *mg = new TMultiGraph();
-	
-	//canvas->SetLogy();
-	//gStyle->SetOptStat(1);
 	gStyle->SetPadTickX(1);
 	gStyle->SetPadTickY(1);
-	//pad2->Divide(2,2,0.001,0.001);
 	pad->Draw();
+	
+	// C to B transition
 	auto g = new TGraph(cb_time.size(), cb_time.data(), v1_cfrac.data());
 	g->SetMarkerStyle(21); // Medium Dot
 	g->SetMarkerColor(9);
 	g->SetMarkerSize(1);
 	g->SetLineStyle(0);
-	
+	// D to A transition
 	auto g2 = new TGraph(da_time.size(), da_time.data(), v2_cfrac.data());
 	g2->SetMarkerStyle(21); // Medium Dot
 	g2->SetMarkerColor(2);
