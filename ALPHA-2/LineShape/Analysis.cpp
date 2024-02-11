@@ -112,7 +112,7 @@ void  Analysis(	TString directory,
 		auto actualStart_da = sweepStart_da.GetValue(); // get starting frequency from Rdataframe node
 		
 		// Load the data and save it in a Histogram (raw lineshape)
-		 // the histogram start from actualStart_cb, with a step given by Params.FrequencyStep
+		 // the histogram start from actualStart_da, with a step given by Params.FrequencyStep
 		auto SpectraDA = frame.Filter("repetition == 0")
 		                 .Filter("mwfrequence >= 1000")
 		                 //.Filter("type != 2") // uncomment to filter the background events

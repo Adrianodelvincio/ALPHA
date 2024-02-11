@@ -37,10 +37,8 @@ delta_right = -30
 delta_left = +10
 
 # Bdrift [kHz/s]
-#Bdrift = 0.0
-#sigmaDrift = 0.
-Bdrift = 0.5
-sigmaDrift = 0.0
+Bdrift = 0
+sigmaDrift = 0
 
 # Parameters of the Cruijff function
 sigma0_cb = 8.76
