@@ -168,7 +168,7 @@ TRandom3 *r = new TRandom3();
 			for(int bin = 1; bin <= Params.SweepStep; bin++){
 				
 				// Bdrift correction for each bin
-				//onset_cb  += - TrueBdrift*(Params.TimeStep);  	// onset c to b + shift + drift
+				//onset_cb  += - TrueBdrift*(Params.TimeStep);  // onset c to b + shift + drift
 				//cbMaximum += - TrueBdrift*(Params.TimeStep);	// peak c to b + shift + drift	
 				//onset_da  += - TrueBdrift*(Params.TimeStep); 	// onset d to a + shift + drift
 				//daMaximum += - TrueBdrift*(Params.TimeStep); 	// peak d to a + shift + drift

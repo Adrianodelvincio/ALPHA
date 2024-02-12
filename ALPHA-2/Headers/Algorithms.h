@@ -216,8 +216,8 @@ double constFrac(ROOT::RDF::RResultPtr<TH1D> histpdf, double fraction, double ba
 		bin = i;		
 	}
 	// constan fraction
-	std::cout << "Constant fraction:" << std::endl;
-	std::cout << "identified frequency: " << onset << " number of bin: " <<  histpdf->GetNbinsX() << std::endl;
+	//std::cout << "Constant fraction:" << std::endl;
+	//std::cout << "identified frequency: " << onset << " number of bin: " <<  histpdf->GetNbinsX() << std::endl;
 	return onset;
 
 }
@@ -253,11 +253,10 @@ double Significance(ROOT::RDF::RResultPtr<TH1D> histpdf, double Nsigma, double b
 	double threshold;
 	
 	TH1D* h2 = (TH1D*) histpdf->Clone();
-	
 	FilterHistogram(histpdf.GetPtr(),h2, Nfilter);
 	
 	// create the filtered histogram
-	std::cout << "check filter: " << std::endl;
+	//std::cout << "check filter: " << std::endl;
 	//for(int i = 1; i < histpdf->GetNbinsX() - 1; i++){
 	//	std::cout << h2->GetBinContent(i) << std::endl;
 	//}

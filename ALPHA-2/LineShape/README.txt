@@ -81,8 +81,7 @@ Passcut dataset, The hyperfine splitting is uniformly generated around the cpt v
 
 - scanMvaData3
 
-this folder contains all the datasets generated for each MVA point. The hyperfine splitting is uniformly generated around the cpt value with interval (-30, + 10) kHz.
-The Bdrift effects are simulated, also the start of the sweep is considered with operator error.
+this folder contains all the datasets generated for each MVA point. The hyperfine splitting is uniformly generated around the cpt value with interval (-30, + 10) kHz. The Bdrift effects are simulated, also the start of the sweep is considered with operator error.
 
 -ScanMvaData4
 

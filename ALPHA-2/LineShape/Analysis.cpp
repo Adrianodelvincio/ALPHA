@@ -16,7 +16,8 @@ void  Analysis(	TString directory,
 		double Nthr,		// Parameter of Threshold algorithm
 		double thr1,            // first threshold for forward
 		double thr2,            // second threshold for forward
-		TString folder = "Plot/"
+		TString folder = "Plot/",
+		TString plotting = "false"
 		){
 
 	TString ConfFile = directory + "ToyConfiguration.txt";
@@ -33,26 +34,27 @@ void  Analysis(	TString directory,
 	double CosmicBackground = Params.TimeStep * Params.CosmicRate;	// Baseline
 	double FrequencyStep = Params.FrequencyStep;
 
-	// JUST FOR VISUALIZATION, uncomment to watch the data
+	// JUST FOR VISUALIZATION
 	// Show the first two files
 	
-	double startPdf1 = Params.cb_start - (Params.FrequencyStep)*(6 + 0.5);	// Start of frequency sweep c-b
-	double startPdf2 = Params.da_start - (Params.FrequencyStep)*(6 + 0.5);	// Start of frequency sweep d-a
+	double startPdf1 = Params.cb_start - (Params.FrequencyStep)*(5 + 0.5);	// Start of frequency sweep c-b
+	double startPdf2 = Params.da_start - (Params.FrequencyStep)*(5 + 0.5);	// Start of frequency sweep d-a
 	
 	ROOT::RDataFrame rdf("myTree", {FileList[0], FileList[1]});
 	auto hist_ctob = rdf.Filter("repetition == 0")
 			.Filter("mwfrequence <= 1000")
 			//.Filter("type != 2")
-			.Histo1D({"Counts"," c to b",static_cast<int>(50),startPdf1, startPdf1 + 50*Params.FrequencyStep }, "mwfrequence");
+			.Histo1D({"Counts"," c to b",static_cast<int>(30),startPdf1, startPdf1 + 30*Params.FrequencyStep }, "mwfrequence");
 	auto ctob_withCosmic = rdf.Filter("repetition == 0")
 			.Filter("mwfrequence <= 1000")
 			//.Filter("type != 2")
-			.Histo1D({"Counts"," c to b",static_cast<int>(50),startPdf1, startPdf1 + 50*Params.FrequencyStep }, "mwfrequence");
+			.Histo1D({"Counts"," c to b",static_cast<int>(30),startPdf1, startPdf1 + 30*Params.FrequencyStep }, "mwfrequence");
 	
-	auto histF4 = 	rdf.Filter("repetition == 0")
+	auto hist_dtoa = 	rdf.Filter("repetition == 0")
 			.Filter("mwfrequence >= 1000")
 			//.Filter("type != 2")
-			.Histo1D({"Counts"," d to a",static_cast<int>(50), startPdf2, startPdf2 + 50*Params.FrequencyStep}, "mwfrequence");
+			.Histo1D({"Counts"," d to a",static_cast<int>(30), startPdf2, startPdf2 + 30*Params.FrequencyStep}, "mwfrequence");
+
 
 	auto b = new TCanvas("b1", "Spectral lines");
 	auto pad = new TPad("pad1", "pad",0,0,1,1);
@@ -65,13 +67,36 @@ void  Analysis(	TString directory,
 	hist_ctob->DrawClone();
 	hist_ctob->DrawClone("SAME P");
 	pad->cd(2);
-	histF4->SetTitle("d to a with cosmic events");
-	histF4->SetMarkerStyle(21);
-	histF4->SetMarkerColor(2);
-	histF4->SetLineColor(4);
-	histF4->DrawClone();
-	histF4->DrawClone("SAME P");
+	hist_dtoa->SetTitle("d to a with cosmic events");
+	hist_dtoa->SetMarkerStyle(21);
+	hist_dtoa->SetMarkerColor(2);
+	hist_dtoa->SetLineColor(4);
+	hist_dtoa->DrawClone();
+	hist_dtoa->DrawClone("SAME P");
         
+        // Check filter
+        TH1D* cb_filter = (TH1D*) hist_ctob->Clone();
+        TH1D* da_filter = (TH1D*) hist_dtoa->Clone();
+	FilterHistogram(hist_ctob.GetPtr(),cb_filter, Nfilter);
+	FilterHistogram(hist_dtoa.GetPtr(),da_filter, Nfilter);
+        auto b1 = new TCanvas("b1filter", "Filter");
+        auto b1pad = new TPad("b1pad", "pad2",0,0,1,1);
+	b1pad->Divide(2,1,0.001,0.001); b1pad->Draw();
+	b1pad->cd(1);
+        cb_filter->SetTitle("c to b with cosmic events");
+	cb_filter->SetMarkerStyle(21);
+	cb_filter->SetMarkerColor(2);
+	cb_filter->SetLineColor(4);
+	cb_filter->DrawClone();
+	cb_filter->DrawClone("SAME P");
+	b1pad->cd(2);
+        da_filter->SetTitle("d to a with cosmic events");
+	da_filter->SetMarkerStyle(21);
+	da_filter->SetMarkerColor(2);
+	da_filter->SetLineColor(4);
+	da_filter->DrawClone();
+	da_filter->DrawClone("SAME P");
+
 	// Define some vectors to store the results
 	vector<double> MCtruth;         // save MC true hyperfine splitting
 	vector<double> v1_2017, v2_2017;// 
@@ -162,6 +187,9 @@ void  Analysis(	TString directory,
 		std::cout << std::setprecision(10);
 		std::cout << "c to b onset: " <<  onset1 << std::endl;
 		std::cout << "d to a onset: " <<  onset2 << std::endl;
+		// True
+		std::cout << "c to b onset: " <<  onsetcb[0] << std::endl;
+		std::cout << "d to a onset: " <<  onsetda[0] << std::endl;
 		
 		// SUM NEIGHBORS
 		onset1 = Significance(SpectraCB, Nsigma, CosmicBackground, Nfilter); // find onset cb
@@ -173,6 +201,7 @@ void  Analysis(	TString directory,
 		
 	}
 	
+	if(plotting == "true"){
 	// Plots
 	auto h1 = new TH1D("h1","onset_{algorithm} - onset_{true}", 81, -40.5, 40.5);
 	auto h2 = new TH1D("h2","onset_{algorithm} - onset_{true}", 81, -40.5 , 40.5);
@@ -500,5 +529,5 @@ void  Analysis(	TString directory,
 	}
 	delta4->SaveAs(folder + name + endname);
 	//TString name = TString::Format("sumNeighbours_sigma%d(cosmic=0)", static_cast<int>(Nthr)); TString endname = ".pdf"; 
-
+	}
 }

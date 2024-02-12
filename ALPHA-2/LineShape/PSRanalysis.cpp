@@ -1,6 +1,13 @@
 #include <iostream>
 #include "RooPlot.h"
 #include "RooHistPdf.h"
+
+//#include <Fit/Fitter.h>
+//#include <Fit/BinData.h>
+//#include <Fit/Chi2FCN.h>
+//#include <Math/WrappedMultiTF1.h>
+//#include <HFitInterface.h>
+
 #include "../Headers/AnalysisLineShape.h"
 #include "../Headers/ConfigurationParser.h"
 #include "../Headers/Algorithms.h"
@@ -117,6 +124,8 @@ void PSRanalysis(	TString directory,      // Directory to the data
 		// SAVE THE GENERATED MONTECARLO
 		MCtruth.push_back(true_da[0] - true_cb[0]);
 		}
+
+	// Combined Fit
    	
    	auto canvas = new TCanvas("canvas", "Constant Fraction", 1000,550);
 	auto pad = new TPad("pad", "pad",0,0,1,1);
