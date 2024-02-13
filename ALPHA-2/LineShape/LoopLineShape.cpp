@@ -28,7 +28,7 @@ if(mvaScan == TString::Format("true")){
 	Params.Efficiency = Efficiency;
 	Params.CosmicRate = CosmicRate;
 }
-Params.Print();
+//Params.Print();
 
 
 // Compute expected number of cosmic annihilation and background

@@ -23,6 +23,7 @@ void PSRanalysis(	TString directory,      // Directory to the data
 			TString ConfFile,	// Configuration files
 			int start,
 			int stop,
+			double sigmay,
 			double Nfilter,		// Filter for the running sum
 			double fraction,	// Parameter of Constant Fraction
 			double Nsigma,		// Paratemer for t-student test
@@ -138,7 +139,6 @@ void PSRanalysis(	TString directory,      // Directory to the data
 		
 		/////////////////////////////////////////
 		// Combined Fit
-	   	double sigmay = 3.089;
 	   	//fit to find the slope
 	   	double slope = 0;
 	   	double S1xy = 0;
@@ -197,7 +197,7 @@ void PSRanalysis(	TString directory,      // Directory to the data
 		std::setprecision(8);
 		std::cout << "intercept cb: " << q1 << " +/- " << eq1 << std::endl;
 		std::cout << "intercept da: " << q2 << " +/- " << eq2 << std::endl;
-		std::cout << "hyperfine measured : " << std::setprecision(8) << q2 - q1 << " +/- " << eq1 + eq2 << std::endl; 
+		std::cout << "hyperfine measured : " << std::setprecision(8) << q2 - q1 << " +/- " << sqrt(eq1*eq1 + eq2*eq2) << std::endl; 
 		/////////////////////////////////////////
 		
 		// save the data
@@ -257,11 +257,8 @@ void PSRanalysis(	TString directory,      // Directory to the data
 	h4->SetLineWidth(2);
 	h4->SetLineColor(38);
 	h4->Draw();
-	
-	
-	
+
 	// Combined Fit
-   	double sigmay = 3.089;
    	vector<double> ex(Params.Repetition,0);
 	vector<double> ey(Params.Repetition,sigmay);
    	//fit to find the slope
@@ -339,7 +336,7 @@ void PSRanalysis(	TString directory,      // Directory to the data
 	std::setprecision(8);
 	std::cout << "intercept cb: " << q1 << " +/- " << eq1 << std::endl;
 	std::cout << "intercept da: " << q2 << " +/- " << eq2 << std::endl;
-	std::cout << "hyperfine measured : " << std::setprecision(8) << q2 - q1 << " +/- " << eq1 + eq2 << std::endl; 
+	std::cout << "hyperfine measured : " << std::setprecision(8) << q2 - q1 << " +/- " << sqrt(eq1*eq1 + eq2*eq2) << std::endl; 
 	
 	mg->SetTitle("Onset vs. Time; time [seconds] ; frequencies ");
 	mg->Add(g);

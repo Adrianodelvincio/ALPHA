@@ -7,13 +7,13 @@
 /////////////////////////////////////////////
 // OVER THRESHOLD
 
-/*
+
 void FilterHistogram(TH1D* original, TH1D *filtered, int Nfilter){
 	for(int i = 1; i < original->GetNbinsX(); i++){
 		double sum = 0;
 		for(int j = 0; j < Nfilter; j++){
-			if(i + j < original->GetNbinsX() - 1){
-				sum += original->GetBinContent(i + j);
+			if(i + j < original->GetNbinsX() && (i - static_cast<int>(Nfilter/2) + j) > 0){
+				sum += original->GetBinContent(i - static_cast<int>(Nfilter/2) + j);
 			}else{
 				sum += 0;
 			}		
@@ -21,8 +21,9 @@ void FilterHistogram(TH1D* original, TH1D *filtered, int Nfilter){
 		filtered->SetBinContent(i, sum);
 	}
 }
-*/
+
 // border to zero
+/*
 void FilterHistogram(TH1D* original, TH1D *filtered, int Nfilter){
 	for(int i = 1; i < original->GetNbinsX(); i++){
 		double sum = 0;
@@ -36,6 +37,7 @@ void FilterHistogram(TH1D* original, TH1D *filtered, int Nfilter){
 		filtered->SetBinContent(i, sum);
 	}
 }
+*/
 
 double firstOverThreshold(ROOT::RDF::RResultPtr<TH1D> histpdf, double threshold, double background){ // WITH BASELINE
 
@@ -210,9 +212,6 @@ double constFrac(ROOT::RDF::RResultPtr<TH1D> histpdf, double fraction, double ba
 		onset = histpdf->GetBinCenter(i);
 		bin = i;		
 	}
-	// constan fraction
-	//std::cout << "Constant fraction:" << std::endl;
-	//std::cout << "identified frequency: " << onset << " number of bin: " <<  histpdf->GetNbinsX() << std::endl;
 	return onset;
 
 }
@@ -227,12 +226,6 @@ double Significance(ROOT::RDF::RResultPtr<TH1D> histpdf, double Nsigma, double b
 	
 	TH1D* h2 = (TH1D*) histpdf->Clone();
 	FilterHistogram(histpdf.GetPtr(),h2, Nfilter);
-	
-	// create the filtered histogram
-	//std::cout << "check filter: " << std::endl;
-	//for(int i = 1; i < histpdf->GetNbinsX() - 1; i++){
-	//	std::cout << h2->GetBinContent(i) << std::endl;
-	//}
 
 	//threshold =  Nfilter*background + Nsigma*sqrt(Nfilter)*sqrt(background);
 	threshold = Nsigma*Nsigma + 2*Nsigma*sqrt(Nfilter*background);
