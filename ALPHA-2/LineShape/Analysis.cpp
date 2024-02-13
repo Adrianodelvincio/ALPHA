@@ -151,10 +151,10 @@ void  Analysis(	TString directory,
 		                 //.Filter("type != 2") // uncomment to filter the background events
 		                 .Histo1D({"Counts","mwfrequence", static_cast<int>(Params.SweepStep), actualStart_da[0], actualStart_da[0] + Params.SweepStep*Params.FrequencyStep}, "mwfrequence");
 
-		auto getOnsetCB = frame.Filter("repetition == 0").Filter("mwfrequence >= 1000").Take<double>("trueOnset");
-		auto getOnsetDA = frame.Filter("repetition == 0").Filter("mwfrequence <= 1000").Take<double>("trueOnset");
-		auto onsetda = getOnsetCB.GetValue(); //std::cout << "onset d to a : " << onsetda[0] << std::endl;
-		auto onsetcb = getOnsetDA.GetValue(); //std::cout << "onset c to b : " << onsetcb[0] << std::endl;
+		auto getOnsetCB = frame.Filter("repetition == 0").Filter("mwfrequence <= 1000").Take<double>("trueOnset");
+		auto getOnsetDA = frame.Filter("repetition == 0").Filter("mwfrequence >= 1000").Take<double>("trueOnset");
+		auto onsetcb = getOnsetCB.GetValue(); //std::cout << "onset d to a : " << onsetda[0] << std::endl;
+		auto onsetda = getOnsetDA.GetValue(); //std::cout << "onset c to b : " << onsetcb[0] << std::endl;
 		
 		double onset1; // Reconstructed onset
 		double onset2; // Reconstructed onset

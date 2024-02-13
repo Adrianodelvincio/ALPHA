@@ -70,7 +70,10 @@ std::vector<double> ParamOptimization(	TString directory,
 		auto Spectra1 = frame.Filter("repetition == 0")
 			 .Filter("mwfrequence <= 1000")
 			 //.Filter("type != 2")
-			 .Histo1D({"Counts","Frequence", static_cast<int>(Params.SweepStep),actualStart_cb[0], actualStart_cb[0] + Params.SweepStep*Params.FrequencyStep }, "mwfrequence");
+			 .Histo1D({"Counts","Frequence", static_cast<int>(Params.SweepStep),
+			                                 actualStart_cb[0],
+			                                 actualStart_cb[0] + Params.SweepStep*Params.FrequencyStep },
+			                                 "mwfrequence");
 		
 		// D TO A TRANSITION
 		// Extract from the dataset the starting frequency of the transition	
@@ -84,7 +87,10 @@ std::vector<double> ParamOptimization(	TString directory,
 		auto Spectra2 = frame.Filter("repetition == 0")
 			 .Filter("mwfrequence >= 1000")
 			 //.Filter("type != 2")
-			 .Histo1D({"Counts","Frequence", static_cast<int>(Params.SweepStep), actualStart_da[0], actualStart_da[0]+ Params.SweepStep*Params.FrequencyStep}, "mwfrequence");
+			 .Histo1D({"Counts","Frequence", static_cast<int>(Params.SweepStep),
+			                                 actualStart_da[0],
+			                                 actualStart_da[0] + Params.SweepStep*Params.FrequencyStep},
+			                                 "mwfrequence");
 
 		// Load the shifts of the lineshapes
 		auto getOnsetCB = frame.Filter("repetition == 0").Filter("mwfrequence <= 1000").Take<double>("trueOnset");
