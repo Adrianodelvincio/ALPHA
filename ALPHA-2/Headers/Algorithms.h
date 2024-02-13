@@ -7,11 +7,27 @@
 /////////////////////////////////////////////
 // OVER THRESHOLD
 
+/*
 void FilterHistogram(TH1D* original, TH1D *filtered, int Nfilter){
-	for(int i = 1; i < original->GetNbinsX() - 1; i++){
+	for(int i = 1; i < original->GetNbinsX(); i++){
 		double sum = 0;
 		for(int j = 0; j < Nfilter; j++){
 			if(i + j < original->GetNbinsX() - 1){
+				sum += original->GetBinContent(i + j);
+			}else{
+				sum += 0;
+			}		
+		}
+		filtered->SetBinContent(i, sum);
+	}
+}
+*/
+// border to zero
+void FilterHistogram(TH1D* original, TH1D *filtered, int Nfilter){
+	for(int i = 1; i < original->GetNbinsX(); i++){
+		double sum = 0;
+		for(int j = 0; j < Nfilter; j++){
+			if(i + j < original->GetNbinsX() - Nfilter){
 				sum += original->GetBinContent(i + j);
 			}else{
 				sum += 0;
@@ -182,35 +198,14 @@ double constFrac(ROOT::RDF::RResultPtr<TH1D> histpdf, double fraction, double ba
 	//threshold =  Nfilter*(background + ( histpdf->GetMaximum() - background )*fraction);
 	threshold =  Nfilter*background + (maximum - Nfilter*background )*fraction;
 	
-	// nearest and cmp
-	// used to find the frequency which is the closest to the threshold, in the particular case no bin is over the threshold
-	// this is not used in the analysis
-	
-	int nearest = 0;
-	double cmp = 0;
-	
-	for(int i = 1; i <= histpdf->GetNbinsX() - Nfilter; i++){ // start the scan
-		double sum = 0;
-		// apply the filter
-		for(int j = 0; j < Nfilter; j++){
-			sum += histpdf->GetBinContent(i + j);
-		}	
-		// find the closes to the threshold
-		if(sum > cmp && sum < threshold){
-			cmp = sum;
-			nearest = static_cast<int>(i);
-		}
+	for(int i = 1; i <= histpdf->GetNbinsX() - 1; i++){ // start the scan
 		// threshold criteria
-		if(sum > threshold){
+		if( h2->GetBinContent(i) > threshold){
 			//std::cout << "identified correct bin " << i << std::endl;
 			onset = histpdf->GetBinCenter(static_cast<int>(i));
 			bin = i;
 			break;
 		}
-		// uncomment the following two lines to return the closest bin to the threshold, in case no onset is found
-		//onset = histpdf->GetBinCenter(nearest); 
-		//bin = nearest;
-		
 		// in case no onset is found, return the last bin as the onset
 		onset = histpdf->GetBinCenter(i);
 		bin = i;		
@@ -224,28 +219,6 @@ double constFrac(ROOT::RDF::RResultPtr<TH1D> histpdf, double fraction, double ba
 
 ////////////////////////////////////////
 // SIGNIFICANCE
-
-double sumNeighbors(ROOT::RDF::RResultPtr<TH1D> histpdf, double Nsigma, double background, int Nfilter){
-	
-	double onset = 0;	// onset value 
-	double bin = 0;		// bin onset
-	double threshold;
-	threshold = Nsigma*Nsigma + 2*Nsigma*sqrt(Nfilter*background);
-	for(int i = 1; i < histpdf->GetNbinsX() - 1; i++){
-		double sum = 0;
-		for(int j = 0; j < Nfilter; j++){
-			sum += histpdf->GetBinContent(i + j);
-		}
-		if(sum > threshold){
-			onset = histpdf->GetBinCenter(static_cast<int>(i));
-			bin = i;
-			break;
-		}
-		onset = histpdf->GetBinCenter(i);
-		bin = i;
-	}
-	return onset;
-}
 
 double Significance(ROOT::RDF::RResultPtr<TH1D> histpdf, double Nsigma, double background, int Nfilter){
 	double onset = 0;	// onset value 

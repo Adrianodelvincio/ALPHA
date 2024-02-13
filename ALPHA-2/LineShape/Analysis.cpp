@@ -37,8 +37,8 @@ void  Analysis(	TString directory,
 	// JUST FOR VISUALIZATION
 	// Show the first two files
 	
-	double startPdf1 = Params.cb_start - (Params.FrequencyStep)*(5 + 0.5);	// Start of frequency sweep c-b
-	double startPdf2 = Params.da_start - (Params.FrequencyStep)*(5 + 0.5);	// Start of frequency sweep d-a
+	double startPdf1 = Params.cb_start - (Params.FrequencyStep)*(8 + 0.5);	// Start of frequency sweep c-b
+	double startPdf2 = Params.da_start - (Params.FrequencyStep)*(8 + 0.5);	// Start of frequency sweep d-a
 	
 	ROOT::RDataFrame rdf("myTree", {FileList[0], FileList[1]});
 	auto hist_ctob = rdf.Filter("repetition == 0")
@@ -54,7 +54,12 @@ void  Analysis(	TString directory,
 			.Filter("mwfrequence >= 1000")
 			//.Filter("type != 2")
 			.Histo1D({"Counts"," d to a",static_cast<int>(30), startPdf2, startPdf2 + 30*Params.FrequencyStep}, "mwfrequence");
-
+	
+	// Check filter
+        TH1D* cb_filter = (TH1D*) hist_ctob->Clone();
+        TH1D* da_filter = (TH1D*) hist_dtoa->Clone();
+	FilterHistogram(hist_ctob.GetPtr(),cb_filter, Nfilter);
+	FilterHistogram(hist_dtoa.GetPtr(),da_filter, Nfilter);
 
 	auto b = new TCanvas("b1", "Spectral lines");
 	auto pad = new TPad("pad1", "pad",0,0,1,1);
@@ -67,30 +72,33 @@ void  Analysis(	TString directory,
 	hist_ctob->DrawClone();
 	hist_ctob->DrawClone("SAME P");
 	pad->cd(2);
+	cb_filter->SetTitle(TString::Format("c to b with Nfilter %d", static_cast<int>(Nfilter)));
+	cb_filter->SetMarkerStyle(21);
+	cb_filter->SetMarkerColor(2);
+	cb_filter->SetLineColor(4);
+	cb_filter->DrawClone();
+	cb_filter->DrawClone("SAME P");
+	/*
 	hist_dtoa->SetTitle("d to a with cosmic events");
 	hist_dtoa->SetMarkerStyle(21);
 	hist_dtoa->SetMarkerColor(2);
 	hist_dtoa->SetLineColor(4);
 	hist_dtoa->DrawClone();
 	hist_dtoa->DrawClone("SAME P");
+        */
         
-        // Check filter
-        TH1D* cb_filter = (TH1D*) hist_ctob->Clone();
-        TH1D* da_filter = (TH1D*) hist_dtoa->Clone();
-	FilterHistogram(hist_ctob.GetPtr(),cb_filter, Nfilter);
-	FilterHistogram(hist_dtoa.GetPtr(),da_filter, Nfilter);
         auto b1 = new TCanvas("b1filter", "Filter");
         auto b1pad = new TPad("b1pad", "pad2",0,0,1,1);
 	b1pad->Divide(2,1,0.001,0.001); b1pad->Draw();
 	b1pad->cd(1);
-        cb_filter->SetTitle("c to b with cosmic events");
+        cb_filter->SetTitle(TString::Format("c to b with Nfilter %d", static_cast<int>(Nfilter)));
 	cb_filter->SetMarkerStyle(21);
 	cb_filter->SetMarkerColor(2);
 	cb_filter->SetLineColor(4);
 	cb_filter->DrawClone();
 	cb_filter->DrawClone("SAME P");
 	b1pad->cd(2);
-        da_filter->SetTitle("d to a with cosmic events");
+        da_filter->SetTitle(TString::Format("d to a with cosmic events %d", static_cast<int>(Nfilter)));
 	da_filter->SetMarkerStyle(21);
 	da_filter->SetMarkerColor(2);
 	da_filter->SetLineColor(4);
@@ -183,21 +191,25 @@ void  Analysis(	TString directory,
 		v1_cfrac.push_back(onset1 - (onsetcb[0]));
 		v2_cfrac.push_back(onset2 - (onsetda[0]));
 		diff_cfrac.push_back(onset2 - onset1 - (onsetda[0]  - onsetcb[0]));
-		
-		std::cout << std::setprecision(10);
-		std::cout << "c to b onset: " <<  onset1 << std::endl;
-		std::cout << "d to a onset: " <<  onset2 << std::endl;
-		// True
-		std::cout << "c to b onset: " <<  onsetcb[0] << std::endl;
-		std::cout << "d to a onset: " <<  onsetda[0] << std::endl;
-		
-		// SUM NEIGHBORS
+
+		// SIGNIFICANCE
 		onset1 = Significance(SpectraCB, Nsigma, CosmicBackground, Nfilter); // find onset cb
 		onset2 = Significance(SpectraDA, Nsigma, CosmicBackground, Nfilter); // find onset da
 		
 		v1_neigh.push_back(onset1 - (onsetcb[0]));
 		v2_neigh.push_back(onset2 - (onsetda[0]));
 		diff_neigh.push_back(onset2 - onset1 - (onsetda[0]  - onsetcb[0]));
+		
+		std::cout << std::setprecision(10);
+		std::cout << "measured:" << std::endl;
+		std::cout << "c to b onset: " <<  onset1 << std::endl;
+		std::cout << "d to a onset: " <<  onset2 << std::endl;
+		std::cout << "hfs: " << onset2 - onset1 << std::endl;
+		// True
+		std::cout << "true val: " << std::endl;
+		std::cout << "c to b onset: " <<  onsetcb[0] << std::endl;
+		std::cout << "d to a onset: " <<  onsetda[0] << std::endl;
+		std::cout << "hfs: " << onsetda[0] - onsetcb[0] << std::endl;
 		
 	}
 	

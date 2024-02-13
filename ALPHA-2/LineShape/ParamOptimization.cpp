@@ -6,11 +6,6 @@
 #include "../Headers/Algorithms.h"
 using namespace RooFit;
 
-struct Result {
-	vector<double> Mean_Sigma;
-	vector<double> Mean_SquareResidual;
-} ;
-
 std::vector<double> ParamOptimization(	TString directory,
 					TString ConfFile,	// Configuration files
 					int stop,		// Number of runs to be analysed
@@ -26,11 +21,8 @@ std::vector<double> ParamOptimization(	TString directory,
 	//std::cout << ConfFile << std::endl;
 
 	ReadConfFile Params(ConfFile); // Read the values from the configuration file 
-	Params.Print();
-	double CosmicBackground = Params.TimeStep * Params.CosmicRate;	// Number of Cosmic Events
-	double FrequencyStep = Params.FrequencyStep;
-	double startPdf1 = Params.cb_start - (FrequencyStep)*(Params.BinBeforeOnset + 0.5);	// Start of frequency sweep c-b
-	double startPdf2 = Params.da_start - (FrequencyStep)*(Params.BinBeforeOnset + 0.5);	// Start of frequency sweep d-a
+	//Params.Print();
+	double CosmicBackground = Params.TimeStep * Params.CosmicRate;	// Number of Cosmic Event
 	
 	std::vector<std::string> FileList;
 	FileList = getFiles(0,stop, directory); // file list to be analyzed
@@ -56,9 +48,6 @@ std::vector<double> ParamOptimization(	TString directory,
 	vector<double> x_cfrac;
 	vector<double> x_neigh;
 	vector<double> x_sign;
-	
-	// Define the struct for the return
-	Result object;
 	
 	
 	int count = 0;
@@ -98,8 +87,8 @@ std::vector<double> ParamOptimization(	TString directory,
 			 .Histo1D({"Counts","Frequence", static_cast<int>(Params.SweepStep), actualStart_da[0], actualStart_da[0]+ Params.SweepStep*Params.FrequencyStep}, "mwfrequence");
 
 		// Load the shifts of the lineshapes
-		auto getOnsetCB = frame.Filter("repetition == 0").Filter("mwfrequence >= 1000").Take<double>("trueOnset");
-		auto getOnsetDA = frame.Filter("repetition == 0").Filter("mwfrequence <= 1000").Take<double>("trueOnset");
+		auto getOnsetCB = frame.Filter("repetition == 0").Filter("mwfrequence <= 1000").Take<double>("trueOnset");
+		auto getOnsetDA = frame.Filter("repetition == 0").Filter("mwfrequence >= 1000").Take<double>("trueOnset");
 		auto onsetda = getOnsetDA.GetValue();
 		auto onsetcb = getOnsetCB.GetValue();
 		
@@ -149,15 +138,6 @@ std::vector<double> ParamOptimization(	TString directory,
 		x_cfrac.push_back(onset2 - onset1);
 		diff_cfrac.push_back(onset2 - onset1 - (onsetda[0] - onsetcb[0]));
 		
-		
-		// SUM NEIGHBORS
-		onset1 = sumNeighbors(Spectra1, Nsigma, CosmicBackground, Nfilter);
-		onset2 = sumNeighbors(Spectra2, Nsigma, CosmicBackground, Nfilter);
-		v1_neigh.push_back(onset1 - onsetcb[0]);
-		v2_neigh.push_back(onset2 - onsetda[0]);
-		x_neigh.push_back(onset2 - onset1);
-		diff_neigh.push_back(onset2 - onset1 - (onsetda[0] - onsetcb[0]));
-		
 		// SIGNIFICANCE
 		onset1 = Significance(Spectra1, Nsigma, CosmicBackground, Nfilter);
 		onset2 = Significance(Spectra2, Nsigma, CosmicBackground, Nfilter);
@@ -173,7 +153,7 @@ std::vector<double> ParamOptimization(	TString directory,
 			mean(diff_bk_2017),	stdev(diff_bk_2017),		//with background
 			mean(diff_bk_rev),	stdev(diff_bk_rev),		//with background
 			mean(diff_cfrac),	stdev(diff_cfrac),       	//with backgrounf
-			mean(diff_neigh),	stdev(diff_neigh),      	// SUM NEIGHBORS
+			0,			0,      			// SUM NEIGHBORS
 			mean(diff_sign),	stdev(diff_sign),
 			stdev(x_thr),	Corr(x_thr,MCtruth),
 			stdev(x_2017),	Corr(x_2017,MCtruth),

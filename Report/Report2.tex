@@ -26,7 +26,7 @@
 \begin{document}
 
 \AddToShipoutPicture*
-    {\put(512.5,775){\includegraphics[width = 0.125\textwidth]{/logo/ALPHA_Logo.jpg}}}
+    {\put(520,775){\includegraphics[width = 0.125\textwidth]{logo/ALPHA_Logo.jpg}}}
 
 \maketitle
 \begin{abstract}
@@ -38,9 +38,50 @@ In this report we present a simple Monte Carlo simulation developed within the c
 
 The Hyperfine Splitting Measurement consists on the determination of the $\Delta f$ frequency transitions between $c \rightarrow b$ and $ d \rightarrow a$ states of anti-hydrogen. This measure is carried out in ALPHA-2, where the anti-hydrogen is irradiated with the light produced by a laser with variable frequency. Due to the transitions induced by the light, a certain amount of anti-hydrogen is released from the trap and annihilates. The counts of anti-hydrogen annihilation per frequency constitutes the experimental \textit{line-shape}. During the experiment, the \textit{line-shape} of the $c \rightarrow b$ and $ d \rightarrow a$ transitions are measured. The Hyperfine Splitting is determined by the frequency interval between the two \textit{line-shapes}, which is estimated taking the difference of the frequency onset of the two \textit{line-shapes}. This study is done using \textit{ROOT} and \textit{RDataFrame} framework. All the software used for the simulation can be found here: {\color{blue}{\url{https://github.com/Adrianodelvincio/ALPHA.git}}}
 
-\section{High Statistic Line-shape, Cosmic Background and Annihilation due to Residual Gas}
+\section{High Statistic Line-Shape, Cosmic Background and Annihilation due to Residual Gas}
 
-\section{Structure of the Simulation}
+The simulation developed and discussed in this note has the aim to reproduce the experimental routine to obtained the hyperfine splitting of anti-hydrogen from the series of run collected in 2023 at ALPHA-2 apparatus. It does not account atomic physics and dynamical simulation of trapped anti-hydrogen in order to reproduce the shape of anti-hydrogen transition. Instead, the simulation focuses on the experimental procedure to extract the onsets frequency from the data considering also the most important secondary effects which can influence the measurement.
+
+in this framework, the two transition are $cb$ and $da$ are simulated from model determined to fit the data contained in the high statistic run ... 
+We point out that this model is a rough estimation of the true line-shape of the transition. We expect the shape of the transition to be influenced by the power of the microwave laser used to induce it, and the model used to generate the data is only a rough approximation of how the real data look like.
+
+The model used to analyze the high statistic run is a truncated Cruiff function, which is a modified version of a gaussian which accounts for the possibility of having asymmetric tails.
+
+\begin{equation} \label{eq:Cruiff}
+mettere \, equazione
+\end{equation} 
+
+The parameters of this model are extracted from the fit to the data, and then saved in the configuration file of the simulation. The fit applied is a \textit{Maximum Likelihood fit}, with six free parameters, fixing the value of the $onset$ at $\SI{175}{ \kilo \hertz}$.
+
+\begin{figure}
+\centering
+\includegraphics[width=0.8\textwidth]{example-image-a}
+\end{figure}
+
+\subsection{Discretization of the Line-Shape}
+
+To generate the data, the baseline is removed from the model in equation \ref{eq:Cruiff}. The background events (which encompass both residual gas and cosmic events) and annihilation coming from the two transitions are generated separately and later combined together, to track the different type of annihilation. The procedure to generate the events from \ref{eq:Cruiff} needs an intermediate step, which we are referring to as \textit{discretization}. The model is discretized in a series of $50$ equally spaced points ( $y_{i}$), and then normalized so that: 
+
+\begin{equation}
+\sum_{i = 0}^{N = 50} y_{i} = 1
+\end{equation}
+
+In a real dataset, the length of the frequency sweep (aka, the number of frequencies measured) is less then the series of $50$ points used in the discretization. For the events belonging to frequencies that falls out of the sweep, they are assigned to the clearing sweep {\color{red}{(not done yet)}}.
+
+\begin{figure}
+\centering
+\includegraphics[width=0.8\textwidth]{example-image-a}
+\caption{Normalized lineshape, sampled with a frequency step of $\SI{5}{\kilo \hertz}$.}
+\end{figure}
+
+Regarding the cosmic background, they are generated flat on each frequency {\color{red}{together with the background annihilations due to residual gas}}. 
+
+\subsection{Radius Distributions}
+ 
+ 
+\section{Variables of the }
+
+
 
 \section{Onset Finding Algorithms: Definitions and Optimization}
 
@@ -118,11 +159,12 @@ If the $B_{drift}$ are small compared to $\frac{f_{step}}{t_{dwell}}$, we can si
 \end{equation}
 
 two additional terms are present, one which is proportional to the magnetic field drift, and one proportional to the square.
-\newpage
+
+
 \begin{figure}[hbtp]
 \centering
 \includegraphics[width = 0.75\textwidth]{SecondOrderTerm.pdf}
-\caption{Plot of the second order term of equation \ref{eq:Systematiceffect}. The $B_{drift}$ effects are computed for 5 possible scenarios which differentiate for the difference between the hyperfine splitting of hydrogen and anti ($\overline{hfs} - hfs$) }
+\caption{Plot of the second order term of equation \ref{eq:Systematiceffect}. The $B_{drift}$ effects are computed for 5 different possible scenarios with a different hyperfine splitting of anti-hydrogen with respect to hydrogen ($\overline{hfs} - hfs$) }
 \end{figure}
 
 

@@ -22,7 +22,7 @@ FrequencyMaxBeforeOnset = -30
 
 # cosmic rate is expressed in event/second, efficiency (point of work of the experiment)
 CosmicRate = 0.046
-Efficiency = 0.68
+Efficiency = 0.55
 
 # The following are in kHz units
 cb_start = 0
@@ -37,7 +37,7 @@ delta_right = -30
 delta_left = +10
 
 # Bdrift [kHz/s]
-Bdrift = 1
+Bdrift = 0
 sigmaDrift = 0
 
 # Parameters of the Cruijff function
