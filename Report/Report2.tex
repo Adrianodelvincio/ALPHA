@@ -53,9 +53,9 @@ mettere \, equazione
 
 The parameters of this model are extracted from the fit to the data, and then saved in the configuration file of the simulation. The fit applied is a \textit{Maximum Likelihood fit}, with six free parameters, fixing the value of the $onset$ at $\SI{175}{ \kilo \hertz}$.
 
-\begin{figure}
+\begin{figure}[hbtp]
 \centering
-\includegraphics[width=0.8\textwidth]{example-image-a}
+\includegraphics[width=0.8\textwidth]{TruncatedLineShape.pdf}
 \end{figure}
 
 \subsection{Discretization of the Line-Shape}
@@ -68,10 +68,10 @@ To generate the data, the baseline is removed from the model in equation \ref{eq
 
 In a real dataset, the length of the frequency sweep (aka, the number of frequencies measured) is less then the series of $50$ points used in the discretization. For the events belonging to frequencies that falls out of the sweep, they are assigned to the clearing sweep {\color{red}{(not done yet)}}.
 
-\begin{figure}
+\begin{figure}[hbtp]
 \centering
-\includegraphics[width=0.8\textwidth]{example-image-a}
-\caption{Normalized lineshape, sampled with a frequency step of $\SI{5}{\kilo \hertz}$.}
+\includegraphics[width=1\textwidth]{NormalizedLineshape.pdf}
+\caption{Example of normalized Line-Shape, sampled with a frequency step of $\SI{5}{\kilo \hertz}$ with 50 frequency step. The red square dot represents the fraction corresponding to a sweep of $24$ steps. The values on the x axis are }
 \end{figure}
 
 Regarding the cosmic background, they are generated flat on each frequency {\color{red}{together with the background annihilations due to residual gas}}. 
